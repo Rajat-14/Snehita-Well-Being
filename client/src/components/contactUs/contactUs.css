@@ -1,0 +1,74 @@
+.contactUs {
+  color: rgb(70, 78, 91);
+}
+.contactUs-heading-section {
+  background-color: rgb(162, 228, 255);
+  padding-top: 5vh;
+  padding-bottom: 20vh;
+}
+
+.contactUs-heading-section-contactUs {
+  font-size: max(9vh, 30px);
+  border-bottom: 1px solid #888888;
+}
+.contactUs-heading-section-tagline {
+  font-size: max(6vh, 20px);
+}
+.contactUs-heading-section-caption {
+  font-size: max(3vh, 12px);
+}
+.contactMode-section {
+  margin-top: -16vh;
+}
+.overlay {
+  position: absolute;
+  top: 0; /* Start off-screen to the left */
+  width: 0%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.3); /* Semi-transparent black overlay */
+  transition: width 0.3s ease-in-out; /* Smooth transition for the overlay */
+}
+
+/* Styles for the image inside the circular container */
+.map-link {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: 100%;
+  min-width: 250px;
+  min-height: 300px;
+  margin-left: auto;
+  margin-right: auto;
+  background-image: linear-gradient(
+      to right,
+      rgba(238, 240, 240, 0.2),
+      rgba(182, 183, 183, 0.2)
+    ),
+    url("./assets/map_2.png");
+  background-position: center center;
+  background-size: cover;
+  background-repeat: no-repeat;
+}
+.map-link:hover .overlay {
+  width: 100%; /* Slide in overlay to the right on hover */
+}
+.map-image {
+  width: 100%;
+  min-width: 250px;
+  min-height: 200px;
+  z-index: 20;
+  margin-left: auto;
+  margin-right: auto;
+}
+@media screen and (max-width: 450px) {
+  .contactUs-heading-section-contactUs {
+    font-size: max(6vh, 30px);
+  }
+  .contactUs-heading-section-tagline {
+    font-size: max(5vh, 20px);
+  }
+  .contactUs-heading-section-caption {
+    /* font-size: max(3vh, 12px); */
+    visibility: hidden;
+  }
+}

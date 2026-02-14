@@ -1,0 +1,75 @@
+.header-custom {
+  background-color: white;
+  box-shadow: 0 4px 18px 0 rgba(0, 0, 0, 0.12),
+    0 7px 10px -5px rgba(0, 0, 0, 0.15);
+}
+.sticky-top {
+  position: sticky;
+  top: 0;
+  z-index: 1020;
+}
+.custom-brandName img {
+  width: 80px;
+  height: 80px;
+}
+.page-nav-item{
+  background-color: #ebf3f7;
+  border-bottom: 4px solid #20b3f7;
+  border-radius: 5px;
+  color: white;
+}
+.page-nav-item-hover:hover{
+  background-color: #d8ecf6;
+  /* border-bottom: 4px solid #20b3f7; */
+  border-radius: 5px;
+  color: white;
+}
+.page-nav-item-hover a{
+  font-size: 1em;
+}
+.loginButton {
+  font-size: 16px;
+  /* justify-content: center; */
+  margin-top: 3px;
+  padding: 0.5rem 1.5rem;
+  cursor: pointer;
+  user-select: none;
+  border: none;
+  border-radius: 0.4rem;
+  box-sizing: border-box;
+  color: #ffffff;
+  background-color: #20b3f7;
+  text-decoration: none;
+  transition: background-image 0.5s ease-in-out;
+}
+
+.loginButton:hover {
+  background-image: linear-gradient(-180deg, #1ea4dd 0%, #17759c 80%);
+}
+
+@media screen and (max-width: 1300px) {
+    .loginButton {
+      padding: .4rem 2rem;
+      margin-left: 9px;
+      margin-top: 15px;
+      
+    }
+    .page-nav-item-hover a{
+      font-size: 0.8em;
+    }
+  }
+
+@media screen and (max-width: 400px) {
+  .custom-brandName {
+    font-size: 18px !important;
+  }
+  .custom-brandName img {
+    width: 60px;
+    height: 60px;
+  }
+}
+
+
+.activessss{
+  color: blue;
+}

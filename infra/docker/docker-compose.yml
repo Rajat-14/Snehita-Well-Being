@@ -1,0 +1,22 @@
+services:
+
+  backend:
+    build:
+      context: ../../server
+      dockerfile: ../infra/docker/backend/Dockerfile
+    container_name: snehita_backend
+    env_file:
+      - ../../server/.env
+    ports:
+      - "8000:8000"
+    command: sh -c "sleep 10 && node seed.js && node app.js"
+
+  frontend:
+    build:
+      context: ../../client
+      dockerfile: ../infra/docker/frontend/Dockerfile
+    container_name: snehita_frontend
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend

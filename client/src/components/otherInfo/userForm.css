@@ -1,0 +1,209 @@
+
+
+.formContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh; /* Use min-height for responsiveness */
+  height: auto;
+  background: url(appointment.png);
+  background-color: #f0f0f0;
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center;
+}
+
+.formWrapper {
+  position: absolute;
+  top: 40%; /* Center vertically */
+  left: 50%; /* Center horizontally */
+  transform: translate(-50%, -50%);
+  width: 100%; /* Adjust width for responsiveness */
+  max-width: 1300px; /* Set a max width */
+  height: auto; /* Allow the height to adjust based on content */
+  overflow-y: auto; /* Enable vertical scrolling if needed */
+  background: #fff;
+  box-shadow: 0 15px 50px rgba(0, 0, 0, 0.6);
+  padding: 30px;
+  box-sizing: border-box;
+}
+
+.formContent {
+  width: 100%;
+}
+
+.formContent h2 {
+  text-align: center;
+  margin-bottom: 20px; /* Adjust margin for smaller screens */
+  font-size: 24px; /* Increase font size for visibility */
+}
+
+.inputRow {
+  display: flex;
+  flex-wrap: wrap; /* Allow flex items to wrap */
+  justify-content: space-between;
+  margin-bottom: 30px;
+ 
+  
+
+}
+
+.inputField {
+  width: 45%;
+  position: relative;
+  margin-bottom: 25px;
+  /* margin-right: 3%; */
+  
+}
+
+
+
+
+.icon {
+  position: absolute;
+  top: 30%;
+  left: 0px;
+  transform: translateY(-60%);
+  transform: translateX(-80%);
+  font-size: 17px;
+  color: #555;
+}
+
+.inputField input,
+.inputField select,
+.inputField textarea {
+  width: 100%;
+  
+  padding: 10px;
+  border: none;
+  border-bottom: 1px solid #555;
+  outline: none;
+  background: none;
+  color: #555;
+  font-size: 16px; 
+}
+
+.inputField input[type="submit"] {
+  background-color: #138496;
+  color: #fff;
+  font-size: 18px;
+  border-radius: 5px;
+  cursor: pointer;
+  align-items: center;
+  display: flex;
+  justify-content: center;
+}
+
+.inputField textarea {
+  resize: vertical;
+}
+
+.icon.required {
+  color: red;
+  margin-left: 5px;
+}
+
+.spinner {
+  border: 4px solid rgba(0, 0, 0, 0.1);
+  border-left-color: #7983ff;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  animation: spin 1s linear infinite;
+  display: inline-block;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.buttonSubmit {
+  width: 100%;
+  padding: 10px 0;
+  border: none;
+  outline: none;
+  background-color: #138496;
+  color: #fff;
+  font-size: 18px;
+  cursor: pointer;
+  border-radius: 5px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.buttonSubmit:hover {
+  background-color: #0a6275;
+}
+
+.buttonSubmit .spinner {
+  margin-right: 12px;
+}
+.formContent h3{
+  font-size: 16px;
+}
+.formContent p{
+  font-size: 13px;
+}
+@media screen and (max-width: 1600px) {
+  .formWrapper {
+    position: relative;
+    max-width: 90%; 
+    width: 1000px; 
+    margin: auto;
+    transform: none;
+    top: auto;
+    left: auto;
+    height: auto;
+    overflow-y: auto;
+    padding: 30px;
+    box-sizing: border-box;
+  }
+  .formContainer {
+    min-height: 110vh; /* Adjust container height for smaller screens */
+  }
+  .formContent h3{
+    font-size: 15px;
+  }
+  .formContent p{
+    font-size: 12px;
+  }
+  
+}
+
+@media screen and (max-width: 600px) {
+  .inputField {
+    width: 100%; /* Full width for input fields */
+    margin-bottom: 15px;
+  }
+
+  .formContainer {
+    min-height: 120vh; /* Adjust container height for smaller screens */
+  }
+  .formContent h3{
+    font-size: 13px;
+  }
+  .formContent p{
+    font-size: 10px;
+  }
+  .inputRow {
+    flex-direction: column; 
+    justify-content: space-between; 
+    margin-bottom: 10px; 
+  }
+
+  .inputField {
+    margin-right: 0; /* Remove margin for individual input fields */
+  }
+  .icon {
+    font-size: 14px; /* Decrease font size of the icon */
+  }
+
+  .buttonSubmit {
+    font-size: 16px; /* Decrease font size for smaller screens */
+  }
+}
+
+

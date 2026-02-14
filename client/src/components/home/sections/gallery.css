@@ -1,0 +1,51 @@
+@import url('https://fonts.googleapis.com/css2?family=Ubuntu:ital,wght@0,300;0,400;0,500;0,700;1,300;1,400;1,500;1,700&display=swap');
+.gallery{
+    background:linear-gradient( 
+        175deg,
+        rgba(242, 247, 250, 0.9),
+        rgba(47, 147, 186, 0.9)
+      ), url(
+        "../../assets/IITRopar/iitrpr.jpg"
+      );
+    padding-top: 50px;
+    padding-bottom: 50px;
+    background-position: center;
+        background-size: cover;
+    color: white;
+    box-shadow: 1px 1px 1px 1px;
+}
+
+.gallery-caption{
+    font-size: xx-large;
+}
+@media screen and (max-width:1200px) {
+    .gallery-caption{
+        font-size: x-large;
+    }
+}
+@media screen and (max-width:767px) {
+    .gallery-caption{
+        font-size: larger;
+    }
+}
+@media screen and (max-width:567px) {
+    .gallery-caption{
+        font-size: large;
+    }
+}
+@media screen and (max-width:400px) {
+    .gallery-caption{
+        font-size: medium;
+    }
+}
+
+.gallery-caption span{
+    color: rgb(21, 1, 1);
+    font-size: 3rem;
+    text-shadow: 1px 1px 2px;
+}
+@media screen and (max-width:767px) {
+    .gallery-caption span{
+        font-size: 2rem;
+    }
+}

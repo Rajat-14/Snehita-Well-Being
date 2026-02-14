@@ -1,0 +1,60 @@
+.contactCard{
+    border-radius: 7px;
+    box-shadow: 2px 2px 7px #b9b9b9;
+    min-width: 200px;
+    max-width: 350px;
+    width: 25vw;
+    height: 55vh;
+    min-height: 120px;
+    max-height: 330px;
+    transform: scale(1);
+    transition: all 0.2s ease-in-out;
+}
+.contact-mode-name{
+    font-size:40px;
+}
+.contact-mode-icon{
+    font-size: 80px;
+}
+.hover {
+    transform: scale(1.025);
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
+  }
+@media screen and (max-width:1200px) {
+    .contactCard{
+        min-width: 150px;
+        max-width: 350px;
+        width: 20vw;
+        height: 35vh;
+    }
+    .contact-mode-name{
+        font-size: 30px;
+    }
+}
+@media screen and (max-width:1000px) {
+    .contactCard{
+        min-width: 150px;
+        max-width: 350px;
+        width: 18vw;
+        height: 35vh;
+    }
+    .contact-mode-name{
+        font-size: 20px;
+    }
+    .contact-mode-icon{
+        font-size: 60px;
+    }
+}
+@media screen and (max-width:522px) {
+    .contactCard{
+        width: 70vw;
+        height: 35vh;
+    }
+    .contact-mode-name{
+        font-size: 25px;
+    }
+    .contact-mode-icon{
+        font-size: 60px;
+    }
+}
+  

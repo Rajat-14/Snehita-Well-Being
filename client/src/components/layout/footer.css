@@ -1,0 +1,13 @@
+.footer-custom{
+    color: black;
+    background-color: rgb(118, 206, 247);
+    bottom: 0px;
+}
+.footer-title{
+    padding: 2px 0px;
+    /* margin: 0px 30px; */
+    border-bottom: 0px solid black;
+}
+.footer-item{
+    margin-left: 3px;
+}

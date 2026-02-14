@@ -1,0 +1,11 @@
+.message-custom{
+    color: rgb(29, 95, 110);
+}
+.message-custom div p{
+    font-size: larger;
+}
+@media  screen and (max-width:550px) {
+    .message-custom div p{
+        font-size: medium;
+    }
+}

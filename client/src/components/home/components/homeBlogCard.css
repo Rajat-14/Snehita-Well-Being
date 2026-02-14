@@ -1,0 +1,12 @@
+.card{
+    border: none;
+    transform: scale(1);
+    transition: all 0.2s ease-in-out;
+    /* width: 25rem; */
+}
+.blogcard{
+    width: fit-content;
+}
+.card:hover{
+    transform: scale(1.025);
+}

@@ -1,0 +1,19 @@
+.tele-manas img{
+    width: 100%;
+}
+.phoneNo-tele-manas{
+    padding: 0.15rem 0;
+    align-items: center;
+    background-color: rgb(233,128,55);
+    border-radius: 20px;
+    width: 250px;
+    margin: 0.25rem 0;
+    font-size: larger;
+}
+@media screen and (max-width:500px) {
+    .phoneNo-tele-manas{
+        padding: 0.05rem 0;
+        border-radius: 15px;
+        font-size: medium;
+    }
+}

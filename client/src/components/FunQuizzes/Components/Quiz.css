@@ -1,0 +1,165 @@
+/* Quiz.css */
+
+  
+  .quiz-page {
+    /*background-image: url('../assets/bg.jpeg'); /* Replace 'path/to/your/image.jpg' with the actual path to your image 
+    background-size: cover; /* This will make the image cover the entire background 
+    background-position: center;*/
+   /* background-color: rgb(235,251,246);*/
+     /* Example background color */
+    /* background-image: linear-gradient(135deg, #fff, #9eecf1);*/
+     padding: 15px;
+     height: calc(100vh - 5px); /* Adjust the padding accordingly */
+     display: flex;
+    justify-content: center;
+    align-items: stretch;
+    animation: backgroundAnimation 10s infinite alternate;
+    background-size: 200% 200%;
+    overflow:auto ;
+  }
+  
+
+  /* Define the animation */
+@keyframes backgroundAnimation {
+  0% {
+      background-position: 0% 0%;
+  }
+  100% {
+      background-position: 100% 100%;
+  }
+}
+  
+  .result {
+    text-align: center;
+    margin-top: 20px;
+    margin-bottom: 20px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  }
+  
+  .custom-question-card {
+    background-color: #fff;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    overflow-y: auto;
+    overflow-x: auto;
+    width: 80vw; /* Set width to 100% minus the padding */
+    max-width: none; /* Remove the maximum width */
+    box-sizing: border-box; /* Ensure padding and border are included in the width */
+    transform: scale(1);
+    transition: all 0.2s ease-in-out;
+    
+    
+    /*align-items:center;
+    justify-content: center;*/
+  }
+  /*
+  @media (max-width: 1200px) {
+    .custom-question-card {
+      width: calc(90 - 30px); /* Adjust width for medium-large screens 
+    }
+  }
+  
+  @media (max-width: 768px) {
+    .custom-question-card {
+      width: calc(100% - 30px); /* Adjust width for medium screens 
+    }
+  }
+  
+  @media (max-width: 576px) {
+    .custom-question-card {
+      width: calc(100% - 30px); /* Adjust width for smaller screens 
+    }
+  }*/
+  
+  
+  /* buttonStyles.css */
+
+.translucent-button {
+  background-color: rgba(248, 240, 240, 0.945); /* translucent white background */
+  border: 1px  rgba(253, 249, 249, 0.642); /* translucent white border */
+  color: grey; /* text color */
+  padding: 5px 10px; /* padding for button content */
+  border-radius: 5px; /* border radius for rounded corners */
+  cursor: pointer; /* cursor style */
+}
+
+.suggestion-card{
+  background-color:rgba(221, 240, 241, 0.87);
+}
+
+ul {
+  list-style-type: none;
+}
+
+  .options {
+    display: flex;
+    flex-direction: column;
+    margin-top: 10px;
+    
+  }
+
+  .options button {
+    margin-bottom: 5px;
+  }
+  
+
+  .result p {
+    margin-top: 10px;
+  }
+
+  .selected {
+    background-color: rgb(4, 69, 92) !important;
+    color: #fff !important;
+  }
+  
+  .button-container {
+    text-align: center;
+    margin-top: 20px;
+  }
+
+  .back-button {
+    background-color: translucent;
+   
+  border: 1px faded rgba(253, 249, 249, 0.642); /* translucent white border */
+    color:grey;
+    padding: 1px;
+    font: inherit;
+    cursor: pointer;
+     /* Initial color */
+  }
+  
+  .translucent-button:hover {
+    color: red; /* Color change on hover */
+  }
+  
+  /*FOR FUN QUIZZES HOME PAGE*/
+  /* Import Bootstrap styles (assuming you want them) */
+@import "~bootstrap/dist/css/bootstrap.min.css";
+
+/* Custom styles */
+
+.body-content {
+  background-color: transparent; /* Add a light background color */
+   /* Add some padding for content */
+}
+
+.breadcrumbs-panel {
+  background-color: transparent; /* Lighten the breadcrumb panel background */
+  /* Add some padding for breadcrumbs */
+}
+
+.section-head {
+  text-align: center; /* Center the title */
+}
+
+.font-weight-bold {
+  font-weight: bold;
+}
+
+.font-italic {
+  font-style: italic;
+}
+
+
+/* Bootstrap class overrides (optional) */

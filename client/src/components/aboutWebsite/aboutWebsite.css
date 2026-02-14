@@ -1,0 +1,12 @@
+.page-heading2 {
+    margin: auto !important;
+    border-bottom: 1.5px solid #dddddd !important;
+    width: 300px !important;
+    margin-bottom: 40px !important;
+}
+.page-head{
+    margin: auto;
+    text-align: center;
+    font-size: 26px;
+    margin-bottom: 10px;
+}

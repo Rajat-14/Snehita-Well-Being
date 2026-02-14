@@ -1,0 +1,18 @@
+
+.feedbackInput{
+    height: 200px;
+    word-wrap: break-word;
+    font-size: 3vh;
+    background-color: rgb(199, 228, 237);
+    text-decoration-color: white;
+    border: solid 4px rgb(206, 239, 250);
+    border-radius: 12px;
+    box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.272);
+}
+.feedback{
+    background:linear-gradient(
+        to bottom,
+        rgba(90, 139, 155, 0.731),
+        rgb(109, 160, 183)
+      );
+}

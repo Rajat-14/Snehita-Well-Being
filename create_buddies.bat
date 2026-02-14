@@ -1,0 +1,23 @@
+@echo off
+REM Create placeholder SVG files for all team buddies
+
+cd server\uploads\team\buddies
+
+echo ^<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 200 200"^>^<rect width="200" height="200" fill="#4ECDC4"/^>^<circle cx="100" cy="70" r="35" fill="white" opacity="0.8"/^>^<ellipse cx="100" cy="150" rx="50" ry="40" fill="white" opacity="0.8"/^>^</svg^> > KATYAYNITIWARI.jpg
+echo ^<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 200 200"^>^<rect width="200" height="200" fill="#45B7D1"/^>^<circle cx="100" cy="70" r="35" fill="white" opacity="0.8"/^>^<ellipse cx="100" cy="150" rx="50" ry="40" fill="white" opacity="0.8"/^>^</svg^> > AswathiPrakash.jpg
+echo ^<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 200 200"^>^<rect width="200" height="200" fill="#FFA07A"/^>^<circle cx="100" cy="70" r="35" fill="white" opacity="0.8"/^>^<ellipse cx="100" cy="150" rx="50" ry="40" fill="white" opacity="0.8"/^>^</svg^> > ARNAVKHARBANDA.jpg
+echo ^<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 200 200"^>^<rect width="200" height="200" fill="#98D8C8"/^>^<circle cx="100" cy="70" r="35" fill="white" opacity="0.8"/^>^<ellipse cx="100" cy="150" rx="50" ry="40" fill="white" opacity="0.8"/^>^</svg^> > NishantYadav.jpg
+echo ^<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 200 200"^>^<rect width="200" height="200" fill="#F7DC6F"/^>^<circle cx="100" cy="70" r="35" fill="white" opacity="0.8"/^>^<ellipse cx="100" cy="150" rx="50" ry="40" fill="white" opacity="0.8"/^>^</svg^> > VijayVaishampayan.jpg
+echo ^<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 200 200"^>^<rect width="200" height="200" fill="#BB8FCE"/^>^<circle cx="100" cy="70" r="35" fill="white" opacity="0.8"/^>^<ellipse cx="100" cy="150" rx="50" ry="40" fill="white" opacity="0.8"/^>^</svg^> > BhushanVanjiwale.jpg
+echo ^<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 200 200"^>^<rect width="200" height="200" fill="#85C1E2"/^>^<circle cx="100" cy="70" r="35" fill="white" opacity="0.8"/^>^<ellipse cx="100" cy="150" rx="50" ry="40" fill="white" opacity="0.8"/^>^</svg^> > MANAVCHAUHAN.jpg
+echo ^<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 200 200"^>^<rect width="200" height="200" fill="#F8B88B"/^>^<circle cx="100" cy="70" r="35" fill="white" opacity="0.8"/^>^<ellipse cx="100" cy="150" rx="50" ry="40" fill="white" opacity="0.8"/^>^</svg^> > SnehaShah.jpg
+echo ^<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 200 200"^>^<rect width="200" height="200" fill="#B8E6D5"/^>^<circle cx="100" cy="70" r="35" fill="white" opacity="0.8"/^>^<ellipse cx="100" cy="150" rx="50" ry="40" fill="white" opacity="0.8"/^>^</svg^> > AdityaBadoni.jpg
+echo ^<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 200 200"^>^<rect width="200" height="200" fill="#F5A9B8"/^>^<circle cx="100" cy="70" r="35" fill="white" opacity="0.8"/^>^<ellipse cx="100" cy="150" rx="50" ry="40" fill="white" opacity="0.8"/^>^</svg^> > ShivamKainth.jpg
+echo ^<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 200 200"^>^<rect width="200" height="200" fill="#C39BD3"/^>^<circle cx="100" cy="70" r="35" fill="white" opacity="0.8"/^>^<ellipse cx="100" cy="150" rx="50" ry="40" fill="white" opacity="0.8"/^>^</svg^> > ShyamPatil.jpg
+echo ^<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 200 200"^>^<rect width="200" height="200" fill="#82E0AA"/^>^<circle cx="100" cy="70" r="35" fill="white" opacity="0.8"/^>^<ellipse cx="100" cy="150" rx="50" ry="40" fill="white" opacity="0.8"/^>^</svg^> > Ankush.jpg
+echo ^<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 200 200"^>^<rect width="200" height="200" fill="#F5B7B1"/^>^<circle cx="100" cy="70" r="35" fill="white" opacity="0.8"/^>^<ellipse cx="100" cy="150" rx="50" ry="40" fill="white" opacity="0.8"/^>^</svg^> > MAYANKKUMAR.jpg
+echo ^<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 200 200"^>^<rect width="200" height="200" fill="#D7BDE2"/^>^<circle cx="100" cy="70" r="35" fill="white" opacity="0.8"/^>^<ellipse cx="100" cy="150" rx="50" ry="40" fill="white" opacity="0.8"/^>^</svg^> > PiyushKumar.jpg
+echo ^<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 200 200"^>^<rect width="200" height="200" fill="#FADBD8"/^>^<circle cx="100" cy="70" r="35" fill="white" opacity="0.8"/^>^<ellipse cx="100" cy="150" rx="50" ry="40" fill="white" opacity="0.8"/^>^</svg^> > ShrenikNandre.jpg
+
+echo All buddy placeholder images created!
+cd ../../../

@@ -1,0 +1,101 @@
+/* LoadingPage.css */
+.loading-page{
+  height: 100vh;
+  width: 100vw;
+  background-color: rgb(219, 218, 218);
+  display:flex;
+  justify-content:center;
+  align-items:center;
+}
+.loading-welcome-first .loading-welcome-second {
+  display:inline-block;
+  overflow:hidden;
+  white-space:nowrap;
+}
+
+.loading-welcome-first {    /* For increasing performance 
+                       ID/Class should've been used. 
+                       For a small demo 
+                       it's okaish for now */
+  animation: showup 1s infinite;
+}
+
+.loading-welcome-second {
+  width:0px;
+  animation: reveal 1s infinite;
+}
+
+.loading-welcome-second span {
+  margin-left:-355px;
+  animation: slidein 1s infinite;
+}
+
+@keyframes showup {
+    0% {opacity:0;}
+    20% {opacity:1;}
+    80% {opacity:1;}
+    100% {opacity:0;}
+}
+
+@keyframes slidein {
+    0% { margin-left:-800px; }
+    20% { margin-left:-800px; }
+    35% { margin-left:0px; }
+    100% { margin-left:0px; }
+}
+
+@keyframes reveal {
+    0% {opacity:0;width:0px;}
+    20% {opacity:1;width:0px;}
+    30% {width:400px;}
+    80% {opacity:1;}
+    100% {opacity:0;width:400px;}
+}
+.loader {
+    /* padding-top: 40vh; */
+  }
+  .loader h2 {
+    margin-bottom: 20px;
+  }
+  
+  .spinner-border {
+    color: #007bff; 
+  }
+  
+  .half-spinner {
+    width: 50px;
+    height: 50px;
+    border: 3px solid #007bff;
+    border-top: 3px solid transparent;
+    border-radius: 50%;
+    animation: spin 0.5s linear 0s infinite;
+  }
+  
+  .completed {
+    font-size: 2rem;
+    color: #03fc4e;
+  
+    animation: bigger 1s linear;
+  }
+  
+  @keyframes bigger {
+    from {
+      transform: scale(0);
+    }
+    to {
+      transform: scale(2);
+    }
+  }
+  
+  @keyframes spin {
+    from {
+      transform: rotate(0);
+    }
+    to {
+      transform: rotate(360deg);
+    }
+  }
+  
+  
+  
+  

@@ -1,0 +1,135 @@
+.area{
+    background: #88dde7;  
+    background: -webkit-linear-gradient(to left, #e2fafa, #85f0f4);  
+    width: 100%;
+    position: fixed;
+    height: 0;
+    z-index: -1;
+}
+
+.circles{
+    position: sticky;
+    top: 0vh;
+    left: 0;
+    width: 100%;
+    height: 0%;
+}
+
+.circles li{
+    position: absolute;
+    display: block;
+    list-style: none;
+    width: 20px;
+    height: 20px;
+    background: rgba(68, 216, 242, 0.605);
+    animation: animate 25s linear infinite;
+    bottom: -150px;
+    z-index:0;
+    overflow: hidden;
+}
+
+.circles li:nth-child(1){
+    
+    left: -70px;
+    width: 150px;
+    height: 150px;
+    animation-delay: 0s;
+    background: rgba(242, 210, 68, 0.605);
+    animation-duration: 18s;
+}
+
+
+
+.circles li:nth-child(3){
+    left: 20%;
+    width: 50px;
+    height: 50px;
+    /* animation-delay: 2s; */
+    background: rgba(230, 67, 230, 0.605);
+    animation-duration: 10s;
+}
+
+.circles li:nth-child(4){
+    left: 34%;
+    width: 30px;
+    height: 30px;
+    /* animation-delay: 1s; */
+    background: rgba(57, 238, 96, 0.605);
+    animation-duration: 18s;
+}
+
+/* .circles li:nth-child(5){
+    left: 50%;
+    width: 60px;
+    height: 60px;
+    animation-delay: 2s;
+    animation-duration: 8s;
+} */
+
+.circles li:nth-child(6){
+    left: 75%;
+    width: 40px;
+    height: 40px;
+    /* animation-delay: 4s; */
+    background: rgba(71, 68, 242, 0.605);
+    animation-duration: 15s;
+}
+
+/* .circles li:nth-child(7){
+    left: 85%;
+    width: 20px;
+    height: 20px;
+    animation-delay: 2s;
+    animation-duration: 18s;
+    
+} */
+
+.circles li:nth-child(8){
+    left: 92%;
+    width: 15px;
+    height: 15px;
+    /* animation-delay: 2s; */
+    background: rgba(73, 192, 52, 0.605);
+    animation-duration: 21s;
+}
+
+.circles li:nth-child(11){
+    
+    left: 98%;
+    width: 25px;
+    height: 25px;
+    /* animation-delay: 3s; */
+    animation-duration: 17s;
+    background: rgba(245, 66, 30, 0.605);
+}
+.circles li:nth-child(12){
+    left: 97%;
+    width: 150px;
+    height: 150px;
+    animation-delay: 0s;
+    animation-duration: 10s;
+    background: rgba(65, 248, 144, 0.605);
+}
+.circles li:nth-child(13){
+    left: 64%;
+    width: 15px;
+    height: 15px;
+    animation-delay: 0s;
+    animation-duration: 8s;
+}
+
+@keyframes animate {
+
+    0%{
+        transform: translateY(0) rotate(0deg);
+        opacity: 0.5;
+        border-radius: 0;
+    }
+
+    100%{
+        transform: translateY(-100vh) rotate(720deg);
+        opacity: 0.25;
+        border-radius: 60%;
+    }
+
+}
