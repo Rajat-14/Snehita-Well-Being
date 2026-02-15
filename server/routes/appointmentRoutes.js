@@ -7,5 +7,6 @@ router.post("/create", authenticate, appointmentController.createAppointment);
 router.get("/data", authenticate, appointmentController.getAppointments);
 router.post("/send-email", authenticate, appointmentController.sendEmail);
 router.get("/bookedSlots", authenticate, appointmentController.getBookedSlots);
+router.get("/counselor/appointments", authenticate, appointmentController.getCounselorAppointments);
 
 module.exports = router;

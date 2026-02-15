@@ -17,6 +17,6 @@ services:
       dockerfile: ../infra/docker/frontend/Dockerfile
     container_name: snehita_frontend
     ports:
-      - "3000:80"
+      - "3001:80"
     depends_on:
       - backend

@@ -31,10 +31,10 @@ const Appointment = () => {
   const [errors, setErrors] = useState({});
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [previousAppointments, setPreviousAppointments] = useState([]);
+  const [counselorAppointments, setCounselorAppointments] = useState([]);
 
   useEffect(() => {
     getUser();
-    fetchPreviousAppointments();
   }, []);
 
   useEffect(() => {
@@ -76,10 +76,19 @@ const Appointment = () => {
         withCredentials: true,
       });
 
-      console.log("response ", response);
       localStorage.setItem("token", response.data.token);
-      console.log("logged issue", response);
       setUserdata(response.data.user);
+
+      // Fallback to localStorage if API doesn't return role (or returns client default)
+      // But verify API response structure first in logs
+      const role = response.data.user.role || localStorage.getItem("role");
+
+      if (role === 'counselor') {
+        fetchCounselorAppointments(response.data.user.person_name);
+      } else {
+        fetchPreviousAppointments();
+      }
+
     } catch (error) {
       toast.error("Please Login First!");
       setTimeout(() => {
@@ -97,6 +106,19 @@ const Appointment = () => {
       setPreviousAppointments(response.data);
     } catch (error) {
       console.error("Error fetching previous appointments:", error);
+    }
+  };
+
+  const fetchCounselorAppointments = async (counselorName) => {
+    try {
+      const response = await axios.get(`${BASE_URL}/counselor/appointments`, {
+        params: { counselorName },
+        withCredentials: true,
+      });
+      setCounselorAppointments(response.data);
+    } catch (error) {
+      console.error("Error fetching counselor appointments:", error);
+      toast.error("Error fetching appointments");
     }
   };
 
@@ -120,8 +142,7 @@ const Appointment = () => {
       alert("Please choose a date starting from today");
       return;
     }
-    else if(formData.mobileNumber.length!==10)
-    {
+    else if (formData.mobileNumber.length !== 10) {
       toast.error("Enter 10 digit number!");
       return;
     }
@@ -137,6 +158,52 @@ const Appointment = () => {
   const handlePrint = () => {
     window.print();
   };
+
+  // Use local variable for role check to include fallback
+  const currentRole = userdata.role || localStorage.getItem("role");
+
+  if (currentRole === 'counselor') {
+    return (
+      <div className="BODY">
+        <div className="appointment">
+          <div className="counselor-view-container">
+            <div className="counselor-requests-box">
+              <h2>Pending Appointment Requests</h2>
+              {counselorAppointments.length > 0 ? (
+                <table className="counselor-requests-table">
+                  <thead>
+                    <tr>
+                      <th>Serial No</th>
+                      <th>Patient Name</th>
+                      <th>Mobile</th>
+                      <th>Email</th>
+                      <th>Date</th>
+                      <th>Time</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {counselorAppointments.map((appointment, index) => (
+                      <tr key={appointment.id}>
+                        <td>{index + 1}</td>
+                        <td>{appointment.fullName}</td>
+                        <td>{appointment.mobileNumber}</td>
+                        <td>{appointment.emailAddress}</td>
+                        <td>{new Date(appointment.appointmentDate).toDateString()}</td>
+                        <td>{appointment.appointmentSlot}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              ) : (
+                <p style={{ textAlign: 'center', padding: '20px', color: '#666' }}>No pending appointment requests found.</p>
+              )}
+            </div>
+          </div>
+        </div>
+        <ToastContainer />
+      </div>
+    );
+  }
 
   return (
     <div className="BODY">
@@ -244,7 +311,7 @@ const Appointment = () => {
         </div>
         <div className="form2">
           <div className="previous-appointments">
-            <h2>Previous Appointments</h2> 
+            <h2>Previous Appointments</h2>
             {previousAppointments.length > 0 ? (
               <table className="previous-appointments-table">
                 <thead>

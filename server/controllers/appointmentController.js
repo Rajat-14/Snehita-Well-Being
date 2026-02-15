@@ -111,3 +111,22 @@ exports.sendEmail = async (req, res) => {
     });
     res.json({ message: "Email sent" });
 };
+
+exports.getCounselorAppointments = async (req, res) => {
+    try {
+        const { counselorName } = req.query;
+        // console.log("Fetching appointments for counselor:", counselorName);
+
+        const appointments = await Appointment.findAll({
+            where: {
+                counselorName: counselorName
+            }
+        });
+
+        // Sort by date/time if needed, or frontend can handle it
+        res.json(appointments);
+    } catch (err) {
+        console.error("Error fetching counselor appointments:", err);
+        res.status(500).send("Server Error");
+    }
+};

@@ -38,9 +38,11 @@ const Login = (props) => {
     }
 
     try {
-      await axios.post(`${BASE_URL}/user/login`, input, {
+      const response = await axios.post(`${BASE_URL}/user/login`, input, {
         withCredentials: true,
       });
+      localStorage.setItem("role", response.data.user.role);
+      localStorage.setItem("user", JSON.stringify(response.data.user));
       toast.success("Login successful");
 
       console.log("logged in");

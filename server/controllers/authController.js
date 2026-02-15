@@ -80,9 +80,13 @@ exports.login = async (req, res) => {
             return res.status(400).json({ error: "Invalid email or password" });
         }
 
+        const roleEntry = await Role.findOne({ where: { email: email } });
+        const role = roleEntry ? roleEntry.role : "client";
+
         const userToken = jwt.sign(
             {
                 id: user.id,
+                role: role,
             },
             "abcdef"
         );
@@ -94,7 +98,7 @@ exports.login = async (req, res) => {
                 secure: false,
             })
             .status(200)
-            .json({ message: "Success!", user: user });
+            .json({ message: "Success!", user: { ...user.toJSON(), role } });
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: "An error occurred, please try again" });
@@ -297,9 +301,12 @@ exports.getLoginSuccess = async (req, res) => {
             throw new Error();
         }
 
+        const roleEntry = await Role.findOne({ where: { email: user.email } });
+        const role = roleEntry ? roleEntry.role : "client";
+
         res
             .status(200)
-            .json({ message: "User logged in successfully", user: user });
+            .json({ message: "User logged in successfully", user: { ...user.toJSON(), role } });
     } catch (error) {
         res.status(401).json({ message: "Not authorized" });
     }

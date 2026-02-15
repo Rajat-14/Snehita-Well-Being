@@ -30,3 +30,40 @@ exports.getTestimonials = async (req, res) => {
         res.status(500).json({ error: "Failed to fetch testimonials" });
     }
 };
+
+exports.createBlog = async (req, res) => {
+    try {
+        const { title, content, type, link } = req.body;
+        const pic = req.file ? req.file.filename : 'default.jpg'; // Assuming multer is used
+
+        const newBlog = await Blog.create({
+            title,
+            content,
+            type,
+            link,
+            pic
+        });
+
+        res.status(201).json(newBlog);
+    } catch (error) {
+        console.error("Error creating blog:", error);
+        res.status(500).json({ error: "Failed to create blog" });
+    }
+};
+
+exports.deleteBlog = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const blog = await Blog.findByPk(id);
+
+        if (!blog) {
+            return res.status(404).json({ error: "Blog not found" });
+        }
+
+        await blog.destroy();
+        res.json({ message: "Blog deleted successfully" });
+    } catch (error) {
+        console.error("Error deleting blog:", error);
+        res.status(500).json({ error: "Failed to delete blog" });
+    }
+};
