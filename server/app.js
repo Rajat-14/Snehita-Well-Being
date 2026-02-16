@@ -5,12 +5,13 @@ const Role = require("./model/role");
 const Counselor = require("./model/counselor");
 const Achievement = require("./model/achievement");
 const OrganizationInfo = require("./model/organizationInfo");
-const Message = require("./model/message");
+
 const ContactDetail = require("./model/contactDetail");
 const TeamMember = require("./model/teamMember");
 const Blog = require("./model/blog");
 const Quiz = require("./model/quiz");
 const Testimonial = require("./model/testimonial");
+const Appointment = require("./model/appointment");
 const fs = require("fs");
 const cors = require("cors");
 const sequelize = require("./db/database");

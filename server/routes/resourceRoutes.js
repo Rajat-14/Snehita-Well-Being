@@ -9,5 +9,6 @@ router.post("/blogs", upload, resourceController.createBlog);
 router.delete("/blogs/:id", resourceController.deleteBlog);
 router.get("/quizzes", resourceController.getQuizzes);
 router.get("/testimonials", resourceController.getTestimonials);
+router.get("/counselors", resourceController.getCounselors);
 
 module.exports = router;

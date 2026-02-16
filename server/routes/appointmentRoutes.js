@@ -8,5 +8,8 @@ router.get("/data", authenticate, appointmentController.getAppointments);
 router.post("/send-email", authenticate, appointmentController.sendEmail);
 router.get("/bookedSlots", authenticate, appointmentController.getBookedSlots);
 router.get("/counselor/appointments", authenticate, appointmentController.getCounselorAppointments);
+router.put("/status/:id", authenticate, appointmentController.updateAppointmentStatus);
+router.put("/notes/:id", authenticate, appointmentController.updateAppointmentNotes);
+router.get("/:id", authenticate, appointmentController.getAppointmentById);
 
 module.exports = router;

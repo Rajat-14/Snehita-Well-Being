@@ -12,14 +12,23 @@ const OurTeamSection = () => {
         const response = await fetch(`${process.env.REACT_APP_API_URL || 'http://localhost:8000'}/api/team-members`);
         if (response.ok) {
           const data = await response.json();
-          // Filter for only specific roles if needed, or sort by order
-          // For now, take the first 3 or relevant ones to display on contact page
-          // Strategy: Display counsellors or mix, limiting to 3 for the preview
-          const activeMembers = data.filter(member => member.isActive);
-          // Sort if order is available
-          activeMembers.sort((a, b) => (a.order || 0) - (b.order || 0));
 
-          setTeamMembers(activeMembers.slice(0, 3));
+          // Filter for Dean, Faculty Advisor, and Counsellors
+          const targetTypes = ['dean', 'faculty_advisor', 'counsellor'];
+          const filteredMembers = data.filter(member =>
+            member.isActive && targetTypes.includes(member.type)
+          );
+
+          // Sort order: Dean -> Faculty Advisor -> Counsellor
+          const typeOrder = { 'dean': 1, 'faculty_advisor': 2, 'counsellor': 3 };
+          filteredMembers.sort((a, b) => {
+            const typeScoreA = typeOrder[a.type] || 99;
+            const typeScoreB = typeOrder[b.type] || 99;
+            if (typeScoreA !== typeScoreB) return typeScoreA - typeScoreB;
+            return (a.order || 0) - (b.order || 0);
+          });
+
+          setTeamMembers(filteredMembers);
         }
       } catch (error) {
         console.error("Error fetching team members:", error);

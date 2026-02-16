@@ -2,6 +2,8 @@ const Blog = require("../model/blog");
 const Quiz = require("../model/quiz");
 const Testimonial = require("../model/testimonial");
 
+const Counselor = require("../model/counselor");
+
 exports.getBlogs = async (req, res) => {
     try {
         const blogs = await Blog.findAll();
@@ -10,6 +12,17 @@ exports.getBlogs = async (req, res) => {
         res.status(500).json({ error: "Failed to fetch blogs" });
     }
 };
+
+exports.getCounselors = async (req, res) => {
+    try {
+        const counselors = await Counselor.findAll();
+        res.status(200).json(counselors);
+    } catch (error) {
+        console.error("Error fetching counselors:", error);
+        res.status(500).json({ error: "Failed to fetch counselors" });
+    }
+};
+
 
 exports.getQuizzes = async (req, res) => {
     try {

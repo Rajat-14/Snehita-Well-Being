@@ -37,7 +37,7 @@ DATABASE_URL=postgres://YOUR_USERNAME:YOUR_PASSWORD@host.docker.internal:YOUR_PO
 MAIL=carewho.987@gmail.com
 PASSWORD=sqib sves tips fpps
 SECRET=1123326285sfgdgvx
-BASE_URL=http://localhost:3000
+BASE_URL=http://localhost:3001
 ```
 
 ## Step 3: Run the Application

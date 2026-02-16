@@ -31,15 +31,36 @@ const FacultyAdvisorMessage = () => {
   return (
     <div>
       {facultyAdvisors.map((item, index) => {
+        // Handle message being an array (from JSON/seed if not stringified?) or string (stored JSON)
+        let messageArray = [];
+        if (Array.isArray(item.message)) {
+          messageArray = item.message;
+        } else if (typeof item.message === 'string') {
+          try {
+            const parsed = JSON.parse(item.message);
+            if (Array.isArray(parsed)) messageArray = parsed;
+            else messageArray = item.message.split('\n').filter(line => line.trim());
+          } catch (e) {
+            messageArray = item.message.split('\n').filter(line => line.trim());
+          }
+        }
+        // If null/undefined, messageArray remains [] which is safe for MessageCard
+
+        const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:8000';
+        // Fix image path logic
+        const imagePath = item.image
+          ? (item.image.startsWith('http') ? item.image : `${apiUrl}${item.image}`)
+          : null;
+
         return (
           <div className="mt-2" key={item.id || index}>
             <MessageCard
-              pic={`${process.env.REACT_APP_API_URL || 'http://localhost:8000'}${item.image}`}
+              pic={imagePath}
               name={item.name}
-              designation={item.designation} // Using designation from DB.
+              designation={item.designation}
               emailId={item.email}
               telephoneNo={item.telephoneNo}
-              message={item.message}
+              message={messageArray}
             />
             <hr></hr>
           </div>

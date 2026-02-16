@@ -1,36 +1,71 @@
-const ClientAppointment = require("../model/clientAppointment");
-const CounselorAppointment = require("../model/counselorAppointment");
+const Appointment = require("../model/appointment");
 const jwt = require("jsonwebtoken");
 const transporter = require("../config/emailConfig");
+const { Op } = require("sequelize");
 
 exports.createAppointment = async (req, res) => {
     try {
+        console.log("====================================");
+        console.log("REQUEST BODY RECEIVED:", req.body);
+        console.log("====================================");
+
         const token = req.cookies.usertoken;
-        console.log("Token received:", token);
         const decoded = jwt.verify(token, "abcdef");
         const userId = decoded.id;
+
         const {
             fullName,
             mobileNumber,
-            emailAddress,
+            email,
+            age,
+            gender,
+            problemDescription,
+            problemExtent,
+            problemRelatedWith,
+            modeOfReferral,
             appointmentDate,
+            timeSlot,
             counselorName,
-            appointmentSlot,
+            durationPeriod
         } = req.body;
 
-        const appointment = await ClientAppointment.create({
+        console.log("Extracted Values:");
+        console.log({
             fullName,
             mobileNumber,
-            emailAddress,
+            email,
+            age,
+            gender,
+            problemDescription,
+            problemExtent,
+            problemRelatedWith,
+            modeOfReferral,
+            durationPeriod
+        });
+
+        const appointment = await Appointment.create({
+            fullName,
+            mobileNumber,
+            email,
+            age,
+            gender,
+            problemDescription,
+            problemExtent,
+            problemRelatedWith,
+            modeOfReferral,
             appointmentDate,
+            timeSlot,
             counselorName,
-            appointmentSlot,
+            durationPeriod,
+            status: "pending",
             userId,
         });
 
+        console.log("INSERTED INTO DATABASE:", appointment.toJSON());
+
         res.status(201).json(appointment);
     } catch (err) {
-        console.error(err);
+        console.error("Error creating appointment:", err);
         res.status(500).send("Server Error");
     }
 };
@@ -38,14 +73,17 @@ exports.createAppointment = async (req, res) => {
 exports.getAppointments = async (req, res) => {
     try {
         const token = req.cookies.usertoken;
-        console.log("Token received:", token);
         const decoded = jwt.verify(token, "abcdef");
         const userId = decoded.id;
-        console.log(userId);
-        const appointments = await ClientAppointment.findAll({ where: { userId: userId } });
+
+        // Fetch appointments for the logged-in client
+        const appointments = await Appointment.findAll({
+            where: { userId: userId },
+            order: [['appointmentDate', 'DESC']]
+        });
         res.json(appointments);
     } catch (err) {
-        console.error(err);
+        console.error("Error fetching client appointments:", err);
         res.status(500).send("Server Error");
     }
 };
@@ -53,20 +91,20 @@ exports.getAppointments = async (req, res) => {
 exports.getBookedSlots = async (req, res) => {
     try {
         const { counselorName, appointmentDate } = req.query;
-        // Sequelize query handling Date might need exact match or range. 
-        // Assuming the frontend sends a date string that matches the DB format or we cast it.
-        const appointments = await ClientAppointment.findAll({
+        // Find all non-rejected appointments for this slot
+        const appointments = await Appointment.findAll({
             where: {
                 counselorName: counselorName,
                 appointmentDate: new Date(appointmentDate),
+                status: { [Op.not]: 'rejected' } // Rejected slots are free again
             }
         });
         const bookedSlots = appointments.map(
-            (appointment) => appointment.appointmentSlot
+            (appointment) => appointment.timeSlot
         );
         res.json(bookedSlots);
     } catch (err) {
-        console.error(err);
+        console.error("Error fetching booked slots:", err);
         res.status(500).send("Server Error");
     }
 };
@@ -74,25 +112,29 @@ exports.getBookedSlots = async (req, res) => {
 exports.sendEmail = async (req, res) => {
     const formData = req.body;
 
-    // Map counselor names to their email addresses
+    // Map counselor names to their email addresses - TODO: Move to DB or Config
     const counselorEmails = {
-        "Deepak Phogat": "2021csb1123@iitrpr.ac.in",
-        "Gargi Tiwari": "kumarchspiyush@gmail.com",
+        "Deepak Phogat": "deepak.phogat@iitrpr.ac.in",
+        "Gargi Tiwari": "Gargi.tiwary@iitrpr.ac.in",
     };
 
-    // Get the email address of the chosen counselor
     const counselorEmail = counselorEmails[formData.counselorName];
+    // Fallback if email not found?
+    if (!counselorEmail) {
+        return res.status(400).json({ message: "Counselor email not found" });
+    }
 
     let formattedText = `
   <div style="font-family: Arial, sans-serif; color: #333;">
-    <h1 style="background-color: #f2f2f2; padding: 10px; text-align: center;">Appointment Confirmation</h1>
+    <h1 style="background-color: #f2f2f2; padding: 10px; text-align: center;">Appointment Request</h1>
     <p>Hello ${formData.counselorName},</p>
-    <p>The following individual has scheduled an appointment with you. Please find the details below:</p>
+    <p>You have a new appointment request. Please log in to your dashboard to review it.</p>
     <ul>
 `;
-
-    for (let key in formData) {
-        if (key !== "counselorName") {
+    // Add relevant fields to email
+    const fields = ['fullName', 'appointmentDate', 'timeSlot', 'problemDescription'];
+    for (let key of fields) {
+        if (formData[key]) {
             formattedText += `<li><strong>${key}:</strong> ${formData[key]}</li>`;
         }
     }
@@ -104,30 +146,95 @@ exports.sendEmail = async (req, res) => {
   </div>
 `;
 
-    let info = await transporter.sendMail({
-        from: '"Piyush" pushkr.1090@gmail.com', // sender address
-        to: counselorEmail, // send to the chosen counselor
-        subject: "New Counselling Appointment", // Subject line
-        html: formattedText, // formatted text body
-    });
-    res.json({ message: "Email sent" });
+    try {
+        let info = await transporter.sendMail({
+            from: '"Snehita Appointment" <no-reply@snehita.com>',
+            to: counselorEmail,
+            subject: "New Counselling Appointment Request",
+            html: formattedText,
+        });
+        res.json({ message: "Email sent" });
+    } catch (emailErr) {
+        console.error("Email error:", emailErr);
+        res.status(500).json({ message: "Failed to send email" });
+    }
 };
 
 exports.getCounselorAppointments = async (req, res) => {
     try {
-        const { counselorName } = req.query;
-        // console.log("Fetching appointments for counselor:", counselorName);
+        const { counselorName, status } = req.query;
 
-        const appointments = await CounselorAppointment.findAll({
-            where: {
-                counselorName: counselorName
-            }
+        let whereClause = { counselorName };
+        if (status) {
+            whereClause.status = status;
+        }
+
+        const appointments = await Appointment.findAll({
+            where: whereClause,
+            order: [['appointmentDate', 'ASC']]
         });
 
-        // Sort by date/time if needed, or frontend can handle it
         res.json(appointments);
     } catch (err) {
         console.error("Error fetching counselor appointments:", err);
+        res.status(500).send("Server Error");
+    }
+};
+
+// Update status (Approve/Reject)
+exports.updateAppointmentStatus = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { status } = req.body; // 'approved' or 'rejected'
+
+        const appointment = await Appointment.findByPk(id);
+        if (!appointment) {
+            return res.status(404).json({ error: "Appointment not found" });
+        }
+
+        appointment.status = status;
+        await appointment.save();
+
+        res.json(appointment);
+    } catch (err) {
+        console.error("Error updating status:", err);
+        res.status(500).send("Server Error");
+    }
+};
+
+// Add/Update Notes
+exports.updateAppointmentNotes = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { notes } = req.body;
+
+        const appointment = await Appointment.findByPk(id);
+        if (!appointment) {
+            return res.status(404).json({ error: "Appointment not found" });
+        }
+
+        appointment.notes = notes;
+        await appointment.save();
+
+        res.json(appointment);
+    } catch (err) {
+        console.error("Error updating notes:", err);
+        res.status(500).send("Server Error");
+    }
+};
+
+exports.getAppointmentById = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const appointment = await Appointment.findByPk(id);
+
+        if (!appointment) {
+            return res.status(404).json({ message: "Appointment not found" });
+        }
+
+        res.json(appointment);
+    } catch (err) {
+        console.error("Error fetching appointment:", err);
         res.status(500).send("Server Error");
     }
 };

@@ -2,7 +2,7 @@ import MessageCard from "../component/messageCard";
 import { useEffect, useState } from "react";
 
 const DirectorMessage = () => {
-  const [message, setMessage] = useState(null);
+  const [messageData, setMessageData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -15,7 +15,7 @@ const DirectorMessage = () => {
         }
         const data = await response.json();
         if (data.length > 0) {
-          setMessage(data[0]);
+          setMessageData(data[0]);
         }
         setError(null);
       } catch (error) {
@@ -37,21 +37,41 @@ const DirectorMessage = () => {
     return <div className="mt-2 text-danger"><p>Error: {error}</p></div>;
   }
 
-  if (!message) {
+  if (!messageData) {
     return <div className="mt-2"><p>No message available</p></div>;
   }
 
-  const messageArray = message.messageContent.split('\n').filter(line => line.trim());
+  // Handle message being an array (from JSON/seed) or string (fallback)
+  let messageArray = [];
+  if (Array.isArray(messageData.message)) {
+    messageArray = messageData.message;
+  } else if (typeof messageData.message === 'string') {
+    try {
+      // Try parsing in case it's a JSON string
+      const parsed = JSON.parse(messageData.message);
+      if (Array.isArray(parsed)) messageArray = parsed;
+      else messageArray = messageData.message.split('\n').filter(line => line.trim());
+    } catch (e) {
+      messageArray = messageData.message.split('\n').filter(line => line.trim());
+    }
+  }
+
   const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:8000';
+
+  // Fix image path: The seed data already has /uploads/team/...
+  // We need to ensure we don't double prepend /uploads or similar if it's already there
+  const imagePath = messageData.image
+    ? (messageData.image.startsWith('http') ? messageData.image : `${apiUrl}${messageData.image}`)
+    : null;
 
   return (
     <div className="mt-2">
       <MessageCard
-        pic={message.image ? `${apiUrl}/uploads/messages/${message.image}` : null}
-        name={message.name}
-        designation={message.designation}
-        emailId={message.emailId}
-        telephoneNo={message.telephoneNo}
+        pic={imagePath}
+        name={messageData.name}
+        designation={messageData.designation}
+        emailId={messageData.email} // Changed from emailId
+        telephoneNo={messageData.telephoneNo}
         message={messageArray}
       />
       <hr></hr>

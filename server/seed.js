@@ -6,7 +6,7 @@ const Quiz = require('./model/quiz');
 const Testimonial = require('./model/testimonial');
 const Achievement = require('./model/achievement');
 const OrganizationInfo = require('./model/organizationInfo');
-const Message = require('./model/message');
+
 const ContactDetail = require('./model/contactDetail');
 const TeamMember = require('./model/teamMember');
 const User = require('./model/userSchema');
@@ -510,54 +510,7 @@ const seedData = async () => {
             }
         }
 
-        // Seed Messages
-        const messages = [
-            {
-                name: "Proff. Rajeev Ahuja",
-                designation: "Director, IIT Ropar",
-                image: "director.jpeg",
-                messageContent: "Dear Students,\nAs we navigate through your academic journey together, it's important to remember that your wellness, both mental and physical, is paramount to us. Your well-being is not just a priority, but a cornerstone of our institute. We understand that the pressures of academic life, coupled with personal challenges, can sometimes feel overwhelming. That's why Snehita Wellbeing Cell is committed to providing you with the support and resources you need to thrive, both inside and outside the classroom.\nRemember, it's perfectly alright to ask for help. Whether you're feeling stressed, anxious, or simply need someone to talk to, know that there are caring individuals and services available to assist you. Reach out to our counselors, mentors, or any trusted faculty member. Your well-being matters to us, and as a team we are here to support you at every step of your academic journey.\nAdditionally, take time for self-care. Engage in activities that bring you joy and relaxation. Whether it's practicing mindfulness, exercising, or spending time with loved ones, nurturing your well-being is essential for your overall success and happiness. Prioritize your wellness and support one another in creating a positive and nurturing community at IIT Ropar.",
-                emailId: "Take care of yourselves, and remember that you are not alone !",
-                telephoneNo: "",
-                type: "director",
-                order: 1
-            },
-            {
-                name: "Dr. Arun Kumar",
-                designation: "Dean, Students Affairs",
-                image: "arun.jpeg",
-                messageContent: "प्रिय छात्रो,\nआप सभी की शैक्षेणिक यात्रा में, आपके संपूर्ण विकास और समृद्धि के लिए हमारा विभाग पर्तिबद्ध है। आपका मानसिक, शारीरिक और आत्मिक स्वास्थ्य हमारे लिए उतना ही महत्वपूर्ण है जितना कि शैक्षिक प्रदर्शन। हम समझते हैं कि छात्र जीवन में विभिन्न चुनौतियाँ और तनाव हो सकते हैं, और इसलिए हम सभी आपके समर्थन में पूरी तरह से समर्पित हैं। यदि आप किसी भी प्रकार की मदद या सहायता की जरूरत महसूस कर रहे हैं, तो कृपया हमसे संपर्क करें। हमारे काउंसलर, मेंटर्स और उपलब्ध संसाधनों से सहायता लें।\nइसके अलावा, स्वास्थ्य के लिए समय निकालें। मनोविश्राम, योग, ध्यान या किसी भी ऐसी गतिविधि में शामिल हों जो आपको सुख और संतुलन में रखती है। हम आपके साथ हैं, हमेशा।",
-                emailId: "धूप में निकलो घटाओं में नहा कर देखो।",
-                telephoneNo: "ज़िंदगी क्या है कुछ देर इंटरनेट और मोबाइल को हटा कर देखो।।",
-                type: "dean",
-                order: 1
-            },
-            {
-                name: "Deepak Phogat",
-                designation: "Counsellor",
-                image: "deepak.jpg",
-                messageContent: "We know that Campus life can be exhilarating, but it can also be overwhelming at times. Balancing coursework, extracurricular activities, social life, and personal responsibilities can put a strain on your mental health. That's why it's crucial to prioritize self-care and seek support when needed. Although after COVID, the attitude of individuals in society towards mental health is gradually changing positively. I feel as we navigate the challenges and responsibilities of academic life, it's essential to pause and reflect on our mental health and wellbeing. Your overall wellness is not just important; it's imperative for your success and happiness during your college journey.\n\nRemember that seeking help is a sign of strength, not weakness. Your mental health matters, and there's no shame in asking for support when you need it. Acknowledge your accomplishments, no matter how small, and forgive yourself for mistakes or setbacks. As your Institute Counsellor, my door is always open to you. Please don't hesitate to reach out if you need assistance or simply someone to talk to. Your wellbeing is our top priority, and we're here to support you every step of the way.",
-                emailId: "deepak.phogat@iitrpr.ac.in",
-                telephoneNo: "01881 23 5113",
-                type: "counsellor",
-                order: 1
-            },
-            {
-                name: "Gargi Tiwary",
-                designation: "Counsellor",
-                image: "gargi.jpg",
-                messageContent: "In light of the ongoing challenges we face, it is crucial now more than ever to prioritize your psychological wellbeing. Your mental health is just as important as your physical health, and we are here to support you every step of the way. If you're feeling overwhelmed, anxious, or stressed, please know that help is available. Reach out to our counselling services or mental health resources for guidance and support.\n\nTake care of yourself by practicing self-care routines, connecting with friends and family for emotional support, and engaging in activities that bring you joy and peace of mind. We are all in this together, and your mental health matters. Don't hesitate to seek help when needed - we are here for you. When Mind controls the body, It should matter!!!",
-                emailId: "Gargi.tiwary@iitrpr.ac.in",
-                telephoneNo: "01881 23 6855",
-                type: "counsellor",
-                order: 2
-            }
-        ];
 
-        if ((await Message.count()) === 0) {
-            await Message.bulkCreate(messages);
-            console.log('Messages seeded');
-        }
 
         // Seed Contact Details
         const contactDetails = [
@@ -583,6 +536,19 @@ const seedData = async () => {
 
         // Seed Team Members
         const teamMembers = [
+            // Director
+            {
+                name: "Proff. Rajeev Ahuja",
+                designation: "Director, IIT Ropar",
+                type: "director",
+                image: "/uploads/team/director.jpeg",
+                message: [
+                    "Dear Students,\nAs we navigate through your academic journey together, it's important to remember that your wellness, both mental and physical, is paramount to us. Your well-being is not just a priority, but a cornerstone of our institute. We understand that the pressures of academic life, coupled with personal challenges, can sometimes feel overwhelming. That's why Snehita Wellbeing Cell is committed to providing you with the support and resources you need to thrive, both inside and outside the classroom.\nRemember, it's perfectly alright to ask for help. Whether you're feeling stressed, anxious, or simply need someone to talk to, know that there are caring individuals and services available to assist you. Reach out to our counselors, mentors, or any trusted faculty member. Your well-being matters to us, and as a team we are here to support you at every step of your academic journey.\nAdditionally, take time for self-care. Engage in activities that bring you joy and relaxation. Whether it's practicing mindfulness, exercising, or spending time with loved ones, nurturing your well-being is essential for your overall success and happiness. Prioritize your wellness and support one another in creating a positive and nurturing community at IIT Ropar.",
+                    "Take care of yourselves, and remember that you are not alone !"
+                ],
+                order: 1,
+                isActive: true
+            },
             // Dean
             {
                 name: "Dr. Arun Kumar",
@@ -592,7 +558,12 @@ const seedData = async () => {
                 telephoneNo: "01881 23 1066",
                 image: "/uploads/team/arun.jpg",
                 experience: "Dr. Arun Kumar received his PhD degree in Mathematics from IIT Bombay in 2012. He also holds a Master degree in Industrial Mathematics from IIT Roorkee. His PhD work is related to Subordinated Stochastic Processes that have applications in finance, fractional partial differential equations and statistical physics. During his stint in financial industry as a research analyst, he worked on all the major asset classes i.e. Fixed Income, Equity, Currency, and Commodity. Further, he possess a good experience in pricing and analysis of Bonds, Swaps, Total Return Swaps, Swap Curve Construction, Bonds Portfolio, Interest Rate Swaps Portfolio, Bond Futures, Cheapest to Deliver Calculations.",
-                order: 1,
+                message: [
+                    "प्रिय छात्रो,\nआप सभी की शैक्षेणिक यात्रा में, आपके संपूर्ण विकास और समृद्धि के लिए हमारा विभाग पर्तिबद्ध है। आपका मानसिक, शारीरिक और आत्मिक स्वास्थ्य हमारे लिए उतना ही महत्वपूर्ण है जितना कि शैक्षिक प्रदर्शन। हम समझते हैं कि छात्र जीवन में विभिन्न चुनौतियाँ और तनाव हो सकते हैं, और इसलिए हम सभी आपके समर्थन में पूरी तरह से समर्पित हैं। यदि आप किसी भी प्रकार की मदद या सहायता की जरूरत महसूस कर रहे हैं, तो कृपया हमसे संपर्क करें। हमारे काउंसलर, मेंटर्स और उपलब्ध संसाधनों से सहायता लें।\nइसके अलावा, स्वास्थ्य के लिए समय निकालें। मनोविश्राम, योग, ध्यान या किसी भी ऐसी गतिविधि में शामिल हों जो आपको सुख और संतुलन में रखती है। हम आपके साथ हैं, हमेशा।",
+                    "धूप में निकलो घटाओं में नहा कर देखो।",
+                    "ज़िंदगी क्या है कुछ देर इंटरनेट और मोबाइल को हटा कर देखो।।"
+                ],
+                order: 2,
                 isActive: true
             },
             // Faculty Advisors
@@ -602,7 +573,7 @@ const seedData = async () => {
                 type: "faculty_advisor",
                 email: "satyam@iitrpr.ac.in",
                 telephoneNo: "01881 23 22373",
-                image: "/uploads/messages/satyam.jpg",
+                image: "/uploads/team/satyam.jpg",
                 academicDesignation: "Assistant Professor, Electrical Engineering",
                 experience: "Dr. Satyam Agarwal, Assistant Professor at IIT Ropar's Department of Electrical Engineering, boasts a Ph.D. from IIT Delhi and extensive experience at IIT Guwahati and Politecnico di Torino. His research focuses on wireless communication networks, earning him accolades and research grants. As Faculty Advisor at Snehita Well-Being Cell, Dr. Agarwal prioritizes students' mental health. He supports organizing workshops, seminars, and counseling sessions to foster a supportive environment, encouraging open dialogue. His dedication ensures the Snehita Well-Being Cell remains a safe haven for IIT Ropar's student community.",
                 message: [
@@ -620,7 +591,7 @@ const seedData = async () => {
                 type: "faculty_advisor",
                 email: "singh_parwinder@iitrpr.ac.in",
                 telephoneNo: "01881 24 2275",
-                image: "/uploads/messages/parwinder.jpg",
+                image: "/uploads/team/parwinder.jpg",
                 academicDesignation: "Assistant Professor, Psychology",
                 experience: "Dr. Parwinder Singh is a Counselling Psychologist specializing in mental health and well-being promotion. With a background including a PhD in Counselling Psychology, a PG Diploma in Counselling Psychology, and a Master's in Psychology, his research interest lies in promoting mental health and fostering supportive communities, aligning perfectly with the mission of the Snehita Well-Being Cell. As a member, he aims to raise awareness about the importance of sharing mental health concerns, provide effective resolutions, and cultivate an environment where seeking help is not stigmatized.",
                 message: [

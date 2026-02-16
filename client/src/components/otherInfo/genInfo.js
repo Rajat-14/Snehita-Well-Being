@@ -1,51 +1,24 @@
-import React, { useEffect, useRef, useState } from "react";
-import { useLocation } from "react-router-dom";
-import { useSelector, useDispatch } from "react-redux";
+import React, { useEffect, useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
 import { resetAppointment } from "../../redux/actions/actions";
 import { BASE_URL } from "../services/helper";
-import {
-  FaUser,
-  FaPhone,
-  FaEnvelope,
-  FaCalendar,
-  FaIdCard,
-  FaBook,
-  FaDiagnoses,
-  FaHospital,
-  FaPage4,
-  FaHourglass,
-  FaGenderless,
-  FaHome,
-} from "react-icons/fa";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import "./userForm.css";
 import axios from "axios";
-import { Navigate, useNavigate } from "react-router-dom";
-import { FaPenToSquare, FaPerson } from "react-icons/fa6";
+import "./userForm.css";
 
 const GenInfo = () => {
-  const [userdata, setUserdata] = useState({});
-  const dispatch = useDispatch();
   const navigate = useNavigate();
-  const appointmentSubmitted = useSelector(
-    (state) => state.appointmentSubmitted
-  ); // get the state from the store
-  const isFormSubmitted = useRef(false);
+  const dispatch = useDispatch();
+  const loc = useLocation();
 
-  useEffect(() => {
-    if (!appointmentSubmitted && !isFormSubmitted.current) {
-      navigate("/appointment");
-    }
-  }, [appointmentSubmitted, navigate]);
+  const [userdata, setUserdata] = useState({});
+  const [formData1, setFormData1] = useState({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const location = useLocation();
-  const formData1 = location.state ? location.state.formData : {};
-  const counselorName = useSelector((state) => state.counselorName);
   const [formData, setFormData] = useState({
-    FullName: "",
     Age: "",
-    Email: "",
     Gender: "",
     ModeOfReferal: "",
     Problem_Related_With: "",
@@ -53,81 +26,97 @@ const GenInfo = () => {
     ProblemDescription: "",
     Duration_Of_Problem: "",
   });
-  const navigate2 = useNavigate();
-  const navigate3 = useNavigate();
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  useEffect(() => {
-    getUser();
-  }, []);
 
-  const getUser = async () => {
-    try {
-      const response = await axios.get(`${BASE_URL}/login/success`, {
-        withCredentials: true,
-      });
-      console.log("logged issue", response.data);
-      setUserdata(response.data.user);
-    } catch (error) {
-      navigate2("/*");
+  // Load Step 1 data
+  useEffect(() => {
+    if (loc?.state?.formData) {
+      setFormData1(loc.state.formData);
+    } else {
+      console.error("Missing Step 1 data");
     }
-  };
+  }, [loc]);
+
+  // Load logged-in user
+  useEffect(() => {
+    const getUser = async () => {
+      try {
+        const response = await axios.get(`${BASE_URL}/login/success`, {
+          withCredentials: true,
+        });
+        setUserdata(response.data.user);
+      } catch {
+        navigate("/*");
+      }
+    };
+    getUser();
+  }, [navigate]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
 
-    setFormData({
-      ...formData,
+    setFormData((prev) => ({
+      ...prev,
       [name]: value,
-    });
+    }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setIsSubmitting(true); // Start form submission
+    setIsSubmitting(true);
 
-    const finalFormData = {
-      ...formData,
-      FullName: formData.FullName || userdata.person_name,
-      Email: formData.Email || userdata.email,
-      counselorName,
+    // Manual validation
+    if (
+      !formData.Gender ||
+      !formData.ModeOfReferal ||
+      !formData.Problem_Related_With ||
+      !formData.ProblemExtent
+    ) {
+      toast.error("Please select all required dropdown fields.");
+      setIsSubmitting(false);
+      return;
+    }
+
+    const finalAppointmentData = {
+      fullName: formData1.fullName || userdata.person_name,
+      mobileNumber: formData1.mobileNumber,
+      email: formData1.email || userdata.email,
+      appointmentDate: formData1.appointmentDate,
+      counselorName: formData1.counselorName,
+      timeSlot: formData1.timeSlot,
+
+      age: formData.Age,
+      gender: formData.Gender,
+      modeOfReferral: formData.ModeOfReferal,
+      problemRelatedWith: formData.Problem_Related_With,
+      problemExtent: formData.ProblemExtent,
+      problemDescription: formData.ProblemDescription,
+      durationPeriod: formData.Duration_Of_Problem,
     };
 
     try {
-      // Make both POST requests concurrently
-      await Promise.all([
-        axios.post(`${BASE_URL}/create`, formData1, {
-          withCredentials: true,
-        }),
-        axios.post(`${BASE_URL}/send-email`, finalFormData, {
-          withCredentials: true,
-        }),
-      ]);
-
-      toast.success("Your appointment has been submitted successfully!", {
-        autoClose: 2000, // Close toast after 2 seconds
-      });
-      isFormSubmitted.current = true;
-      dispatch(resetAppointment());
-      setTimeout(() => {
-        navigate3("/AppointmentSubmitted", {
-          state: { formData: finalFormData },
-        });
-      }, 2000); // Navigate to another pAge after 2 seconds
-    } catch (error) {
-      console.error("Error creating appointment:", error);
-      // If any request fails, display an error messAge
-      setIsSubmitting(false);
-      toast.error(
-        "An error occurred while submitting your appointment. Please try again.",
-        {
-          autoClose: 2000,
-        }
+      const createResponse = await axios.post(
+        `${BASE_URL}/create`,
+        finalAppointmentData,
+        { withCredentials: true }
       );
-      setTimeout(() => {
-        navigate3("/appointment");
-      }, 2000);
-    } finally {
-      setIsSubmitting(false); // Stop form submission
+
+      if (createResponse.status === 201) {
+        toast.success("Appointment submitted successfully!", {
+          autoClose: 2000,
+        });
+
+        dispatch(resetAppointment());
+
+        setTimeout(() => {
+          navigate("/AppointmentSubmitted", {
+            state: { formData: finalAppointmentData },
+          });
+        }, 1500);
+      }
+    } catch (error) {
+      console.error("Submission error:", error);
+      setIsSubmitting(false);
+      toast.error("Submission failed. Please try again.");
     }
   };
 
@@ -137,54 +126,29 @@ const GenInfo = () => {
         <div className="formContent">
           <form onSubmit={handleSubmit}>
             <h2>User Data Form</h2>
-            <h3>
-              🔒 Your Privacy is Our Priority 🔒
-            </h3>
-            <p style={{ fontStyle: "italic", color: "red"}}>
-              We respect your privacy and handle your personal information with
-              care. Your data stays safe with us, always.
-            </p>
+
+            {/* ROW 1 */}
             <div className="inputRow">
               <div className="inputField">
-                <FaUser className="icon" />
                 <input
-                  type="text"
-                  value={userdata.person_name}
-                  name="FullName"
-                  placeholder="* Full Name"
+                  type="number"
+                  name="Age"
+                  value={formData.Age}
+                  placeholder="* Age"
                   onChange={handleInputChange}
                   required
                 />
               </div>
 
               <div className="inputField">
-                <FaUser className="icon" />
-                <input
-                  type="number"
-                  name="Age"
-                  placeholder="* Age"
+                <select
+                  name="Gender"
+                  value={formData.Gender}
                   onChange={handleInputChange}
                   required
-                />
-              </div>
-            </div>
-            <div className="inputRow">
-              <div className="inputField">
-                <FaUser className="icon" />
-                <input
-                  type="text"
-                  name="Email"
-                  value={userdata.email}
-                  placeholder="* Email"
-                  onChange={handleInputChange}
-                  required
-                />
-              </div>
-              <div className="inputField">
-                <FaPerson className="icon" />
-                <select name="Gender" onChange={handleInputChange} required>
-                  <option value="" disabled selected>
-                    * Gender
+                >
+                  <option value="" disabled>
+                    * Select Gender
                   </option>
                   <option value="Male">Male</option>
                   <option value="Female">Female</option>
@@ -192,88 +156,91 @@ const GenInfo = () => {
               </div>
             </div>
 
+            {/* ROW 2 */}
             <div className="inputRow">
               <div className="inputField">
-                <FaEnvelope className="icon" />
                 <select
                   name="ModeOfReferal"
+                  value={formData.ModeOfReferal}
                   onChange={handleInputChange}
                   required
                 >
-                  <option value="" disabled selected>
-                    * Mode of referal
+                  <option value="" disabled>
+                    * Mode of Referral
                   </option>
                   <option value="Self">Self</option>
-                  <option value="Freind">Friend</option>
+                  <option value="Friend">Friend</option>
                   <option value="Faculty">Faculty</option>
                   <option value="Medical">Medical</option>
                 </select>
               </div>
 
               <div className="inputField">
-                <FaHospital className="icon" />
                 <select
                   name="Problem_Related_With"
+                  value={formData.Problem_Related_With}
                   onChange={handleInputChange}
                   required
                 >
-                  <option value="" disabled selected>
+                  <option value="" disabled>
                     * Problem Related With
                   </option>
                   <option value="Academics">Academics</option>
                   <option value="Relationship">Relationship</option>
-                  <option value="Faculties">Faculties</option>
                   <option value="Family">Family</option>
                   <option value="Finance">Finance</option>
-                  <option value="Self">Self</option>
                   <option value="Health">Health</option>
                   <option value="Others">Others</option>
                 </select>
               </div>
             </div>
 
+            {/* ROW 3 */}
             <div className="inputRow">
               <div className="inputField">
-                <FaEnvelope className="icon" />
                 <select
                   name="ProblemExtent"
+                  value={formData.ProblemExtent}
                   onChange={handleInputChange}
                   required
                 >
-                  <option value="" disabled selected>
+                  <option value="" disabled>
                     * Problem Extent
                   </option>
-                  <option value="Moderate">Low</option>
-                  <option value="Severe">Moderate</option>
-                  <option value="Low">Severe</option>
+                  <option value="Low">Low</option>
+                  <option value="Moderate">Moderate</option>
+                  <option value="Severe">Severe</option>
                 </select>
               </div>
+
               <div className="inputField">
-                <FaHourglass className="icon" />
                 <input
                   type="text"
                   name="Duration_Of_Problem"
-                  placeholder=" Duration of Problem"
+                  value={formData.Duration_Of_Problem}
+                  placeholder="Duration of Problem"
                   onChange={handleInputChange}
                 />
               </div>
             </div>
+
+            {/* ROW 4 */}
             <div className="inputRow">
               <div className="inputField">
-                <FaPenToSquare className="icon" />
                 <textarea
                   name="ProblemDescription"
+                  value={formData.ProblemDescription}
                   placeholder="Problem Description"
                   onChange={handleInputChange}
                 />
               </div>
+
               <div className="inputField">
                 <button
                   type="submit"
                   className="buttonSubmit"
                   disabled={isSubmitting}
                 >
-                  {isSubmitting && <div className="spinner"></div>}
                   {isSubmitting ? "Submitting..." : "Submit"}
                 </button>
               </div>
@@ -281,6 +248,7 @@ const GenInfo = () => {
           </form>
         </div>
       </div>
+
       <ToastContainer />
     </div>
   );
