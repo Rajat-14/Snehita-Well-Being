@@ -35,6 +35,15 @@ const SnehitaBuddies = () => {
     return <div className="text-danger"><p>Error: {error}</p></div>;
   }
 
+  const getImageUrl = (imagePath) => {
+    if (!imagePath) return "";
+    if (imagePath.startsWith("http")) return imagePath;
+
+    const baseUrl = (process.env.REACT_APP_API_URL || 'http://localhost:8000').replace(/\/$/, "");
+    const cleanPath = imagePath.startsWith("/") ? imagePath : `/${imagePath}`;
+    return `${baseUrl}${cleanPath}`;
+  };
+
   return (
     <div className="row row-col-1 row-col-md-2 row-col-lg-3 g-4">
       {buddies.map((item, index) => {
@@ -45,7 +54,7 @@ const SnehitaBuddies = () => {
               designation={item.course}
               phoneNo={item.telephoneNo}
               emailId={item.email}
-              pic={`http://localhost:8000${item.image || ''}`}
+              pic={getImageUrl(item.image)}
               instaId={item.instaId}
               linkedinId={item.linkedinId}
             />

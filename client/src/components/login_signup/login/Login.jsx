@@ -52,7 +52,8 @@ const Login = (props) => {
         window.location.href = "/"; // Redirect to home page
       }, 1500);
     } catch (error) {
-      toast.error("Login failed. Please try again.");
+      console.error("Login Error:", error);
+      toast.error(error.response?.data?.message || error.message || "Login failed. Please try again.");
     } finally {
       setIsSubmitting(false); // Stop form submission
     }

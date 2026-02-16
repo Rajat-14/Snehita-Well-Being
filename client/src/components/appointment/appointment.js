@@ -33,8 +33,28 @@ const Appointment = () => {
   const [previousAppointments, setPreviousAppointments] = useState([]);
   const [counselorAppointments, setCounselorAppointments] = useState([]);
 
+
+
   useEffect(() => {
     getUser();
+  }, []);
+
+  const [counselorsList, setCounselorsList] = useState([]);
+
+  useEffect(() => {
+    // Fetch counselors list
+    const fetchCounselors = async () => {
+      try {
+        const response = await axios.get(`${BASE_URL}/api/counselors`, {
+          withCredentials: true,
+        });
+        setCounselorsList(response.data);
+      } catch (error) {
+        console.error("Error fetching counselors:", error);
+        toast.error("Error fetching counselors list");
+      }
+    };
+    fetchCounselors();
   }, []);
 
   useEffect(() => {
@@ -257,6 +277,7 @@ const Appointment = () => {
                     required
                   />
                 </div>
+
                 <div className="input-box">
                   <select
                     name="counselorName"
@@ -267,8 +288,11 @@ const Appointment = () => {
                     <option value="" disabled selected>
                       * Choose Counsellor
                     </option>
-                    <option value="Deepak Phogat">Deepak Phogat</option>
-                    <option value="Gargi Tiwari">Gargi Tiwari</option>
+                    {counselorsList.map((counselor) => (
+                      <option key={counselor.id} value={counselor.name}>
+                        {counselor.name}
+                      </option>
+                    ))}
                   </select>
                 </div>
 

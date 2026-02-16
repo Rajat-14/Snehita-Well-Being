@@ -1,4 +1,5 @@
-const Appointment = require("../model/appointment");
+const ClientAppointment = require("../model/clientAppointment");
+const CounselorAppointment = require("../model/counselorAppointment");
 const jwt = require("jsonwebtoken");
 const transporter = require("../config/emailConfig");
 
@@ -17,7 +18,7 @@ exports.createAppointment = async (req, res) => {
             appointmentSlot,
         } = req.body;
 
-        const appointment = await Appointment.create({
+        const appointment = await ClientAppointment.create({
             fullName,
             mobileNumber,
             emailAddress,
@@ -41,7 +42,7 @@ exports.getAppointments = async (req, res) => {
         const decoded = jwt.verify(token, "abcdef");
         const userId = decoded.id;
         console.log(userId);
-        const appointments = await Appointment.findAll({ where: { userId: userId } });
+        const appointments = await ClientAppointment.findAll({ where: { userId: userId } });
         res.json(appointments);
     } catch (err) {
         console.error(err);
@@ -54,7 +55,7 @@ exports.getBookedSlots = async (req, res) => {
         const { counselorName, appointmentDate } = req.query;
         // Sequelize query handling Date might need exact match or range. 
         // Assuming the frontend sends a date string that matches the DB format or we cast it.
-        const appointments = await Appointment.findAll({
+        const appointments = await ClientAppointment.findAll({
             where: {
                 counselorName: counselorName,
                 appointmentDate: new Date(appointmentDate),
@@ -117,7 +118,7 @@ exports.getCounselorAppointments = async (req, res) => {
         const { counselorName } = req.query;
         // console.log("Fetching appointments for counselor:", counselorName);
 
-        const appointments = await Appointment.findAll({
+        const appointments = await CounselorAppointment.findAll({
             where: {
                 counselorName: counselorName
             }

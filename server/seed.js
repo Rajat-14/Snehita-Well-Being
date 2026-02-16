@@ -9,6 +9,10 @@ const OrganizationInfo = require('./model/organizationInfo');
 const Message = require('./model/message');
 const ContactDetail = require('./model/contactDetail');
 const TeamMember = require('./model/teamMember');
+const User = require('./model/userSchema');
+const Role = require('./model/role');
+const Counselor = require('./model/counselor');
+const bcrypt = require('bcrypt');
 
 const seedData = async () => {
     try {
@@ -586,7 +590,7 @@ const seedData = async () => {
                 type: "dean",
                 email: "arun.kumar@iitrpr.ac.in",
                 telephoneNo: "01881 23 1066",
-                image: "/uploads/team/arun.svg",
+                image: "/uploads/team/arun.jpg",
                 experience: "Dr. Arun Kumar received his PhD degree in Mathematics from IIT Bombay in 2012. He also holds a Master degree in Industrial Mathematics from IIT Roorkee. His PhD work is related to Subordinated Stochastic Processes that have applications in finance, fractional partial differential equations and statistical physics. During his stint in financial industry as a research analyst, he worked on all the major asset classes i.e. Fixed Income, Equity, Currency, and Commodity. Further, he possess a good experience in pricing and analysis of Bonds, Swaps, Total Return Swaps, Swap Curve Construction, Bonds Portfolio, Interest Rate Swaps Portfolio, Bond Futures, Cheapest to Deliver Calculations.",
                 order: 1,
                 isActive: true
@@ -598,7 +602,7 @@ const seedData = async () => {
                 type: "faculty_advisor",
                 email: "satyam@iitrpr.ac.in",
                 telephoneNo: "01881 23 22373",
-                image: "/uploads/team/satyam.svg",
+                image: "/uploads/messages/satyam.jpg",
                 academicDesignation: "Assistant Professor, Electrical Engineering",
                 experience: "Dr. Satyam Agarwal, Assistant Professor at IIT Ropar's Department of Electrical Engineering, boasts a Ph.D. from IIT Delhi and extensive experience at IIT Guwahati and Politecnico di Torino. His research focuses on wireless communication networks, earning him accolades and research grants. As Faculty Advisor at Snehita Well-Being Cell, Dr. Agarwal prioritizes students' mental health. He supports organizing workshops, seminars, and counseling sessions to foster a supportive environment, encouraging open dialogue. His dedication ensures the Snehita Well-Being Cell remains a safe haven for IIT Ropar's student community.",
                 message: [
@@ -616,7 +620,7 @@ const seedData = async () => {
                 type: "faculty_advisor",
                 email: "singh_parwinder@iitrpr.ac.in",
                 telephoneNo: "01881 24 2275",
-                image: "/uploads/team/parwinder.svg",
+                image: "/uploads/messages/parwinder.jpg",
                 academicDesignation: "Assistant Professor, Psychology",
                 experience: "Dr. Parwinder Singh is a Counselling Psychologist specializing in mental health and well-being promotion. With a background including a PhD in Counselling Psychology, a PG Diploma in Counselling Psychology, and a Master's in Psychology, his research interest lies in promoting mental health and fostering supportive communities, aligning perfectly with the mission of the Snehita Well-Being Cell. As a member, he aims to raise awareness about the importance of sharing mental health concerns, provide effective resolutions, and cultivate an environment where seeking help is not stigmatized.",
                 message: [
@@ -635,7 +639,7 @@ const seedData = async () => {
                 type: "counsellor",
                 email: "deepak.phogat@iitrpr.ac.in",
                 telephoneNo: "01881 23 5113",
-                image: "/uploads/team/deepak.svg",
+                image: "/uploads/team/deepak.jpg",
                 experience: "Deepak Phogat, the counselor at IIT Ropar since 2016, holds an M. Phil Clinical Psychology from PGIBAMS, Raipur, and is registered under the Rehabilitation Council of India, RCI - New Delhi, as a Clinical Psychologist. Alongside his M. Phil, Deepak has completed short-term certificate courses in Child Therapy, Adolescent Therapy, and Family Therapy from NIMHANS, Bangalore. With almost 8 years of experience, Deepak serves, facilitates, and encourages the young talented students at IIT Ropar, aiding them in solving their routine life challenges during their academic journey.",
                 message: [
                     "We know that Campus life can be exhilarating, but it can also be overwhelming at times. Balancing coursework, extracurricular activities, social life, and personal responsibilities can put a strain on your mental health. That's why it's crucial to prioritize self-care and seek support when needed. Although after COVID, the attitude of individuals in society towards mental health is gradually changing positively. I feel as we navigate the challenges and responsibilities of academic life, it's essential to pause and reflect on our mental health and wellbeing. Your overall wellness is not just important; it's imperative for your success and happiness during your college journey.",
@@ -652,7 +656,7 @@ const seedData = async () => {
                 type: "counsellor",
                 email: "Gargi.tiwary@iitrpr.ac.in",
                 telephoneNo: "01881 23 6855",
-                image: "/uploads/team/gargi.svg",
+                image: "/uploads/team/gargi.jpg",
                 experience: "Gargi Tiwary holds an M.Sc. in Counseling Psychology from Christ University, Bangalore, and boasts rich experience working with individuals of all ages. With a focus on fostering psychological well-being and personal growth, she has conducted tailored workshops for diverse audiences including teachers, corporate professionals, and students. At IIT Bhilai, Gargi dedicated three years to community initiatives, engaging in various projects aimed at supporting students and staff. Now, at IIT Ropar, Gargi focuses on establishing meaningful connections with students. Through proactive measures like workshops and activities, she seeks insights into their concerns and needs, always aiming for solution-oriented approaches.",
                 message: [
                     "In light of the ongoing challenges we face, it is crucial now more than ever to prioritize your psychological wellbeing. Your mental health is just as important as your physical health, and we are here to support you every step of the way. If you're feeling overwhelmed, anxious, or stressed, please know that help is available. Reach out to our counselling services or mental health resources for guidance and support.",
@@ -670,7 +674,7 @@ const seedData = async () => {
                 type: "buddy",
                 email: "2021eeb1183@iitrpr.ac.in",
                 telephoneNo: "7061614428",
-                image: "/uploads/team/buddies/KRISHNAKUMAR.svg",
+                image: "/uploads/team/buddies/KRISHNAKUMAR.jpg",
                 course: "B.Tech EE",
                 order: 1,
                 isActive: true
@@ -681,7 +685,7 @@ const seedData = async () => {
                 type: "buddy",
                 email: "katyayni.20phz0008@iitrpr.ac.in",
                 telephoneNo: "8076896179",
-                image: "/uploads/team/buddies/KATYAYNITIWARI.svg",
+                image: "/uploads/team/buddies/KATYAYNITIWARI.jpg",
                 course: "Ph.D. Physics",
                 instaId: "https://www.instagram.com/tkatyayni/",
                 order: 2,
@@ -693,7 +697,7 @@ const seedData = async () => {
                 type: "buddy",
                 email: "aswathi.19hsz0013@iitrpr.ac.in",
                 telephoneNo: "8187029090",
-                image: "/uploads/team/buddies/AswathiPrakash.svg",
+                image: "/uploads/team/buddies/AswathiPrakash.jpg",
                 course: "Ph.D",
                 instaId: "https://www.instagram.com/aswathiprakash161/",
                 order: 3,
@@ -705,7 +709,7 @@ const seedData = async () => {
                 type: "buddy",
                 email: "2021csb1072@iitrpr.ac.in",
                 telephoneNo: "7011195216",
-                image: "/uploads/team/buddies/ARNAVKHARBANDA.svg",
+                image: "/uploads/team/buddies/ARNAVKHARBANDA.jpg",
                 course: "B.Tech CSE",
                 order: 4,
                 isActive: true
@@ -716,7 +720,7 @@ const seedData = async () => {
                 type: "buddy",
                 email: "2023cem1026@iitrpr.ac.in",
                 telephoneNo: "8209905879",
-                image: "/uploads/team/buddies/NishantYadav.svg",
+                image: "/uploads/team/buddies/NishantYadav.jpg",
                 course: "M.Tech Civil",
                 order: 5,
                 isActive: true
@@ -727,7 +731,7 @@ const seedData = async () => {
                 type: "buddy",
                 email: "vijay.21chz0008@iitrpr.ac.in",
                 telephoneNo: "9834491331",
-                image: "/uploads/team/buddies/VijayVaishampayan.svg",
+                image: "/uploads/team/buddies/VijayVaishampayan.jpg",
                 course: "PhD Chemical",
                 instaId: "https://www.instagram.com/vijayvaishampayan/",
                 order: 6,
@@ -739,7 +743,7 @@ const seedData = async () => {
                 type: "buddy",
                 email: "2023dss1011@iitrpr.ac.in",
                 telephoneNo: "7506262213",
-                image: "/uploads/team/buddies/BhushanVanjiwale.svg",
+                image: "/uploads/team/buddies/BhushanVanjiwale.jpg",
                 course: "M.Sc DS And Manag.",
                 order: 7,
                 isActive: true
@@ -750,7 +754,7 @@ const seedData = async () => {
                 type: "buddy",
                 email: "2021csb1108@iitrpr.ac.in",
                 telephoneNo: "7877072667",
-                image: "/uploads/team/buddies/MANAVCHAUHAN.svg",
+                image: "/uploads/team/buddies/MANAVCHAUHAN.jpg",
                 course: "B.Tech CSE",
                 order: 8,
                 isActive: true
@@ -761,7 +765,7 @@ const seedData = async () => {
                 type: "buddy",
                 email: "2021mcb1368@iitrpr.ac.in",
                 telephoneNo: "8868070206",
-                image: "/uploads/team/buddies/SnehaShah.svg",
+                image: "/uploads/team/buddies/SnehaShah.jpg",
                 course: "B.Tech MnC",
                 instaId: "https://www.instagram.com/happyfeet.iitropar/",
                 order: 9,
@@ -773,7 +777,7 @@ const seedData = async () => {
                 type: "buddy",
                 email: "2022cem1001@iitrpr.ac.in",
                 telephoneNo: "7302476127",
-                image: "/uploads/team/buddies/AdityaBadoni.svg",
+                image: "/uploads/team/buddies/AdityaBadoni.jpg",
                 course: "M.tech Civil",
                 order: 10,
                 isActive: true
@@ -784,7 +788,7 @@ const seedData = async () => {
                 type: "buddy",
                 email: "shivam.20csz0006@iitrpr.ac.in",
                 telephoneNo: "7650024500",
-                image: "/uploads/team/buddies/ShivamKainth.svg",
+                image: "/uploads/team/buddies/ShivamKainth.jpg",
                 course: "Ph.D. CSE",
                 instaId: "https://www.instagram.com/real.shivamk/",
                 order: 11,
@@ -796,7 +800,7 @@ const seedData = async () => {
                 type: "buddy",
                 email: "patilshyam079@gmail.com",
                 telephoneNo: "7769005407",
-                image: "/uploads/team/buddies/ShyamPatil.svg",
+                image: "/uploads/team/buddies/ShyamPatil.jpg",
                 course: "B.Tech",
                 order: 12,
                 isActive: true
@@ -807,7 +811,7 @@ const seedData = async () => {
                 type: "buddy",
                 email: "ankush.21eez0009@iitrpr.ac.in",
                 telephoneNo: "7018545213",
-                image: "/uploads/team/buddies/Ankush.svg",
+                image: "/uploads/team/buddies/Ankush.jpg",
                 course: "PhD EE",
                 instaId: "https://www.instagram.com/edmaholic/",
                 order: 13,
@@ -819,7 +823,7 @@ const seedData = async () => {
                 type: "buddy",
                 email: "2020chb1045@iitrpr.ac.in",
                 telephoneNo: "7479825017",
-                image: "/uploads/team/buddies/MAYANKKUMAR.svg",
+                image: "/uploads/team/buddies/MAYANKKUMAR.jpg",
                 course: "B.Teh Chemical",
                 order: 14,
                 isActive: true
@@ -830,7 +834,7 @@ const seedData = async () => {
                 type: "buddy",
                 email: "2021csb1123@iitrpr.ac.in",
                 telephoneNo: "8960104181",
-                image: "/uploads/team/buddies/PiyushKumar.svg",
+                image: "/uploads/team/buddies/PiyushKumar.jpg",
                 course: "B.Tech CSE",
                 order: 15,
                 isActive: true
@@ -841,7 +845,7 @@ const seedData = async () => {
                 type: "buddy",
                 email: "2023dss1032@iitrpr.ac.in",
                 telephoneNo: "9980333631",
-                image: "/uploads/team/buddies/ShrenikNandre.svg",
+                image: "/uploads/team/buddies/ShrenikNandre.jpg",
                 course: "M.Sc DS and Manag.",
                 order: 16,
                 isActive: true
@@ -852,7 +856,7 @@ const seedData = async () => {
                 type: "buddy",
                 email: "2022mmb1386@iitrpr.ac.in",
                 telephoneNo: "8409344447",
-                image: "/uploads/team/buddies/MrinalMaurya.svg",
+                image: "/uploads/team/buddies/MrinalMaurya.jpg",
                 course: "B.Tech MME",
                 order: 17,
                 isActive: true
@@ -870,6 +874,47 @@ const seedData = async () => {
             });
             await TeamMember.bulkCreate(prepared);
             console.log('Team Members seeded');
+        }
+
+        // Seed Counselors - User/Role/Counselor with encrypted password
+        const counselorTargets = [
+            { name: "Deepak Phogat", email: "deepak.phogat@iitrpr.ac.in" },
+            { name: "Gargi Tiwary", email: "Gargi.tiwary@iitrpr.ac.in" }
+        ];
+
+        for (const t of counselorTargets) {
+            // 1. Ensure User
+            let user = await User.findOne({ where: { email: t.email } });
+            if (!user) {
+                // Determine password - default or specific? Using Snehita@123 as default
+                const passwordHash = await bcrypt.hash("Snehita@123", 10);
+                await User.create({
+                    person_name: t.name,
+                    email: t.email,
+                    password: passwordHash
+                }, { hooks: false }); // Bypass hook to avoid double hashing if it were to run
+                console.log(`Seeded User: ${t.name}`);
+            }
+
+            // 2. Ensure Role
+            let role = await Role.findOne({ where: { email: t.email } });
+            if (!role) {
+                await Role.create({
+                    email: t.email,
+                    role: 'counselor'
+                });
+                console.log(`Seeded Role for: ${t.name}`);
+            }
+
+            // 3. Ensure Counselor
+            let counselor = await Counselor.findOne({ where: { email: t.email } });
+            if (!counselor) {
+                await Counselor.create({
+                    name: t.name,
+                    email: t.email
+                });
+                console.log(`Seeded Counselor Config for: ${t.name}`);
+            }
         }
 
         console.log('Seeding complete');

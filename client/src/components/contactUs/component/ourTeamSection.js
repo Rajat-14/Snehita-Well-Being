@@ -34,6 +34,16 @@ const OurTeamSection = () => {
   const handleNavLinkClick = () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
+
+  const getImageUrl = (imagePath) => {
+    if (!imagePath) return "";
+    if (imagePath.startsWith("http")) return imagePath;
+
+    const baseUrl = (process.env.REACT_APP_API_URL || 'http://localhost:8000').replace(/\/$/, "");
+    const cleanPath = imagePath.startsWith("/") ? imagePath : `/${imagePath}`;
+    return `${baseUrl}${cleanPath}`;
+  };
+
   return (
     <div className=" my-4  container " data-aos="fade-up">
       <p className="d-flex justify-content-center border-bottom fs-1" style={{ marginTop: "40px", color: "black" }}>
@@ -54,7 +64,7 @@ const OurTeamSection = () => {
                     name={profile.name}
                     designation={profile.designation} // Using designation as backend doesn't seem to have fullDesignation populated in seed for everyone, or I should use designation
                     emailId={profile.email}
-                    pic={`${process.env.REACT_APP_API_URL || 'http://localhost:8000'}${profile.image}`}
+                    pic={getImageUrl(profile.image)}
                     telephoneNo={profile.telephoneNo}
                   />
                 </div>

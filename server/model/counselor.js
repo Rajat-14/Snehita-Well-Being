@@ -1,6 +1,5 @@
 const { DataTypes } = require('sequelize');
 const sequelize = require('../db/database');
-const bcrypt = require('bcrypt');
 const Role = require('./role');
 
 const Counselor = sequelize.define('Counselor', {
@@ -20,22 +19,12 @@ const Counselor = sequelize.define('Counselor', {
             model: Role,
             key: 'email'
         }
-    },
-    password: {
-        type: DataTypes.STRING,
-        allowNull: false
     }
 }, {
-    timestamps: true,
-    hooks: {
-        beforeSave: async (counselor) => {
-            if (counselor.changed('password')) {
-                counselor.password = await bcrypt.hash(counselor.password, 10);
-            }
-        }
-    }
+    timestamps: true
 });
 
+// Associations
 Role.hasOne(Counselor, { foreignKey: 'email', sourceKey: 'email' });
 Counselor.belongsTo(Role, { foreignKey: 'email', targetKey: 'email' });
 

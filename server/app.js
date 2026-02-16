@@ -1,4 +1,5 @@
 const express = require("express");
+const path = require("path");
 require("dotenv").config();
 const Role = require("./model/role");
 const Counselor = require("./model/counselor");
@@ -28,10 +29,34 @@ const mediaRoutes = require("./routes/mediaRoutes");
 const infoRoutes = require("./routes/infoRoutes");
 
 // Middleware
-app.use(cors({ credentials: true, origin: BASE_URL }));
+app.use(cors({
+  credentials: true,
+  origin: ["http://localhost:3000", "http://localhost:3001", process.env.BASE_URL].filter(Boolean)
+}));
 app.use(express.json());
 app.use(cookieParser());
-app.use('/uploads', express.static('uploads'));
+// Debugging middleware for uploads
+app.use('/uploads', (req, res, next) => {
+  const requestPath = req.path;
+  console.log(`[Static] Request for: /uploads${requestPath}`);
+
+  // Construct physical path to verify existence
+  // req.path works relative to the mount point in app.use
+  const fileSystemPath = path.join(__dirname, 'uploads', requestPath);
+
+  console.log(`  -> Looking for file at: ${fileSystemPath}`);
+
+  try {
+    if (fs.existsSync(fileSystemPath)) {
+      console.log('  -> File FOUND on disk');
+    } else {
+      console.log('  -> File NOT FOUND on disk');
+    }
+  } catch (err) {
+    console.error('  -> Error checking file:', err.message);
+  }
+  next();
+}, express.static(path.join(__dirname, 'uploads')));
 app.use(express.static('public'));  // For serving public assets
 
 app.use(

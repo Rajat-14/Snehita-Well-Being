@@ -13,31 +13,31 @@ const TeamCard = (props) => {
           <div className="front">
             <div className="front__bkg-photo"></div>
             <div className="front__face-photo">
-                <img src={props.pic?props.pic:""} alt={"Buddy Pic"} loading='lazy' />
+              <img src={props.pic ? props.pic : ""} alt={"Buddy Pic"} />
             </div>
             <div className="front__text">
-              <h3 className="front__text-header">{props.name?props.name:"Name"}</h3>
+              <h3 className="front__text-header">{props.name ? props.name : "Name"}</h3>
               <p className="front__text-para">
-              {props.designation?props.designation:"Designation"}
+                {props.designation ? props.designation : "Designation"}
               </p>
             </div>
           </div>
           <div className="back">
             <div className="social-media-wrapper">
-              {props.phoneNo&&<a href={`https://wa.me/${props.phoneNo}`} target='_blank' className="social-icon">
-              <FaWhatsapp />
+              {props.phoneNo && <a href={`https://wa.me/${props.phoneNo}`} target='_blank' className="social-icon">
+                <FaWhatsapp />
               </a>}
-              {props.emailId&&<a href={"mailto:"+props.emailId} target='_blank' className="social-icon">
-              <MdOutlineMailOutline />
+              {props.emailId && <a href={"mailto:" + props.emailId} target='_blank' className="social-icon">
+                <MdOutlineMailOutline />
               </a>}
-              {props.telephoneNo&&<a href={"callto:"+props.telephoneNo} target='_blank' className="social-icon">
-              <MdOutlinePhoneInTalk />
+              {props.telephoneNo && <a href={"callto:" + props.telephoneNo} target='_blank' className="social-icon">
+                <MdOutlinePhoneInTalk />
               </a>}
-              {props.instaId&&<a href={props.instaId} target='_blank' className="social-icon">
-              <FaInstagram />
+              {props.instaId && <a href={props.instaId} target='_blank' className="social-icon">
+                <FaInstagram />
               </a>}
-              {props.linkedinId&&<a href={props.linkedinId} target='_blank' className="social-icon">
-              <CiLinkedin />
+              {props.linkedinId && <a href={props.linkedinId} target='_blank' className="social-icon">
+                <CiLinkedin />
               </a>}
             </div>
           </div>

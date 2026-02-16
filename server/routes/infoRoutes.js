@@ -43,4 +43,8 @@ router.post("/team-member", teamMemberController.createTeamMember);
 router.put("/team-member/:id", teamMemberController.updateTeamMember);
 router.delete("/team-member/:id", teamMemberController.deleteTeamMember);
 
+// Counselor routes
+const counselorController = require("../controllers/counselorController");
+router.get("/counselors", counselorController.getAllCounselors);
+
 module.exports = router;
