@@ -608,7 +608,7 @@ const seedData = async () => {
                 name: "Deepak Phogat",
                 designation: "Counsellor",
                 type: "counsellor",
-                email: "deepak.phogat@iitrpr.ac.in",
+                email: "carewho.987@gmail.com",
                 telephoneNo: "01881 23 5113",
                 image: "/uploads/team/deepak.jpg",
                 experience: "Deepak Phogat, the counselor at IIT Ropar since 2016, holds an M. Phil Clinical Psychology from PGIBAMS, Raipur, and is registered under the Rehabilitation Council of India, RCI - New Delhi, as a Clinical Psychologist. Alongside his M. Phil, Deepak has completed short-term certificate courses in Child Therapy, Adolescent Therapy, and Family Therapy from NIMHANS, Bangalore. With almost 8 years of experience, Deepak serves, facilitates, and encourages the young talented students at IIT Ropar, aiding them in solving their routine life challenges during their academic journey.",
@@ -625,7 +625,7 @@ const seedData = async () => {
                 name: "Gargi Tiwary",
                 designation: "Counsellor",
                 type: "counsellor",
-                email: "Gargi.tiwary@iitrpr.ac.in",
+                email: "carewho.987@gmail.com",
                 telephoneNo: "01881 23 6855",
                 image: "/uploads/team/gargi.jpg",
                 experience: "Gargi Tiwary holds an M.Sc. in Counseling Psychology from Christ University, Bangalore, and boasts rich experience working with individuals of all ages. With a focus on fostering psychological well-being and personal growth, she has conducted tailored workshops for diverse audiences including teachers, corporate professionals, and students. At IIT Bhilai, Gargi dedicated three years to community initiatives, engaging in various projects aimed at supporting students and staff. Now, at IIT Ropar, Gargi focuses on establishing meaningful connections with students. Through proactive measures like workshops and activities, she seeks insights into their concerns and needs, always aiming for solution-oriented approaches.",
@@ -849,8 +849,8 @@ const seedData = async () => {
 
         // Seed Counselors - User/Role/Counselor with encrypted password
         const counselorTargets = [
-            { name: "Deepak Phogat", email: "deepak.phogat@iitrpr.ac.in" },
-            { name: "Gargi Tiwary", email: "Gargi.tiwary@iitrpr.ac.in" }
+            { name: "Deepak Phogat", email: "carewho.987@gmail.com" },
+            { name: "Gargi Tiwary", email: "carewho.987@gmail.com" }
         ];
 
         for (const t of counselorTargets) {

@@ -47,7 +47,24 @@ exports.getTestimonials = async (req, res) => {
 exports.createBlog = async (req, res) => {
     try {
         const { title, content, type, link } = req.body;
-        const pic = req.file ? req.file.filename : 'default.jpg'; // Assuming multer is used
+
+        // Map types to folder names (Must match upload middleware)
+        const folderMap = {
+            "Anxiety": "Anxiety",
+            "Anger": "Anger",
+            "Habit": "habit",
+            "Goals Setting": "motivation",
+            "Stress": "stress",
+            "Depression": "depression",
+            "Internet Usage": "internetUsage",
+            "Time-Management": "timeManagement",
+            "Sleep and Body Image": "sleep"
+        };
+
+        const folderName = folderMap[type] || type;
+
+        // If file exists, save path as "FolderName/Filename"
+        const pic = req.file ? `${folderName}/${req.file.filename}` : 'default.jpg';
 
         const newBlog = await Blog.create({
             title,

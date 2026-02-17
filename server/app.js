@@ -37,27 +37,19 @@ app.use(cors({
 app.use(express.json());
 app.use(cookieParser());
 // Debugging middleware for uploads
+// Debugging middleware for uploads
 app.use('/uploads', (req, res, next) => {
   const requestPath = req.path;
   console.log(`[Static] Request for: /uploads${requestPath}`);
-
-  // Construct physical path to verify existence
-  // req.path works relative to the mount point in app.use
-  const fileSystemPath = path.join(__dirname, 'uploads', requestPath);
-
-  console.log(`  -> Looking for file at: ${fileSystemPath}`);
-
-  try {
-    if (fs.existsSync(fileSystemPath)) {
-      console.log('  -> File FOUND on disk');
-    } else {
-      console.log('  -> File NOT FOUND on disk');
-    }
-  } catch (err) {
-    console.error('  -> Error checking file:', err.message);
-  }
   next();
-}, express.static(path.join(__dirname, 'uploads')));
+});
+
+// Serve Blog Images from Client Assets
+const clientAssetsPath = path.join(__dirname, '../../client/src/components/assets/BlogsPics');
+app.use('/uploads/blogs', express.static(clientAssetsPath));
+
+// Serve other uploads from server/uploads
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 app.use(express.static('public'));  // For serving public assets
 
 app.use(
