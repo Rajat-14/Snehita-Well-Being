@@ -162,16 +162,25 @@ exports.sendEmail = async (req, res) => {
 
 exports.getCounselorAppointments = async (req, res) => {
     try {
-        const { counselorName, status } = req.query;
+        const { counselorName, status, timeframe } = req.query;
 
         let whereClause = { counselorName };
         if (status) {
             whereClause.status = status;
         }
 
+        const today = new Date();
+        today.setHours(0, 0, 0, 0); // Start of today
+
+        if (timeframe === 'future') {
+            whereClause.appointmentDate = { [Op.gte]: today };
+        } else if (timeframe === 'past') {
+            whereClause.appointmentDate = { [Op.lt]: today };
+        }
+
         const appointments = await Appointment.findAll({
             where: whereClause,
-            order: [['appointmentDate', 'ASC']]
+            order: [['appointmentDate', timeframe === 'past' ? 'DESC' : 'ASC']] // Show newest past appointments first
         });
 
         res.json(appointments);
@@ -223,6 +232,7 @@ exports.updateAppointmentNotes = async (req, res) => {
     }
 };
 
+
 exports.getAppointmentById = async (req, res) => {
     try {
         const { id } = req.params;
@@ -235,6 +245,30 @@ exports.getAppointmentById = async (req, res) => {
         res.json(appointment);
     } catch (err) {
         console.error("Error fetching appointment:", err);
+        res.status(500).send("Server Error");
+    }
+};
+
+exports.getPatientHistory = async (req, res) => {
+    try {
+        const { userId } = req.params;
+
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+
+        const history = await Appointment.findAll({
+            where: {
+                userId: userId,
+                status: 'approved',
+                appointmentDate: { [Op.lt]: today } // Only past appointments
+            },
+            order: [['appointmentDate', 'DESC']],
+            attributes: ['id', 'appointmentDate', 'problemDescription', 'notes', 'problemRelatedWith'] // Removed status and timeSlot
+        });
+
+        res.json(history);
+    } catch (err) {
+        console.error("Error fetching patient history:", err);
         res.status(500).send("Server Error");
     }
 };

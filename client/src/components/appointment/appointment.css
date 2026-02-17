@@ -5,17 +5,20 @@
   padding: 0;
   font-family: "Baloo Bhai 2", sans-serif;
 }
+
 .BODY {
   background: url(appointment.png);
   background-repeat: no-repeat;
   object-fit: "contain";
   background-size: cover;
   background-position: center;
-  position: relative; /* Set position to relative */
+  position: relative;
+  /* Set position to relative */
   top: 0;
   left: 0;
   width: 100%;
-  height: 100vh; /* Set height to 100% of the viewport height */
+  height: 100vh;
+  /* Set height to 100% of the viewport height */
 }
 
 .form {
@@ -23,7 +26,7 @@
   top: 50%;
   left: 35%;
   overflow-y: auto;
-  
+
   /* height: 550px; */
 
   transform: translate(-50%, -50%);
@@ -36,7 +39,7 @@
   box-shadow: 0 15px 50px rgba(0, 0, 0, 0.6);
   padding: 50px;
   box-sizing: border-box;
-  
+
 }
 
 .form h2 {
@@ -44,10 +47,12 @@
   margin: 0 0 40px;
   padding: 0px;
 }
+
 .form .input-box {
   position: relative;
   margin: 20px 0;
 }
+
 .form .input-box input {
   width: 100%;
   font-size: 16px;
@@ -60,6 +65,7 @@
   font-weight: bold;
   color: rgba(0, 0, 0, 0.467);
 }
+
 .form .input-box input:focus,
 .form .input-box input:focus {
   border-bottom: 2px solid #03a9f4;
@@ -82,10 +88,12 @@
   font-weight: bold;
   transition: 0.5s;
 }
+
 .form .input-box input[type="submit"]:hover {
   background: #03a9f4;
   transition: 0.4s;
 }
+
 .form .input-box input[type="date"] {
   color: #777;
   font-weight: bold;
@@ -93,11 +101,13 @@
 
 /* ... (your existing CSS) */
 .input-box {
-  text-align: center; /* Center-align the content within the .input-box */
+  text-align: center;
+  /* Center-align the content within the .input-box */
 }
 
 .input-box button.calendarbutton {
-  background-color: #3498db; /* Blue for the Calendar button */
+  background-color: #3498db;
+  /* Blue for the Calendar button */
   color: white;
   border: none;
   padding: 10px 20px;
@@ -112,11 +122,13 @@
 }
 
 .input-box button.calendarbutton:hover {
-  background-color: #2980b9; /* Darker blue on hover */
+  background-color: #2980b9;
+  /* Darker blue on hover */
 }
 
 .input-box button.print {
-  background-color: #008cba; /* Blue for the Print button */
+  background-color: #008cba;
+  /* Blue for the Print button */
   color: white;
   border: none;
   padding: 10px 20px;
@@ -131,7 +143,8 @@
 }
 
 .input-box button.print:hover {
-  background-color: #00688b; /* Darker blue on hover */
+  background-color: #00688b;
+  /* Darker blue on hover */
 }
 
 input[type="number"]::-webkit-inner-spin-button,
@@ -144,7 +157,7 @@ input[type="number"]::-webkit-outer-spin-button {
   top: 18%;
   right: 10%;
   overflow-y: auto;
-  overflow-x:hidden;
+  overflow-x: hidden;
   display: flex;
   justify-content: center;
   height: 550px;
@@ -156,9 +169,11 @@ input[type="number"]::-webkit-outer-spin-button {
   padding: 50px;
   box-sizing: border-box;
 }
+
 .previous-appointments-list {
   padding: 10px;
 }
+
 .form2 h2 {
   color: #777;
   text-align: center;
@@ -229,55 +244,67 @@ input[type="number"]::-webkit-outer-spin-button {
 .previous-appointments-table tbody tr:hover {
   background-color: #dddddd;
 }
+
 .previous-appointments h2 {
   margin-top: -1rem;
   padding-top: 0px;
   top: 0;
 }
+
 @media (min-width: 769px) and (max-width: 1600px) {
   .appointment {
-    flex-direction: row; /* Align items in a row */
-    justify-content: space-around; /* Evenly distribute items along the main axis */
+    flex-direction: row;
+    /* Align items in a row */
+    justify-content: space-around;
+    /* Evenly distribute items along the main axis */
     align-items: flex-start;
   }
 
   .form,
   .form2 {
-  /* Adjust width to occupy 45% of the parent container */
-  /* flex: 1; */
-  max-width: 45%; /* Set maximum width to 45% of the parent container */
-  width: auto; /* Allow width to adjust based on content */
-  min-width: 320px; /* Set minimum width to avoid becoming too narrow */
+    /* Adjust width to occupy 45% of the parent container */
+    /* flex: 1; */
+    max-width: 45%;
+    /* Set maximum width to 45% of the parent container */
+    width: auto;
+    /* Allow width to adjust based on content */
+    min-width: 320px;
+    /* Set minimum width to avoid becoming too narrow */
     /* min-width: 400px; */
     height: auto;
     min-height: 400px;
     margin-bottom: 20px;
     justify-content: space-around;
-    margin-bottom: 20px; /* Add margin to separate the forms */
+    margin-bottom: 20px;
+    /* Add margin to separate the forms */
   }
 
   .form {
     /* Add margin to separate forms */
     left: 28%;
-    
+
   }
+
   .form2 {
     position: absolute;
-    top:15%;
-    left: 60%;/* Add margin to separate forms */
+    top: 15%;
+    left: 60%;
+    /* Add margin to separate forms */
     max-height: 70%;
     overflow-x: hidden;
     display: flex;
     justify-content: center;
   }
+
   .previous-appointments-table th,
   .previous-appointments-table td {
     padding: auto;
     font-size: 11px;
-   
+
 
   }
-  .form2 h2{
+
+  .form2 h2 {
     font-size: 25px;
   }
 }
@@ -289,6 +316,7 @@ input[type="number"]::-webkit-outer-spin-button {
     align-items: center;
     justify-content: space-around;
   }
+
   .BODY {
     overflow: auto;
     background-repeat: no-repeat;
@@ -305,47 +333,57 @@ input[type="number"]::-webkit-outer-spin-button {
     position: absolute;
     top: 27%;
     left: 50%;
-    width: 80%; /* Adjust width as needed */
+    width: 80%;
+    /* Adjust width as needed */
     max-width: 768px;
-    height: 43%; /* Reset height */
-    margin-bottom: 20px; /* Add some margin to separate the forms */
-    overflow-y: hidden; /* Remove scroll */
+    height: 43%;
+    /* Reset height */
+    margin-bottom: 20px;
+    /* Add some margin to separate the forms */
+    overflow-y: hidden;
+    /* Remove scroll */
     padding: 5%;
     transform: translate(-50%, -50%);
     min-height: 10px;
-    
+
   }
+
   .form input[type="text"],
   .form input[type="number"],
   .form input[type="email"],
   .form input[type="date"],
   .form input[type="submit"],
   .form select {
-    font-size: 15px; /* Adjust font size as needed */
+    font-size: 15px;
+    /* Adjust font size as needed */
     padding: 0.6em;
   }
 
   .form .input-box .fa {
     font-size: 12px;
   }
+
   .form2 {
-  position: absolute;
-  top: 54%;
-  right: 10%;
-  overflow-y: auto;
-  height: 500px;
-  max-width: 100%;
-  width: 80%;
-  min-height: 200px;
-  padding: 5%;
+    position: absolute;
+    top: 54%;
+    right: 10%;
+    overflow-y: auto;
+    height: 500px;
+    max-width: 100%;
+    width: 80%;
+    min-height: 200px;
+    padding: 5%;
   }
 
-  .form h2, .form2 h2 {
+  .form h2,
+  .form2 h2 {
     font-size: 20px;
   }
-  .form2 h2{
-    padding-top:10px;
+
+  .form2 h2 {
+    padding-top: 10px;
   }
+
   .previous-appointments-table th,
   .previous-appointments-table td {
     padding: 5px;
@@ -362,7 +400,8 @@ input[type="number"]::-webkit-outer-spin-button {
   width: 100%;
   padding: 20px;
   box-sizing: border-box;
-  overflow-y: auto; /* Enable scrolling if content overflows viewport */
+  overflow-y: auto;
+  /* Enable scrolling if content overflows viewport */
 }
 
 .counselor-requests-box {
@@ -373,7 +412,8 @@ input[type="number"]::-webkit-outer-spin-button {
   width: 90%;
   max-width: 1200px;
   margin: auto;
-  margin-top: 50px; /* Push down a bit from top */
+  margin-top: 50px;
+  /* Push down a bit from top */
 }
 
 .counselor-requests-box h2 {
@@ -391,7 +431,7 @@ input[type="number"]::-webkit-outer-spin-button {
   margin-top: 20px;
 }
 
-.counselor-requests-table th, 
+.counselor-requests-table th,
 .counselor-requests-table td {
   border: 1px solid #ddd;
   padding: 12px;
@@ -418,8 +458,8 @@ input[type="number"]::-webkit-outer-spin-button {
     padding: 20px;
     margin-top: 20px;
   }
-  
-  .counselor-requests-table th, 
+
+  .counselor-requests-table th,
   .counselor-requests-table td {
     padding: 8px;
     font-size: 14px;
@@ -428,3 +468,169 @@ input[type="number"]::-webkit-outer-spin-button {
 
 
 
+
+/* Improved Counselor Dashboard Styles */
+.counselor-dashboard-layout {
+  display: flex;
+  flex-direction: column;
+  width: 95%;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 20px;
+  height: 100vh;
+  /* Full viewport height */
+  overflow: hidden;
+  /* Prevent body scroll if improved scrolling logic is used */
+}
+
+.header-bar {
+  flex-shrink: 0;
+  /* Don't shrink the header */
+  border-left: 5px solid #007bff;
+  /* Accent on left */
+  /* width: 100%; explicit width not needed in flex column but good for safety */
+}
+
+.white-board-container {
+  background: #fff;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  /* Subtle shadow like a floating board */
+  border-radius: 8px;
+  padding: 20px;
+  flex-grow: 1;
+  /* Take up remaining space */
+  overflow: hidden;
+  /* Prevent spillover */
+  display: flex;
+  flex-direction: column;
+  margin-top: 20px;
+}
+
+.white-board-container .table-responsive {
+  height: 100%;
+  overflow-y: auto;
+  /* Scroll within table area */
+}
+
+/* Enhancing Table */
+.white-board-container .table th {
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 0.9rem;
+  letter-spacing: 0.5px;
+  background-color: #f8f9fa;
+  /* Light grey header */
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.white-board-container .table td {
+  vertical-align: middle;
+}
+
+/* Badge Tweaks */
+.badge {
+  font-size: 0.85rem;
+  padding: 0.5em 0.8em;
+  font-weight: 500;
+}
+
+/* Action Buttons */
+.btn-action {
+  transition: all 0.3s ease;
+  font-weight: 600;
+  border-radius: 20px;
+  /* Rounded pill shape */
+  padding: 5px 15px;
+  font-size: 0.85rem;
+}
+
+.btn-accept {
+  background-color: #28a745;
+  color: white;
+  border: none;
+}
+
+.btn-accept:hover {
+  background-color: #218838;
+  box-shadow: 0 4px 8px rgba(40, 167, 69, 0.3);
+  transform: translateY(-1px);
+}
+
+.btn-reject {
+  background-color: #dc3545;
+  color: white;
+  border: none;
+}
+
+.btn-reject:hover {
+  background-color: #c82333;
+  box-shadow: 0 4px 8px rgba(220, 53, 69, 0.3);
+  transform: translateY(-1px);
+}
+
+/* Actions Dropdown */
+.actions-wrapper {
+  position: relative;
+  display: inline-block;
+}
+
+.actions-dropdown-menu {
+  position: absolute;
+  right: 0;
+  top: 100%;
+  background-color: white;
+  border: 1px solid rgba(0, 0, 0, .15);
+  border-radius: 0.25rem;
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+  z-index: 1000;
+  min-width: 10rem;
+  padding: 0.5rem 0;
+  margin-top: 0.125rem;
+}
+
+.actions-dropdown-menu .dropdown-item {
+  display: block;
+  width: 100%;
+  padding: 0.25rem 1.5rem;
+  clear: both;
+  font-weight: 400;
+  color: #212529;
+  text-align: inherit;
+  white-space: nowrap;
+  background-color: transparent;
+  border: 0;
+  cursor: pointer;
+}
+
+.actions-dropdown-menu .dropdown-item:hover {
+  color: #16181b;
+  background-color: #f8f9fa;
+}
+
+/* Problem Severity Coloring */
+.severity-badge {
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-weight: bold;
+  font-size: 0.9em;
+}
+
+.severity-low {
+  color: #155724;
+  background-color: #d4edda;
+  border: 1px solid #c3e6cb;
+}
+
+.severity-moderate {
+  color: #856404;
+  background-color: #fff3cd;
+  border: 1px solid #ffeeba;
+}
+
+.severity-severe {
+  color: #721c24;
+  background-color: #f8d7da;
+  border: 1px solid #f5c6cb;
+}

@@ -11,5 +11,6 @@ router.get("/counselor/appointments", authenticate, appointmentController.getCou
 router.put("/status/:id", authenticate, appointmentController.updateAppointmentStatus);
 router.put("/notes/:id", authenticate, appointmentController.updateAppointmentNotes);
 router.get("/:id", authenticate, appointmentController.getAppointmentById);
+router.get("/counselor/patient-history/:userId", authenticate, appointmentController.getPatientHistory);
 
 module.exports = router;
