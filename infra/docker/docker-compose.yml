@@ -9,7 +9,7 @@ services:
       - ../../server/.env
     ports:
       - "8000:8000"
-    command: sh -c "sleep 10 && node seed.js && node app.js"
+    command: sh -c "sleep 5 && node seed.js && node app.js"
 
   frontend:
     build:

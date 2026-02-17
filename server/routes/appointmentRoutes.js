@@ -10,6 +10,8 @@ router.get("/bookedSlots", authenticate, appointmentController.getBookedSlots);
 router.get("/counselor/appointments", authenticate, appointmentController.getCounselorAppointments);
 router.put("/status/:id", authenticate, appointmentController.updateAppointmentStatus);
 router.put("/notes/:id", authenticate, appointmentController.updateAppointmentNotes);
+
+router.get("/public-availability", appointmentController.getPublicCounselorAvailability); // Public endpoint, no auth required
 router.get("/:id", authenticate, appointmentController.getAppointmentById);
 router.get("/counselor/patient-history/:userId", authenticate, appointmentController.getPatientHistory);
 

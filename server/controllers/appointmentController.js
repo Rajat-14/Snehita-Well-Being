@@ -272,3 +272,46 @@ exports.getPatientHistory = async (req, res) => {
         res.status(500).send("Server Error");
     }
 };
+
+exports.getPublicCounselorAvailability = async (req, res) => {
+    try {
+        const { counselorName } = req.query;
+        console.log("Fetching public availability for counselor:", counselorName);
+
+        if (!counselorName) {
+            console.warn("Counselor name missing in request");
+            return res.status(400).json({ msg: "Counselor name is required" });
+        }
+
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+
+        console.log("Querying appointments from:", today);
+
+        // Verify that Appointment model is working
+        if (!Appointment || !Appointment.findAll) {
+            throw new Error("Appointment model is not properly initialized");
+        }
+
+        const appointments = await Appointment.findAll({
+            where: {
+                counselorName: counselorName,
+                status: 'approved',
+                appointmentDate: { [Op.gte]: today }
+            },
+            attributes: ['appointmentDate', 'timeSlot']
+        });
+
+        console.log(`Found ${appointments.length} appointments for ${counselorName}`);
+        res.json(appointments);
+    } catch (err) {
+        console.error("Error fetching counselor availability:", err);
+        // Send detailed error to client for debugging
+        res.status(500).json({
+            msg: "Server Error fetching availability",
+            error: err.message,
+            stack: err.stack,
+            details: err.toString()
+        });
+    }
+};

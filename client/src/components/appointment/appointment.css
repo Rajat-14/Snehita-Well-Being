@@ -634,3 +634,55 @@ input[type="number"]::-webkit-outer-spin-button {
   background-color: #f8d7da;
   border: 1px solid #f5c6cb;
 }
+
+/* Calendar View Styles */
+.calendar-view {
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.calendar-view .table-responsive {
+  flex-grow: 1;
+  overflow-y: auto;
+  min-height: 0;
+}
+
+/* Ensure table header sticks */
+.calendar-table thead th {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  background-color: #e3f2fd;
+}
+
+.calendar-table th,
+.calendar-table td {
+  vertical-align: middle;
+}
+
+.calendar-table td {
+  height: 80px;
+  /* Fixed height for consistency */
+  position: relative;
+  padding: 0;
+}
+
+.clickable-slot {
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.clickable-slot:hover {
+  background-color: #218838 !important;
+  /* Darker green on hover */
+}
+
+/* Specific Lunch Style override if needed beyond bootstrap classes */
+.calendar-table .bg-secondary {
+  background-color: #6c757d !important;
+}

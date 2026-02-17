@@ -52,6 +52,32 @@ const CounselorDashboard = ({ user }) => {
         setPatientHistory([]);
     };
 
+    const [showCalendar, setShowCalendar] = useState(false);
+    const [calendarAppointments, setCalendarAppointments] = useState([]);
+
+    useEffect(() => {
+        fetchAppointments();
+        if (showCalendar) {
+            fetchCalendarAppointments();
+        }
+    }, [filter, showCalendar]);
+
+    const fetchCalendarAppointments = async () => {
+        try {
+            const response = await axios.get(`${BASE_URL}/counselor/appointments`, {
+                params: {
+                    counselorName: user.person_name,
+                    status: 'approved',
+                    timeframe: 'future' // Fetch all future approved for calendar
+                },
+                withCredentials: true,
+            });
+            setCalendarAppointments(response.data);
+        } catch (error) {
+            console.error("Error fetching calendar appointments:", error);
+        }
+    };
+
     const fetchAppointments = async () => {
         setLoading(true);
         try {
@@ -175,10 +201,98 @@ const CounselorDashboard = ({ user }) => {
                                 History
                             </button>
                         </div>
+                        <button
+                            className={`btn ${showCalendar ? 'btn-info text-white' : 'btn-outline-info'} ms-3`}
+                            onClick={() => setShowCalendar(!showCalendar)}
+                        >
+                            {showCalendar ? 'Hide Weekly Plan' : 'Weekly Plan'}
+                        </button>
                     </div>
 
                     <div className="white-board-container">
-                        {loading ? <p className="text-center p-4">Loading...</p> : (
+                        {showCalendar ? (
+                            <div className="calendar-view p-3">
+                                <h4 className="text-center mb-4 text-primary">Weekly Plan (Next 7 Days)</h4>
+                                <div className="table-responsive">
+                                    <table className="table table-bordered text-center calendar-table">
+                                        <thead className="table-primary">
+                                            <tr>
+                                                <th>Date</th>
+                                                <th>9 AM - 10 AM</th>
+                                                <th>10 AM - 11 AM</th>
+                                                <th>11 AM - 12 PM</th>
+                                                <th>12 PM - 1 PM</th>
+                                                <th className="bg-secondary text-white">1 PM - 2 PM</th>
+                                                <th>2 PM - 3 PM</th>
+                                                <th>3 PM - 4 PM</th>
+                                                <th>4 PM - 5 PM</th>
+                                                <th>5 PM - 6 PM</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {Array.from({ length: 7 }).map((_, dayIndex) => {
+                                                const date = new Date();
+                                                date.setDate(date.getDate() + dayIndex);
+                                                const dateString = date.toLocaleDateString();
+                                                const dayName = date.toLocaleDateString('en-US', { weekday: 'short' });
+
+                                                // Slots: 9, 10, 11, 12, 13(Lunch), 14, 15, 16, 17
+                                                const timeSlots = [9, 10, 11, 12, 13, 14, 15, 16, 17];
+
+                                                return (
+                                                    <tr key={dayIndex}>
+                                                        <td className="fw-bold bg-light" style={{ minWidth: '120px' }}>
+                                                            {dateString} <br /> <small className="text-muted">{dayName}</small>
+                                                        </td>
+                                                        {timeSlots.map(hour => {
+                                                            if (hour === 13) {
+                                                                return <td key={hour} className="bg-secondary text-white align-middle">Lunch Break</td>;
+                                                            }
+
+                                                            // Find appointment for this slot
+                                                            // Format time logic: "09:00 AM - 10:00 AM" roughly matches our slot
+                                                            // DB stores "09:00 AM - 10:00 AM" string
+                                                            // Let's construct matching string or check substring
+                                                            const hour12 = hour > 12 ? hour - 12 : hour;
+                                                            const ampm = hour >= 12 ? 'PM' : 'AM';
+                                                            const nextHour = hour + 1;
+                                                            const nextHour12 = nextHour > 12 ? nextHour - 12 : nextHour;
+                                                            const nextAmpm = nextHour >= 12 ? 'PM' : 'AM';
+
+                                                            const slotStringStart = `${hour12.toString().padStart(2, '0')}:00 ${ampm}`;
+                                                            // Appt timeSlot format: "09:00 AM - 10:00 AM"
+
+                                                            const bookedAppt = calendarAppointments.find(appt => {
+                                                                const apptDate = new Date(appt.appointmentDate).toLocaleDateString();
+                                                                return apptDate === dateString && appt.timeSlot.startsWith(slotStringStart);
+                                                            });
+
+                                                            return (
+                                                                <td key={hour} className={`align-middle ${bookedAppt ? 'bg-success text-white clickable-slot' : ''}`}
+                                                                    onClick={() => bookedAppt && openPatientModal(bookedAppt)}
+                                                                    style={{ cursor: bookedAppt ? 'pointer' : 'default', height: '80px' }}
+                                                                >
+                                                                    {bookedAppt ? (
+                                                                        <div>
+                                                                            <strong>{bookedAppt.fullName}</strong>
+                                                                            <br />
+                                                                            {/* Show Severity Badge Style Text */}
+                                                                            <small className="fw-bold" style={{ textTransform: 'capitalize' }}>
+                                                                                {bookedAppt.problemExtent || 'Moderate'}
+                                                                            </small>
+                                                                        </div>
+                                                                    ) : '-'}
+                                                                </td>
+                                                            );
+                                                        })}
+                                                    </tr>
+                                                );
+                                            })}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        ) : loading ? <p className="text-center p-4">Loading...</p> : (
                             <div className="table-responsive">
                                 {appointments.length > 0 ? (
                                     <table className="table table-hover align-middle">
