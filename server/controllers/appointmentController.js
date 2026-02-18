@@ -63,6 +63,9 @@ exports.createAppointment = async (req, res) => {
 
         console.log("INSERTED INTO DATABASE:", appointment.toJSON());
 
+        // Send email notification asynchronously
+        sendAppointmentEmail(req.body).catch(err => console.error("Async email send failed:", err));
+
         res.status(201).json(appointment);
     } catch (err) {
         console.error("Error creating appointment:", err);
@@ -109,54 +112,63 @@ exports.getBookedSlots = async (req, res) => {
     }
 };
 
-exports.sendEmail = async (req, res) => {
-    const formData = req.body;
+const Counselor = require("../model/counselor"); // Import Counselor model
 
-    // Map counselor names to their email addresses - TODO: Move to DB or Config
-    const counselorEmails = {
-        "Deepak Phogat": "deepak.phogat@iitrpr.ac.in",
-        "Gargi Tiwari": "Gargi.tiwary@iitrpr.ac.in",
-    };
+// Helper function to send email
+const sendAppointmentEmail = async (formData) => {
+    try {
+        // Fetch counselor email from the database
+        const counselor = await Counselor.findOne({ where: { name: formData.counselorName } });
 
-    const counselorEmail = counselorEmails[formData.counselorName];
-    // Fallback if email not found?
-    if (!counselorEmail) {
-        return res.status(400).json({ message: "Counselor email not found" });
-    }
+        if (!counselor || !counselor.email) {
+            console.error(`Counselor not found or email missing for: ${formData.counselorName}`);
+            return { success: false, message: "Counselor email not found" };
+        }
 
-    let formattedText = `
+        const counselorEmail = counselor.email;
+
+        let formattedText = `
   <div style="font-family: Arial, sans-serif; color: #333;">
     <h1 style="background-color: #f2f2f2; padding: 10px; text-align: center;">Appointment Request</h1>
     <p>Hello ${formData.counselorName},</p>
     <p>You have a new appointment request. Please log in to your dashboard to review it.</p>
     <ul>
 `;
-    // Add relevant fields to email
-    const fields = ['fullName', 'appointmentDate', 'timeSlot', 'problemDescription'];
-    for (let key of fields) {
-        if (formData[key]) {
-            formattedText += `<li><strong>${key}:</strong> ${formData[key]}</li>`;
+        // Add relevant fields to email
+        const fields = ['fullName', 'appointmentDate', 'timeSlot', 'problemDescription'];
+        for (let key of fields) {
+            if (formData[key]) {
+                formattedText += `<li><strong>${key}:</strong> ${formData[key]}</li>`;
+            }
         }
-    }
 
-    formattedText += `
+        formattedText += `
     </ul>
     <p>Regards,</p>
     <p><strong>Team Snehita Well-Being</strong></p>
   </div>
 `;
 
-    try {
-        let info = await transporter.sendMail({
+        await transporter.sendMail({
             from: '"Snehita Appointment" <no-reply@snehita.com>',
             to: counselorEmail,
             subject: "New Counselling Appointment Request",
             html: formattedText,
         });
-        res.json({ message: "Email sent" });
-    } catch (emailErr) {
-        console.error("Email error:", emailErr);
-        res.status(500).json({ message: "Failed to send email" });
+        console.log(`Email sent successfully to ${counselorEmail}`);
+        return { success: true, message: "Email sent" };
+    } catch (err) {
+        console.error("Error in sendAppointmentEmail:", err);
+        return { success: false, message: "Failed to send email" };
+    }
+};
+
+exports.sendEmail = async (req, res) => {
+    const result = await sendAppointmentEmail(req.body);
+    if (result.success) {
+        res.json({ message: result.message });
+    } else {
+        res.status(500).json({ message: result.message });
     }
 };
 
@@ -296,7 +308,7 @@ exports.getPublicCounselorAvailability = async (req, res) => {
         const appointments = await Appointment.findAll({
             where: {
                 counselorName: counselorName,
-                status: 'approved',
+                status: { [Op.ne]: 'rejected' }, // Include pending and approved
                 appointmentDate: { [Op.gte]: today }
             },
             attributes: ['appointmentDate', 'timeSlot']
