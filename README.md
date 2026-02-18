@@ -1,47 +1,175 @@
-# Snehita Well Being 
+# Snehita Well-Being 🌿
 
-Welcome to the Snehita Well Being  repository! This project is built using the MERN stack and aims to address mental health issues among IIT Ropar students by providing a platform with various features including blogs, fun quizzes, appointments, a homepage,  team page,etc.
+A full-stack web application designed to support mental health and well-being through appointment scheduling and structured interaction between users and professionals.
 
-## Features
+---
 
-- Blogs: Users can read  blog posts related to various topics of mental health and well-being.
-- Fun Quizzes: Engaging quizzes are available for users to participate in and self analyze their various aspects of mental health.
-- Appointments: Users can schedule appointments with counsellors through this platform.
-- Home Page: The home page provides an overview of the Snehita Well Being  and its objectives.
--Team Page: Get to know the team behind the Snehita Well Being Cell.
+## 📌 Overview
 
-## Deployment
+**Snehita Well-Being** provides a platform where users can connect with professionals and book appointments in a secure and user-friendly environment.
 
-The project is currently deployed at https://snehita-well-being.vercel.app/.
+The system focuses on:
 
-## Installation:
-1. Clone the repository: `git clone https://github.com/Nikhilg657/DEP24-P19-SnehitaWellBeing’
-2. Navigate to the project directory: `cd snehita-well-being-project`
-3. Install dependencies: `npm install` (for both client and server directories)
-4. Set up environment variables:
-   - Create a `.env` file in the server directory.
-   - Add environment variables such as MongoDB URI, session secret, and any other necessary configuration.
-5. Start the server: `nodemon app` (in the server directory)
-6. Start the client: `npm start` (in the client directory)
+* Seamless appointment booking
+* Secure authentication
+* Clean and responsive interface
+* Scalable backend architecture
 
+---
 
+## 🎯 Objectives
 
-## Contributing:
-Contributions to the Snehita Well Being Project are welcome! To contribute:
-1. Fork the repository.
-2. Create a new branch: `git checkout -b feature-name`
-3. Make your changes and commit them: `git commit -m 'Add new feature'`
-4. Push to the branch: `git push origin feature-name`
-5. Submit a pull request.
+* Provide an accessible mental health support platform
+* Enable easy appointment scheduling and management
+* Ensure secure storage and handling of user data
+* Deliver a smooth user experience
 
+---
 
-## Credits:
-- Project Mentors: Dr.Puneet Goyal(Faculty CSE) , Dr.Deepak Phogat (Counselor), 
-- Development Team: Nikhil Garg , Khushboo Gupta , Piyush Kumar , Manav Chauhan
-- Special Thanks: Dr.Parwinder Singh (Faculty Advisor of SWB) , Dr.Gargi Tiwari (Counselor) , Dr.Arun Kumar(Dean SA) , Dr.Satyam Agarwal (Faculty Advisor of SWB)
+## 🏗️ Tech Stack
 
+### Frontend
 
-## Contact:
-For inquiries or support, please contact 2021csb1114@iitrpr.ac.in.
+* React.js
+* React Router
+
+### Backend
+
+* Node.js
+* Express.js
+* RESTful APIs
+
+### Database
+
+* PostgreSQL
+
+### DevOps
+
+* Docker & Docker Compose
+* Environment configuration using `.env`
+
+---
+
+## 🗂️ Project Structure
+
+```
+Snehita-Well-Being/
+│
+├── frontend/
+│   ├── src/
+│   ├── components/
+│
+├── backend/
+│   ├── routes/
+│   ├── controllers/
+│   ├── models/
+│
+├── infra/
+│   ├── docker/
+│   └── docker-compose.yml
+│
+└── README.md
+```
+
+---
+
+## ⚙️ Features
+
+### 👤 User Features
+
+* User registration and login
+* View available professionals
+* Book and manage appointments
+* Profile management
+
+### 🩺 Admin / Professional Features
+
+* Manage appointments
+* View user details
+* Update availability
+
+---
+
+## 🚀 Setup Instructions
+
+### 1️⃣ Clone the Repository
+
+```bash
+git clone <your-repo-link>
+cd Snehita-Well-Being
+```
+
+---
+
+### 2️⃣ Environment Setup
+
+Create a `.env` file inside the backend directory:
+
+```
+PORT=5000
+DATABASE_URL=your_postgres_connection_string
+MAIL=your_email_address
+PASSWORD=your_email_password
+SECRET=your_jwt_secret_key
+BASE_URL=http://localhost:3001
+```
+
+---
+
+### 3️⃣ Run Using Docker (Recommended)
+
+```bash
+docker-compose up --build
+```
+
+---
+
+### 4️⃣ Run Manually
+
+#### Backend
+
+```bash
+cd backend
+npm install
+npm start
+```
+
+#### Frontend
+
+```bash
+cd frontend
+npm install
+npm start
+```
+
+---
+
+## 🔐 Security Features
+
+* JWT-based authentication
+* Protected API routes
+* Environment-based configuration
+* Secure password hashing
+
+---
+
+## 📊 System Design Highlights
+
+* Modular MVC backend structure
+* RESTful API architecture
+* PostgreSQL relational database design
+* Containerized deployment using Docker
+
+---
+
+## 🧪 Future Enhancements
+
+* Real-time chat integration
+* Appointment reminders
+* Video consultation support
+* Payment gateway integration
+* Enhanced role-based access control
+
+---
 
 
