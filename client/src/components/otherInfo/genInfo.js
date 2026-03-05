@@ -17,6 +17,15 @@ const GenInfo = () => {
   const [formData1, setFormData1] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  // Initial state strictly loading from localStorage to avoid sync issues
+  const getSavedData = () => {
+    try {
+      const saved = localStorage.getItem("tempAppointmentData");
+      if (saved) return JSON.parse(saved);
+    } catch (e) { }
+    return {};
+  };
+
   const [formData, setFormData] = useState({
     Age: "",
     Gender: "",
@@ -29,11 +38,25 @@ const GenInfo = () => {
 
   // Load Step 1 data
   useEffect(() => {
-    if (loc?.state?.formData) {
-      setFormData1(loc.state.formData);
-    } else {
-      console.error("Missing Step 1 data");
-    }
+    const rawData = loc?.state?.formData || {};
+    const savedData = getSavedData();
+
+    // Combine location state with localstorage, giving priority to state just in case, but localStorage is the SSOT for form 2
+    const combinedData = { ...savedData, ...rawData };
+
+    setFormData1(combinedData);
+
+    // Provide robust fallback to empty string so the select tags can reset properly
+    setFormData(prev => ({
+      ...prev,
+      Age: combinedData.age || combinedData.Age || prev.Age || "",
+      Gender: combinedData.gender || combinedData.Gender || prev.Gender || "",
+      ModeOfReferal: combinedData.modeOfReferral || combinedData.ModeOfReferal || prev.ModeOfReferal || "",
+      Problem_Related_With: combinedData.problemRelatedWith || combinedData.Problem_Related_With || prev.Problem_Related_With || "",
+      ProblemExtent: combinedData.problemExtent || combinedData.ProblemExtent || prev.ProblemExtent || "",
+      ProblemDescription: combinedData.problemDescription || combinedData.ProblemDescription || prev.ProblemDescription || "",
+      Duration_Of_Problem: combinedData.durationPeriod || combinedData.Duration_Of_Problem || prev.Duration_Of_Problem || "",
+    }));
   }, [loc]);
 
   // Load logged-in user
@@ -105,6 +128,7 @@ const GenInfo = () => {
           autoClose: 2000,
         });
 
+        localStorage.removeItem("tempAppointmentData"); // Clean up on success
         dispatch(resetAppointment());
 
         setTimeout(() => {
@@ -116,7 +140,16 @@ const GenInfo = () => {
     } catch (error) {
       console.error("Submission error:", error);
       setIsSubmitting(false);
-      toast.error("Submission failed. Please try again.");
+
+      if (error.response && error.response.status === 409) {
+        toast.error(error.response.data.error || "Time slot already booked. Please choose another date and time.");
+        localStorage.setItem("tempAppointmentData", JSON.stringify(finalAppointmentData));
+        setTimeout(() => {
+          navigate("/appointment");
+        }, 2000);
+      } else {
+        toast.error("Submission failed. Please try again.");
+      }
     }
   };
 

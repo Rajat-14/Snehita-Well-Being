@@ -3,21 +3,43 @@ import { FaUser, FaPhone, FaEnvelope, FaCalendarAlt } from "react-icons/fa";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { BASE_URL } from "../services/helper";
 import "./appointment.css";
 
 const ClientAppointment = ({ user }) => {
     const navigate = useNavigate();
+    const loc = useLocation();
+
+    // Consolidate data strictly from localStorage
+    const getSavedData = () => {
+        try {
+            const saved = localStorage.getItem("tempAppointmentData");
+            if (saved) return JSON.parse(saved);
+        } catch (e) { }
+        return {};
+    };
+
+    const savedData = getSavedData();
 
     const [formData, setFormData] = useState({
-        fullName: user?.person_name || "",
-        mobileNumber: "",
-        email: user?.email || "",
+        fullName: savedData.fullName || user?.person_name || "",
+        mobileNumber: savedData.mobileNumber || "",
+        email: savedData.email || user?.email || "",
         appointmentDate: "",
-        counselorName: "",
+        counselorName: savedData.counselorName || "",
         timeSlot: "",
     });
+
+    useEffect(() => {
+        if (user && !savedData.fullName) {
+            setFormData(prev => ({
+                ...prev,
+                fullName: user.person_name,
+                email: user.email
+            }));
+        }
+    }, [user, savedData.fullName]);
 
     const [counselorsList, setCounselorsList] = useState([]);
     const [previousAppointments, setPreviousAppointments] = useState([]);
@@ -144,7 +166,11 @@ const ClientAppointment = ({ user }) => {
             }
         }
 
-        navigate("/otherinfo", { state: { formData: formData } });
+        const currentSaved = getSavedData();
+        const consolidatedData = { ...currentSaved, ...formData };
+        localStorage.setItem("tempAppointmentData", JSON.stringify(consolidatedData));
+
+        navigate("/otherinfo", { state: { formData: consolidatedData } });
     };
 
     return (

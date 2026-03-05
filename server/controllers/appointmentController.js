@@ -43,6 +43,20 @@ exports.createAppointment = async (req, res) => {
             durationPeriod
         });
 
+        // Check for double booking
+        const existingAppointment = await Appointment.findOne({
+            where: {
+                counselorName,
+                appointmentDate,
+                timeSlot,
+                status: { [Op.not]: 'rejected' } // Only non-rejected appointments count as a conflict
+            }
+        });
+
+        if (existingAppointment) {
+            return res.status(409).json({ error: "Time slot already booked. Please choose another date and time." });
+        }
+
         const appointment = await Appointment.create({
             fullName,
             mobileNumber,
