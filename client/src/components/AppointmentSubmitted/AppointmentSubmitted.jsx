@@ -82,9 +82,7 @@ const AppointmentSubmitted = () => {
           <p>{appointment.problemDescription}</p>
         </div>
 
-        <p>
-          <strong>Duration of Problem:</strong> {appointment.durationPeriod}
-        </p>
+
       </div>
       <div className="d-flex justify-content-center">
         <button className="print-button" onClick={handlePrint}>

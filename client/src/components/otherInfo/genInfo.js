@@ -7,6 +7,7 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import axios from "axios";
 import "./userForm.css";
+import TermsAndConditions from "./TermsAndConditions";
 
 const GenInfo = () => {
   const navigate = useNavigate();
@@ -16,6 +17,7 @@ const GenInfo = () => {
   const [userdata, setUserdata] = useState({});
   const [formData1, setFormData1] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showTerms, setShowTerms] = useState(false);
 
   // Initial state strictly loading from localStorage to avoid sync issues
   const getSavedData = () => {
@@ -205,6 +207,7 @@ const GenInfo = () => {
                   <option value="Friend">Friend</option>
                   <option value="Faculty">Faculty</option>
                   <option value="Medical">Medical</option>
+                  <option value="Other">Other</option>
                 </select>
               </div>
 
@@ -223,6 +226,7 @@ const GenInfo = () => {
                   <option value="Family">Family</option>
                   <option value="Finance">Finance</option>
                   <option value="Health">Health</option>
+                  <option value="Lifestyle related">Lifestyle related</option>
                   <option value="Others">Others</option>
                 </select>
               </div>
@@ -240,21 +244,13 @@ const GenInfo = () => {
                   <option value="" disabled>
                     * Problem Extent
                   </option>
-                  <option value="Low">Low</option>
+                  <option value="Mild">Mild</option>
                   <option value="Moderate">Moderate</option>
                   <option value="Severe">Severe</option>
                 </select>
               </div>
 
-              <div className="inputField">
-                <input
-                  type="text"
-                  name="Duration_Of_Problem"
-                  value={formData.Duration_Of_Problem}
-                  placeholder="Duration of Problem"
-                  onChange={handleInputChange}
-                />
-              </div>
+
             </div>
 
             {/* ROW 4 */}
@@ -269,6 +265,17 @@ const GenInfo = () => {
               </div>
 
               <div className="inputField">
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '15px' }}>
+                  <input
+                    type="checkbox"
+                    id="terms"
+                    required
+                    style={{ width: 'auto', margin: 0, cursor: 'pointer' }}
+                  />
+                  <label htmlFor="terms" style={{ fontSize: '14px', cursor: 'pointer' }}>
+                    I agree to the <span onClick={(e) => { e.preventDefault(); setShowTerms(true); }} style={{ color: 'blue', textDecoration: 'underline' }}>Terms and Conditions</span>
+                  </label>
+                </div>
                 <button
                   type="submit"
                   className="buttonSubmit"
@@ -283,6 +290,30 @@ const GenInfo = () => {
       </div>
 
       <ToastContainer />
+
+      {showTerms && (
+        <div style={{
+          position: 'fixed', top: 0, left: 0, width: '100%', height: '100%',
+          backgroundColor: 'rgba(0,0,0,0.5)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 1000
+        }}>
+          <div style={{
+            backgroundColor: 'white', padding: '20px', borderRadius: '8px', maxWidth: '600px', width: '90%', maxHeight: '80vh', overflowY: 'auto', position: 'relative', marginTop: '80px'
+          }}>
+            <button
+              type="button"
+              onClick={() => setShowTerms(false)}
+              style={{
+                position: 'absolute', top: '20px', right: '10px', cursor: 'pointer', background: 'none', border: 'none', fontSize: '20px', fontWeight: 'bold'
+              }}
+            >
+              &times;
+            </button>
+            <div style={{ marginTop: '20px', fontSize: '14px', lineHeight: '1.6', textAlign: 'left' }}>
+              <TermsAndConditions />
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

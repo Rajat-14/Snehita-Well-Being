@@ -1,5 +1,5 @@
 // import { Fragment } from "react"
-import logo from "../assets/SWBLogo.png";
+import logo from "../assets/SWBLogo.PNG";
 import React, { useEffect, useState } from "react";
 // import "./Login.css"
 import { NavLink, useLocation, useNavigate } from "react-router-dom";
@@ -34,12 +34,13 @@ const Header = () => {
   };
 
   // logoout
-  
+
   useEffect(() => {
     getUser();
   }, []);
-  
+
   const logout = () => {
+    localStorage.clear();
     window.open(`${BASE_URL}/logout`, "_self");
   };
   const navItems = [
@@ -113,9 +114,8 @@ const Header = () => {
             {navItems.map((item, index) => {
               return (
                 <li
-                  className={`nav-item mx-1 page-nav-item-hover ${
-                    location.pathname === item.link ? "page-nav-item" : ""
-                  }`}
+                  className={`nav-item mx-1 page-nav-item-hover ${location.pathname === item.link ? "page-nav-item" : ""
+                    }`}
                   key={index}
                   data-bs-toggle="collapse"
                   data-bs-target="#navbarSupportedContent"
@@ -133,8 +133,8 @@ const Header = () => {
             })}
             {Object.keys(userdata).length > 0 ? (
               <>
-              
-                    
+
+
                 <li className="nav-item mx-1 cursor-pointer"
                   data-bs-toggle="collapse"
                   data-bs-target="#navbarSupportedContent" >
@@ -166,14 +166,14 @@ const Header = () => {
                 </li>
               </>
             ) : (
-              <li className="nav-item  mt-2  " 
-              data-bs-toggle="collapse"
-              data-bs-target="#navbarSupportedContent"
-              onClick={() => handleNavItemClick("/login")}>
+              <li className="nav-item  mt-2  "
+                data-bs-toggle="collapse"
+                data-bs-target="#navbarSupportedContent"
+                onClick={() => handleNavItemClick("/login")}>
                 <NavLink
                   to="/login"
                   className="loginButton" // Add the class for styling
-                  // onClick={handleNavLinkClick}
+                // onClick={handleNavLinkClick}
                 >
                   Login
                 </NavLink>

@@ -625,7 +625,7 @@ const seedData = async () => {
                 name: "Gargi Tiwary",
                 designation: "Counsellor",
                 type: "counsellor",
-                email: "carewho.987@gmail.com",
+                email: "carewho.987+01@gmail.com",
                 telephoneNo: "01881 23 6855",
                 image: "/uploads/team/gargi.jpg",
                 experience: "Gargi Tiwary holds an M.Sc. in Counseling Psychology from Christ University, Bangalore, and boasts rich experience working with individuals of all ages. With a focus on fostering psychological well-being and personal growth, she has conducted tailored workshops for diverse audiences including teachers, corporate professionals, and students. At IIT Bhilai, Gargi dedicated three years to community initiatives, engaging in various projects aimed at supporting students and staff. Now, at IIT Ropar, Gargi focuses on establishing meaningful connections with students. Through proactive measures like workshops and activities, she seeks insights into their concerns and needs, always aiming for solution-oriented approaches.",
@@ -850,7 +850,7 @@ const seedData = async () => {
         // Seed Counselors - User/Role/Counselor with encrypted password
         const counselorTargets = [
             { name: "Deepak Phogat", email: "carewho.987@gmail.com" },
-            { name: "Gargi Tiwary", email: "carewho.987@gmail.com" }
+            { name: "Gargi Tiwary", email: "carewho.987+01@gmail.com" }
         ];
 
         for (const t of counselorTargets) {

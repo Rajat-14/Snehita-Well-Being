@@ -25,8 +25,7 @@ exports.createAppointment = async (req, res) => {
             modeOfReferral,
             appointmentDate,
             timeSlot,
-            counselorName,
-            durationPeriod
+            counselorName
         } = req.body;
 
         console.log("Extracted Values:");
@@ -39,8 +38,7 @@ exports.createAppointment = async (req, res) => {
             problemDescription,
             problemExtent,
             problemRelatedWith,
-            modeOfReferral,
-            durationPeriod
+            modeOfReferral
         });
 
         // Check for double booking
@@ -70,7 +68,6 @@ exports.createAppointment = async (req, res) => {
             appointmentDate,
             timeSlot,
             counselorName,
-            durationPeriod,
             status: "pending",
             userId,
         });

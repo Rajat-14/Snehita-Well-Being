@@ -52,10 +52,7 @@ const Appointment = sequelize.define('Appointment', {
         type: DataTypes.STRING,
         allowNull: false
     },
-    durationPeriod: {
-        type: DataTypes.STRING, // e.g., '30 mins', '1 hour' - likely filled by counselor or default
-        allowNull: true
-    },
+
     counselorName: {
         type: DataTypes.STRING,
         allowNull: false
