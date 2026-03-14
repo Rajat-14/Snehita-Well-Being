@@ -30,7 +30,6 @@ const GenInfo = () => {
 
   const [formData, setFormData] = useState({
     Age: "",
-    Gender: "",
     ModeOfReferal: "",
     Problem_Related_With: "",
     ProblemExtent: "",
@@ -52,7 +51,6 @@ const GenInfo = () => {
     setFormData(prev => ({
       ...prev,
       Age: combinedData.age || combinedData.Age || prev.Age || "",
-      Gender: combinedData.gender || combinedData.Gender || prev.Gender || "",
       ModeOfReferal: combinedData.modeOfReferral || combinedData.ModeOfReferal || prev.ModeOfReferal || "",
       Problem_Related_With: combinedData.problemRelatedWith || combinedData.Problem_Related_With || prev.Problem_Related_With || "",
       ProblemExtent: combinedData.problemExtent || combinedData.ProblemExtent || prev.ProblemExtent || "",
@@ -91,7 +89,6 @@ const GenInfo = () => {
 
     // Manual validation
     if (
-      !formData.Gender ||
       !formData.ModeOfReferal ||
       !formData.Problem_Related_With ||
       !formData.ProblemExtent
@@ -110,7 +107,7 @@ const GenInfo = () => {
       timeSlot: formData1.timeSlot,
 
       age: formData.Age,
-      gender: formData.Gender,
+      gender: userdata.gender,
       modeOfReferral: formData.ModeOfReferal,
       problemRelatedWith: formData.Problem_Related_With,
       problemExtent: formData.ProblemExtent,
@@ -173,21 +170,6 @@ const GenInfo = () => {
                   onChange={handleInputChange}
                   required
                 />
-              </div>
-
-              <div className="inputField">
-                <select
-                  name="Gender"
-                  value={formData.Gender}
-                  onChange={handleInputChange}
-                  required
-                >
-                  <option value="" disabled>
-                    * Select Gender
-                  </option>
-                  <option value="Male">Male</option>
-                  <option value="Female">Female</option>
-                </select>
               </div>
             </div>
 

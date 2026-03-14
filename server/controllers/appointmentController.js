@@ -189,7 +189,11 @@ exports.getCounselorAppointments = async (req, res) => {
 
         let whereClause = { counselorName };
         if (status) {
-            whereClause.status = status;
+            if (status.includes(',')) {
+                whereClause.status = { [Op.in]: status.split(',') };
+            } else {
+                whereClause.status = status;
+            }
         }
 
         const today = new Date();
@@ -336,5 +340,175 @@ exports.getPublicCounselorAvailability = async (req, res) => {
             stack: err.stack,
             details: err.toString()
         });
+    }
+};
+
+// Block a slot
+exports.blockSlot = async (req, res) => {
+    try {
+        const { counselorName, appointmentDate, timeSlot } = req.body;
+        
+        const startOfDay = new Date(appointmentDate);
+        startOfDay.setHours(0, 0, 0, 0);
+        const endOfDay = new Date(appointmentDate);
+        endOfDay.setHours(23, 59, 59, 999);
+
+        // Ensure no actual pending/approved/blocked appointment exists
+        const existingAppointment = await Appointment.findOne({
+            where: {
+                counselorName,
+                timeSlot,
+                status: { [Op.not]: 'rejected' },
+                appointmentDate: {
+                    [Op.between]: [startOfDay, endOfDay]
+                }
+            }
+        });
+
+        if (existingAppointment) {
+            return res.status(409).json({ error: "Time slot already booked or blocked." });
+        }
+
+        // Create a dummy appointment with 'blocked' status
+        const blockedSlot = await Appointment.create({
+            fullName: 'Blocked Slot',
+            mobileNumber: 0, // Using 0 for dummy blocked slot
+            email: 'system@snehita.com', // Dummy email
+            appointmentDate: startOfDay,
+            timeSlot,
+            counselorName,
+            status: "blocked",
+        });
+
+        res.status(201).json(blockedSlot);
+    } catch (err) {
+        console.error("Error blocking slot:", err);
+        res.status(500).send("Server Error");
+    }
+};
+
+// Unblock a slot
+exports.unblockSlot = async (req, res) => {
+    try {
+        const { counselorName, appointmentDate, timeSlot } = req.body;
+
+        const startOfDay = new Date(appointmentDate);
+        startOfDay.setHours(0, 0, 0, 0);
+        const endOfDay = new Date(appointmentDate);
+        endOfDay.setHours(23, 59, 59, 999);
+
+        const blockedSlot = await Appointment.findOne({
+            where: {
+                counselorName,
+                timeSlot,
+                status: 'blocked',
+                appointmentDate: {
+                    [Op.between]: [startOfDay, endOfDay]
+                }
+            }
+        });
+
+        if (!blockedSlot) {
+            return res.status(404).json({ error: "Blocked slot not found" });
+        }
+
+        await blockedSlot.destroy(); // Remove the blocked dummy appointment
+        res.json({ message: "Slot unblocked successfully" });
+    } catch (err) {
+        console.error("Error unblocking slot:", err);
+        res.status(500).send("Server Error");
+    }
+};
+
+// Block an entire day
+exports.blockDay = async (req, res) => {
+    try {
+        const { counselorName, appointmentDate } = req.body;
+
+        const startOfDay = new Date(appointmentDate);
+        startOfDay.setHours(0, 0, 0, 0);
+        const endOfDay = new Date(appointmentDate);
+        endOfDay.setHours(23, 59, 59, 999);
+
+        // Standard 9 hour slots
+        const timeSlots = [
+            "09:00 AM - 10:00 AM",
+            "10:00 AM - 11:00 AM",
+            "11:00 AM - 12:00 PM",
+            "12:00 PM - 01:00 PM",
+            // 1 PM to 2 PM is lunch break
+            "02:00 PM - 03:00 PM",
+            "03:00 PM - 04:00 PM",
+            "04:00 PM - 05:00 PM",
+            "05:00 PM - 06:00 PM"
+        ];
+
+        // Find all non-rejected appointments for this day
+        const existingAppointments = await Appointment.findAll({
+            where: {
+                counselorName,
+                status: { [Op.not]: 'rejected' },
+                appointmentDate: {
+                    [Op.between]: [startOfDay, endOfDay]
+                }
+            }
+        });
+
+        // Set of already taken slots
+        const takenSlots = new Set(existingAppointments.map(appt => appt.timeSlot));
+
+        // Create 'blocked' appointments for all free slots
+        const slotsToBlock = timeSlots.filter(slot => !takenSlots.has(slot));
+
+        if (slotsToBlock.length === 0) {
+            return res.status(409).json({ error: "No free slots to block on this day." });
+        }
+
+        const blockPromises = slotsToBlock.map(timeSlot => {
+            return Appointment.create({
+                fullName: 'Blocked Slot',
+                mobileNumber: 0,
+                email: 'system@snehita.com',
+                appointmentDate: startOfDay,
+                timeSlot,
+                counselorName,
+                status: "blocked",
+            });
+        });
+
+        await Promise.all(blockPromises);
+
+        res.status(201).json({ message: "Successfully blocked the day", blockedCount: slotsToBlock.length });
+    } catch (err) {
+        console.error("Error blocking day:", err);
+        res.status(500).send("Server Error");
+    }
+};
+
+// Unblock an entire day
+exports.unblockDay = async (req, res) => {
+    try {
+        const { counselorName, appointmentDate } = req.body;
+
+        const startOfDay = new Date(appointmentDate);
+        startOfDay.setHours(0, 0, 0, 0);
+        const endOfDay = new Date(appointmentDate);
+        endOfDay.setHours(23, 59, 59, 999);
+
+        // Find and destroy all 'blocked' slots for this day
+        const deletedCount = await Appointment.destroy({
+            where: {
+                counselorName,
+                status: 'blocked',
+                appointmentDate: {
+                    [Op.between]: [startOfDay, endOfDay]
+                }
+            }
+        });
+
+        res.json({ message: "Day unblocked successfully", unblockedCount: deletedCount });
+    } catch (err) {
+        console.error("Error unblocking day:", err);
+        res.status(500).send("Server Error");
     }
 };

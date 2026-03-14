@@ -14,4 +14,6 @@ router.post("/user/newpassword", authController.changePassword);
 router.get("/login/success", authController.getLoginSuccess);
 router.get("/logout", authController.logout);
 
+router.put("/user/profile", authController.updateProfile);
+
 module.exports = router;

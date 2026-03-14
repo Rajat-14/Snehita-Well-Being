@@ -15,4 +15,10 @@ router.get("/public-availability", appointmentController.getPublicCounselorAvail
 router.get("/:id", authenticate, appointmentController.getAppointmentById);
 router.get("/counselor/patient-history/:userId", authenticate, appointmentController.getPatientHistory);
 
+router.post("/counselor/block-slot", authenticate, appointmentController.blockSlot);
+router.post("/counselor/unblock-slot", authenticate, appointmentController.unblockSlot);
+
+router.post("/counselor/block-day", authenticate, appointmentController.blockDay);
+router.post("/counselor/unblock-day", authenticate, appointmentController.unblockDay);
+
 module.exports = router;

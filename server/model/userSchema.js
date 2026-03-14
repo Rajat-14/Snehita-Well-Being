@@ -10,6 +10,14 @@ const User = sequelize.define('User', {
       notEmpty: { msg: "Name is required" }
     }
   },
+  mobileNumber: {
+    type: DataTypes.STRING,
+    allowNull: true,
+  },
+  gender: {
+    type: DataTypes.STRING,
+    allowNull: true,
+  },
   email: {
     type: DataTypes.STRING,
     allowNull: false,

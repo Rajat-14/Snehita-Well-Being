@@ -17,6 +17,108 @@ const CounselorDashboard = ({ user }) => {
     const [showRejectConfirm, setShowRejectConfirm] = useState(false);
     const [appointmentToReject, setAppointmentToReject] = useState(null);
 
+    const [showBlockConfirm, setShowBlockConfirm] = useState(false);
+    const [showUnblockConfirm, setShowUnblockConfirm] = useState(false);
+    const [slotToManage, setSlotToManage] = useState(null); // { date, timeSlot }
+
+    const openBlockConfirm = (date, slotString) => {
+        setSlotToManage({ appointmentDate: date, timeSlot: slotString });
+        setShowBlockConfirm(true);
+    };
+
+    const openUnblockConfirm = (date, slotString) => {
+        setSlotToManage({ appointmentDate: date, timeSlot: slotString });
+        setShowUnblockConfirm(true);
+    };
+
+    const confirmBlockSlot = async () => {
+        if (!slotToManage) return;
+        try {
+            await axios.post(`${BASE_URL}/counselor/block-slot`, {
+                counselorName: user.person_name,
+                appointmentDate: slotToManage.appointmentDate,
+                timeSlot: slotToManage.timeSlot
+            }, { withCredentials: true });
+            toast.success("Slot blocked successfully");
+            fetchCalendarAppointments();
+        } catch (error) {
+            console.error("Error blocking slot:", error);
+            toast.error(error.response?.data?.error || "Failed to block slot");
+        } finally {
+            setShowBlockConfirm(false);
+            setSlotToManage(null);
+        }
+    };
+
+    const confirmUnblockSlot = async () => {
+        if (!slotToManage) return;
+        try {
+            await axios.post(`${BASE_URL}/counselor/unblock-slot`, {
+                counselorName: user.person_name,
+                appointmentDate: slotToManage.appointmentDate,
+                timeSlot: slotToManage.timeSlot
+            }, { withCredentials: true });
+            toast.success("Slot unblocked successfully");
+            fetchCalendarAppointments();
+        } catch (error) {
+            console.error("Error unblocking slot:", error);
+            toast.error(error.response?.data?.error || "Failed to unblock slot");
+        } finally {
+            setShowUnblockConfirm(false);
+            setSlotToManage(null);
+        }
+    };
+
+    const [showBlockDayConfirm, setShowBlockDayConfirm] = useState(false);
+    const [showUnblockDayConfirm, setShowUnblockDayConfirm] = useState(false);
+    const [dayToManage, setDayToManage] = useState(null); // { date }
+
+    const openBlockDayConfirm = (date) => {
+        setDayToManage({ appointmentDate: date });
+        setShowBlockDayConfirm(true);
+    };
+
+    const openUnblockDayConfirm = (date) => {
+        setDayToManage({ appointmentDate: date });
+        setShowUnblockDayConfirm(true);
+    };
+
+    const confirmBlockDay = async () => {
+        if (!dayToManage) return;
+        try {
+            await axios.post(`${BASE_URL}/counselor/block-day`, {
+                counselorName: user.person_name,
+                appointmentDate: dayToManage.appointmentDate
+            }, { withCredentials: true });
+            toast.success("Day blocked successfully");
+            fetchCalendarAppointments();
+        } catch (error) {
+            console.error("Error blocking day:", error);
+            toast.error(error.response?.data?.error || "Failed to block day");
+        } finally {
+            setShowBlockDayConfirm(false);
+            setDayToManage(null);
+        }
+    };
+
+    const confirmUnblockDay = async () => {
+        if (!dayToManage) return;
+        try {
+            await axios.post(`${BASE_URL}/counselor/unblock-day`, {
+                counselorName: user.person_name,
+                appointmentDate: dayToManage.appointmentDate
+            }, { withCredentials: true });
+            toast.success("Day unblocked successfully");
+            fetchCalendarAppointments();
+        } catch (error) {
+            console.error("Error unblocking day:", error);
+            toast.error(error.response?.data?.error || "Failed to unblock day");
+        } finally {
+            setShowUnblockDayConfirm(false);
+            setDayToManage(null);
+        }
+    };
+
     useEffect(() => {
         fetchAppointments();
     }, [filter]);
@@ -67,8 +169,8 @@ const CounselorDashboard = ({ user }) => {
             const response = await axios.get(`${BASE_URL}/counselor/appointments`, {
                 params: {
                     counselorName: user.person_name,
-                    status: 'approved',
-                    timeframe: 'future' // Fetch all future approved for calendar
+                    status: 'approved,blocked',
+                    timeframe: 'future' // Fetch all future approved/blocked for calendar
                 },
                 withCredentials: true,
             });
@@ -243,6 +345,24 @@ const CounselorDashboard = ({ user }) => {
                                                     <tr key={dayIndex}>
                                                         <td className="fw-bold bg-light" style={{ minWidth: '120px' }}>
                                                             {dateString} <br /> <small className="text-muted">{dayName}</small>
+                                                            <div className="mt-2 d-flex justify-content-center gap-1">
+                                                                <button 
+                                                                    className="btn btn-outline-secondary" 
+                                                                    onClick={() => openBlockDayConfirm(date)}
+                                                                    style={{ fontSize: '0.65rem', padding: '0.2rem 0.4rem', borderRadius: '12px' }}
+                                                                    title="Block Entire Day"
+                                                                >
+                                                                    Block
+                                                                </button>
+                                                                <button 
+                                                                    className="btn btn-outline-info" 
+                                                                    onClick={() => openUnblockDayConfirm(date)}
+                                                                    style={{ fontSize: '0.65rem', padding: '0.2rem 0.4rem', borderRadius: '12px' }}
+                                                                    title="Unblock Entire Day"
+                                                                >
+                                                                    Unblock
+                                                                </button>
+                                                            </div>
                                                         </td>
                                                         {timeSlots.map(hour => {
                                                             if (hour === 13) {
@@ -267,12 +387,25 @@ const CounselorDashboard = ({ user }) => {
                                                                 return apptDate === dateString && appt.timeSlot.startsWith(slotStringStart);
                                                             });
 
+                                                            const isBlocked = bookedAppt && bookedAppt.status === 'blocked';
+                                                            const fullSlotString = `${slotStringStart} - ${nextHour12.toString().padStart(2, '0')}:00 ${nextAmpm}`;
+
                                                             return (
-                                                                <td key={hour} className={`align-middle ${bookedAppt ? 'bg-success text-white clickable-slot' : ''}`}
-                                                                    onClick={() => bookedAppt && openPatientModal(bookedAppt)}
-                                                                    style={{ cursor: bookedAppt ? 'pointer' : 'default', height: '80px' }}
+                                                                <td key={hour} className={`align-middle ${isBlocked ? 'bg-secondary text-white clickable-slot' : bookedAppt ? 'bg-success text-white clickable-slot' : 'clickable-slot hover-bg-light'}`}
+                                                                    onClick={() => {
+                                                                        if (isBlocked) {
+                                                                            openUnblockConfirm(date, fullSlotString);
+                                                                        } else if (bookedAppt) {
+                                                                            openPatientModal(bookedAppt);
+                                                                        } else {
+                                                                            openBlockConfirm(date, fullSlotString);
+                                                                        }
+                                                                    }}
+                                                                    style={{ cursor: 'pointer', height: '80px' }}
                                                                 >
-                                                                    {bookedAppt ? (
+                                                                    {isBlocked ? (
+                                                                        <div className="fw-bold">Blocked</div>
+                                                                    ) : bookedAppt ? (
                                                                         <div>
                                                                             <strong>{bookedAppt.fullName}</strong>
                                                                             <br />
@@ -523,6 +656,94 @@ const CounselorDashboard = ({ user }) => {
                             <div className="modal-footer">
                                 <button type="button" className="btn btn-secondary" onClick={cancelReject}>Cancel</button>
                                 <button type="button" className="btn btn-danger" onClick={confirmReject}>Yes, Reject</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Block Confirmation Modal */}
+            {showBlockConfirm && slotToManage && (
+                <div className="modal d-block" style={{ backgroundColor: 'rgba(0,0,0,0.5)', zIndex: 1060 }}>
+                    <div className="modal-dialog modal-dialog-centered">
+                        <div className="modal-content">
+                            <div className="modal-header bg-secondary text-white">
+                                <h5 className="modal-title">Confirm Block Slot</h5>
+                                <button type="button" className="btn-close btn-close-white" onClick={() => setShowBlockConfirm(false)}></button>
+                            </div>
+                            <div className="modal-body">
+                                <p>Do you want to block the slot on <strong>{slotToManage.appointmentDate.toLocaleDateString()}</strong> at <strong>{slotToManage.timeSlot}</strong>?</p>
+                                <p className="text-muted small">This slot will no longer be available for clients to book.</p>
+                            </div>
+                            <div className="modal-footer">
+                                <button type="button" className="btn btn-light" onClick={() => setShowBlockConfirm(false)}>Cancel</button>
+                                <button type="button" className="btn btn-secondary" onClick={confirmBlockSlot}>Yes, Block Slot</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Unblock Confirmation Modal */}
+            {showUnblockConfirm && slotToManage && (
+                <div className="modal d-block" style={{ backgroundColor: 'rgba(0,0,0,0.5)', zIndex: 1060 }}>
+                    <div className="modal-dialog modal-dialog-centered">
+                        <div className="modal-content">
+                            <div className="modal-header bg-info text-dark">
+                                <h5 className="modal-title">Confirm Unblock Slot</h5>
+                                <button type="button" className="btn-close" onClick={() => setShowUnblockConfirm(false)}></button>
+                            </div>
+                            <div className="modal-body">
+                                <p>Do you want to unblock the slot on <strong>{slotToManage.appointmentDate.toLocaleDateString()}</strong> at <strong>{slotToManage.timeSlot}</strong>?</p>
+                                <p className="text-muted small">This slot will become available for clients to book again.</p>
+                            </div>
+                            <div className="modal-footer">
+                                <button type="button" className="btn btn-secondary" onClick={() => setShowUnblockConfirm(false)}>Cancel</button>
+                                <button type="button" className="btn btn-info" onClick={confirmUnblockSlot}>Yes, Unblock Slot</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Block Day Confirmation Modal */}
+            {showBlockDayConfirm && dayToManage && (
+                <div className="modal d-block" style={{ backgroundColor: 'rgba(0,0,0,0.5)', zIndex: 1060 }}>
+                    <div className="modal-dialog modal-dialog-centered">
+                        <div className="modal-content">
+                            <div className="modal-header bg-secondary text-white">
+                                <h5 className="modal-title">Confirm Block Day</h5>
+                                <button type="button" className="btn-close btn-close-white" onClick={() => setShowBlockDayConfirm(false)}></button>
+                            </div>
+                            <div className="modal-body">
+                                <p>Do you want to block the entire day on <strong>{dayToManage.appointmentDate.toLocaleDateString()}</strong>?</p>
+                                <p className="text-muted small">All free slots for this day will be blocked. Existing appointments will not be affected.</p>
+                            </div>
+                            <div className="modal-footer">
+                                <button type="button" className="btn btn-light" onClick={() => setShowBlockDayConfirm(false)}>Cancel</button>
+                                <button type="button" className="btn btn-secondary" onClick={confirmBlockDay}>Yes, Block Day</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Unblock Day Confirmation Modal */}
+            {showUnblockDayConfirm && dayToManage && (
+                <div className="modal d-block" style={{ backgroundColor: 'rgba(0,0,0,0.5)', zIndex: 1060 }}>
+                    <div className="modal-dialog modal-dialog-centered">
+                        <div className="modal-content">
+                            <div className="modal-header bg-info text-dark">
+                                <h5 className="modal-title">Confirm Unblock Day</h5>
+                                <button type="button" className="btn-close" onClick={() => setShowUnblockDayConfirm(false)}></button>
+                            </div>
+                            <div className="modal-body">
+                                <p>Do you want to unblock all previously blocked slots on <strong>{dayToManage.appointmentDate.toLocaleDateString()}</strong>?</p>
+                                <p className="text-muted small">This will make any blocked slot available for clients to book again.</p>
+                            </div>
+                            <div className="modal-footer">
+                                <button type="button" className="btn btn-secondary" onClick={() => setShowUnblockDayConfirm(false)}>Cancel</button>
+                                <button type="button" className="btn btn-info" onClick={confirmUnblockDay}>Yes, Unblock Day</button>
                             </div>
                         </div>
                     </div>

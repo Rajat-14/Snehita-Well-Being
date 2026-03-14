@@ -1,5 +1,5 @@
 // import { Fragment } from "react"
-import logo from "../assets/SWBLogo.PNG";
+import logo from "../assets/SWBLogo.png";
 import React, { useEffect, useState } from "react";
 // import "./Login.css"
 import { NavLink, useLocation, useNavigate } from "react-router-dom";
@@ -135,6 +135,7 @@ const Header = () => {
               <>
 
 
+
                 <li className="nav-item mx-1 cursor-pointer"
                   data-bs-toggle="collapse"
                   data-bs-target="#navbarSupportedContent" >
@@ -146,9 +147,13 @@ const Header = () => {
                     Logout
                   </div>
                 </li>
-                <li className="nav-item mx-1">
+                <li className="nav-item mx-1 cursor-pointer"
+                  data-bs-toggle="collapse"
+                  data-bs-target="#navbarSupportedContent" >
                   <div
                     className="nav-link active fw-bold mx-1 cursor-pointer"
+                    onClick={() => handleNavItemClick('/profile')}
+                    title="View Profile"
                     style={{
                       fontSize: "17px",
                       backgroundColor: "#20b3f7",

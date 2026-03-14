@@ -60,7 +60,7 @@ const Appointment = sequelize.define('Appointment', {
 
     // Status & Notes
     status: {
-        type: DataTypes.ENUM('pending', 'approved', 'rejected', 'completed'),
+        type: DataTypes.ENUM('pending', 'approved', 'rejected', 'completed', 'blocked'),
         defaultValue: 'pending'
     },
     notes: {

@@ -36,7 +36,8 @@ const ClientAppointment = ({ user }) => {
             setFormData(prev => ({
                 ...prev,
                 fullName: user.person_name,
-                email: user.email
+                email: user.email,
+                mobileNumber: user.mobileNumber || prev.mobileNumber
             }));
         }
     }, [user, savedData.fullName]);
@@ -57,10 +58,19 @@ const ClientAppointment = ({ user }) => {
             setFormData(prev => ({
                 ...prev,
                 fullName: user.person_name,
-                email: user.email
+                email: user.email,
+                mobileNumber: user.mobileNumber || prev.mobileNumber
             }));
+            
+            // Redirect to profile if mobileNumber or gender is missing
+            if (!user.mobileNumber || !user.gender) {
+                toast.info("Please fill out your Mobile Number and Gender in your profile first.", { position: "top-center" });
+                setTimeout(() => {
+                    navigate("/profile");
+                }, 2000);
+            }
         }
-    }, [user]);
+    }, [user, navigate]);
 
     // Fetch availability when calendar is opened
     useEffect(() => {

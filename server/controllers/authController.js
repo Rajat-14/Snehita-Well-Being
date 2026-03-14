@@ -316,3 +316,27 @@ exports.logout = (req, res) => {
     res.clearCookie("usertoken");
     res.redirect(BASE_URL);
 };
+
+exports.updateProfile = async (req, res) => {
+    try {
+        const token = req.cookies.usertoken;
+        if (!token) return res.status(401).json({ error: "Not authorized" });
+
+        const decoded = jwt.verify(token, "abcdef");
+        const user = await User.findByPk(decoded.id);
+
+        if (!user) return res.status(404).json({ error: "User not found" });
+
+        const { mobileNumber, gender } = req.body;
+        
+        user.mobileNumber = mobileNumber || user.mobileNumber;
+        user.gender = gender || user.gender;
+
+        await user.save();
+
+        res.status(200).json({ message: "Profile updated successfully", user });
+    } catch (error) {
+        console.error("Profile update error:", error);
+        res.status(500).json({ error: "Server error" });
+    }
+};
