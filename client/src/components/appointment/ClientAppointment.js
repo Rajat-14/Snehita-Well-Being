@@ -61,7 +61,7 @@ const ClientAppointment = ({ user }) => {
                 email: user.email,
                 mobileNumber: user.mobileNumber || prev.mobileNumber
             }));
-            
+
             // Redirect to profile if mobileNumber or gender is missing
             if (!user.mobileNumber || !user.gender) {
                 toast.info("Please fill out your Mobile Number and Gender in your profile first.", { position: "top-center" });
@@ -196,7 +196,7 @@ const ClientAppointment = ({ user }) => {
                         </div>
                         <div className="input-box">
                             <FaPhone className="fa" />
-                            <input type="number" name="mobileNumber" value={formData.mobileNumber} placeholder="Mobile Number" onChange={handleInputChange} required />
+                            <input type="number" name="mobileNumber" value={formData.mobileNumber} placeholder="Mobile Number" disabled required />
                         </div>
 
                         <div className="input-box">
@@ -350,7 +350,6 @@ const ClientAppointment = ({ user }) => {
                                         <th>Time</th>
                                         <th>Counselor</th>
                                         <th>Status</th>
-                                        <th>Counselor's Note</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -360,31 +359,9 @@ const ClientAppointment = ({ user }) => {
                                             <td>{appt.timeSlot}</td>
                                             <td>{appt.counselorName}</td>
                                             <td>
-                                                <span className={`badge ${appt.status === 'approved' ? 'bg-success' : appt.status === 'rejected' ? 'bg-danger' : 'bg-warning'}`}>
-                                                    {appt.status}
+                                                <span className={`badge ${appt.status === 'approved' ? 'bg-success' : appt.status === 'rejected' ? 'bg-secondary' : 'bg-warning'}`}>
+                                                    {appt.status === 'rejected' ? 'Not available' : appt.status}
                                                 </span>
-                                            </td>
-                                            <td>
-                                                {appt.status === 'rejected' && appt.notes ? (
-                                                    <div style={{
-                                                        background: '#fff5f5',
-                                                        border: '1px solid #f5c6cb',
-                                                        borderLeft: '4px solid #dc3545',
-                                                        borderRadius: '6px',
-                                                        padding: '8px 12px',
-                                                        color: '#721c24',
-                                                        fontSize: '0.85rem',
-                                                        maxWidth: '220px',
-                                                        textAlign: 'left'
-                                                    }}>
-                                                        <strong style={{ display: 'block', marginBottom: '3px' }}>ℹ️ Reason:</strong>
-                                                        {appt.notes}
-                                                    </div>
-                                                ) : appt.status === 'rejected' ? (
-                                                    <span className="text-muted" style={{ fontSize: '0.8rem' }}>No reason provided</span>
-                                                ) : (
-                                                    <span className="text-muted">—</span>
-                                                )}
                                             </td>
                                         </tr>
                                     ))}

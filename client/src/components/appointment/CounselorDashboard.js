@@ -214,7 +214,8 @@ const CounselorDashboard = ({ user }) => {
 
     const handleStatusUpdate = async (id, newStatus, note = "") => {
         try {
-            await axios.put(`${BASE_URL}/status/${id}`, { status: newStatus }, { withCredentials: true });
+            console.log("SENDING STATUS UPDATE:", { id, newStatus, rejectionNote: note.trim() });
+            await axios.put(`${BASE_URL}/status/${id}`, { status: newStatus, rejectionNote: note.trim() }, { withCredentials: true });
             // If a rejection note was provided, save it alongside the status change
             if (note && note.trim()) {
                 await axios.put(`${BASE_URL}/notes/${id}`, { notes: note.trim() }, { withCredentials: true });
@@ -288,7 +289,7 @@ const CounselorDashboard = ({ user }) => {
             <div className="appointment">
                 <div className="counselor-dashboard-layout">
                     <div className="d-flex justify-content-between align-items-center mb-4 p-3 bg-white rounded shadow-sm header-bar">
-                        <h2 className="mb-0 text-primary">Counselor Dashboard - {user.person_name}</h2>
+                        <h2 className="mb-0 text-primary">Counsellor Dashboard - {user.person_name}</h2>
                         <div className="btn-group" role="group" aria-label="Appointment Filter">
                             <button
                                 type="button"
@@ -355,16 +356,16 @@ const CounselorDashboard = ({ user }) => {
                                                         <td className="fw-bold bg-light" style={{ minWidth: '120px' }}>
                                                             {dateString} <br /> <small className="text-muted">{dayName}</small>
                                                             <div className="mt-2 d-flex justify-content-center gap-1">
-                                                                <button 
-                                                                    className="btn btn-outline-secondary" 
+                                                                <button
+                                                                    className="btn btn-outline-secondary"
                                                                     onClick={() => openBlockDayConfirm(date)}
                                                                     style={{ fontSize: '0.65rem', padding: '0.2rem 0.4rem', borderRadius: '12px' }}
                                                                     title="Block Entire Day"
                                                                 >
                                                                     Block
                                                                 </button>
-                                                                <button 
-                                                                    className="btn btn-outline-info" 
+                                                                <button
+                                                                    className="btn btn-outline-info"
                                                                     onClick={() => openUnblockDayConfirm(date)}
                                                                     style={{ fontSize: '0.65rem', padding: '0.2rem 0.4rem', borderRadius: '12px' }}
                                                                     title="Unblock Entire Day"

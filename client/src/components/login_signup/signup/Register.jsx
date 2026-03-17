@@ -13,8 +13,8 @@ const Register = () => {
   let [input, setinput] = useState({
     person_name: "",
     email: "",
-    password: "",
-    confirm_password: "",
+    mobileNumber: "",
+    gender: "",
   });
   let fnct2 = (event) => {
     let { name, value } = event.target;
@@ -24,12 +24,11 @@ const Register = () => {
   const Regist = async (event) => {
     event.preventDefault();
     setIsSubmitting(true);
-    // Check if all fields are filled
     if (
       !input.person_name ||
       !input.email ||
-      !input.password ||
-      !input.confirm_password
+      !input.mobileNumber ||
+      !input.gender
     ) {
       setIsSubmitting(false);
       toast.error("All fields are required!");
@@ -42,9 +41,6 @@ const Register = () => {
     if (!isValid) {
       setIsSubmitting(false);
       toast.error("Enter a valid IIT Ropar email!");
-    } else if (input.password !== input.confirm_password) {
-      setIsSubmitting(false);
-      toast.error("Passwords must match!");
     } else {
       try {
         console.log("input", input);
@@ -55,7 +51,8 @@ const Register = () => {
         // toast.success("Registration successful");
       } catch (error) {
         setIsSubmitting(false);
-        toast.error("Failed. Please try again.");
+        const errorMsg = error.response?.data?.error || error.response?.data?.message || "Failed. Please try again.";
+        toast.error(errorMsg);
       } finally {
         setIsSubmitting(false); // Stop form submission
       }
@@ -92,24 +89,23 @@ const Register = () => {
               />
             </div>
             <div className="enter_in_form">
-              <label htmlFor="password">Password</label>
+              <label htmlFor="mobileNumber">Mobile Number</label>
               <input
-                type="password"
-                name="password"
+                type="text"
+                name="mobileNumber"
                 onChange={fnct2}
-                placeholder="Enter your password"
+                placeholder="Enter your mobile number"
                 required
               />
             </div>
             <div className="enter_in_form">
-              <label htmlFor="confirm_password">Confirm Password</label>
-              <input
-                type="password"
-                name="confirm_password"
-                onChange={fnct2}
-                placeholder="Enter your password again"
-                required
-              />
+              <label htmlFor="gender">Gender</label>
+              <select name="gender" onChange={fnct2} required style={{ width: '100%', padding: '10px', borderRadius: '5px', border: '1px solid #ccc', marginTop: '5px' }}>
+                <option value="">Select Gender</option>
+                <option value="Male">Male</option>
+                <option value="Female">Female</option>
+                <option value="Other">Other</option>
+              </select>
             </div>
 
             <button

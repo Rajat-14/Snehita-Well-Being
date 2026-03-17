@@ -29,17 +29,13 @@ const User = sequelize.define('User', {
   },
   password: {
     type: DataTypes.STRING,
-    allowNull: false,
-    validate: {
-      notEmpty: { msg: "Password is required" },
-      len: { args: [6, 100], msg: "Password must be at least 6 characters" }
-    }
+    allowNull: true,
   }
 }, {
   timestamps: true,
   hooks: {
     beforeSave: async (user) => {
-      if (user.changed('password')) {
+      if (user.changed('password') && user.password) {
         user.password = await bcrypt.hash(user.password, 10);
       }
     }

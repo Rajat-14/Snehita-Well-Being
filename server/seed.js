@@ -605,18 +605,18 @@ const seedData = async () => {
             },
             // Counsellors
             {
-                name: "Deepak Phogat",
-                designation: "Counsellor",
+                name: "Dr. Deepak Kumar",
+                designation: "Clinical Psychologist, Counsellor",
                 type: "counsellor",
                 email: "carewho.987@gmail.com",
                 telephoneNo: "01881 23 5113",
                 image: "/uploads/team/deepak.jpg",
-                experience: "Deepak Phogat, the counselor at IIT Ropar since 2016, holds an M. Phil Clinical Psychology from PGIBAMS, Raipur, and is registered under the Rehabilitation Council of India, RCI - New Delhi, as a Clinical Psychologist. Alongside his M. Phil, Deepak has completed short-term certificate courses in Child Therapy, Adolescent Therapy, and Family Therapy from NIMHANS, Bangalore. With almost 8 years of experience, Deepak serves, facilitates, and encourages the young talented students at IIT Ropar, aiding them in solving their routine life challenges during their academic journey.",
+                experience: "Dr. Deepak Kumar, the counselor at IIT Ropar since 2016, holds an M. Phil Clinical Psychology from PGIBAMS, Raipur, and is registered under the Rehabilitation Council of India, RCI - New Delhi, as a Clinical Psychologist. Alongside his M. Phil, Deepak has completed short-term certificate courses in Child Therapy, Adolescent Therapy, and Family Therapy from NIMHANS, Bangalore. With almost 8 years of experience, Deepak serves, facilitates, and encourages the young talented students at IIT Ropar, aiding them in solving their routine life challenges during their academic journey.",
                 message: [
                     "We know that Campus life can be exhilarating, but it can also be overwhelming at times. Balancing coursework, extracurricular activities, social life, and personal responsibilities can put a strain on your mental health. That's why it's crucial to prioritize self-care and seek support when needed. Although after COVID, the attitude of individuals in society towards mental health is gradually changing positively. I feel as we navigate the challenges and responsibilities of academic life, it's essential to pause and reflect on our mental health and wellbeing. Your overall wellness is not just important; it's imperative for your success and happiness during your college journey.",
                     "Remember that seeking help is a sign of strength, not weakness. Your mental health matters, and there's no shame in asking for support when you need it. Acknowledge your accomplishments, no matter how small, and forgive yourself for mistakes or setbacks. As your Institute Counsellor, my door is always open to you. Please don't hesitate to reach out if you need assistance or simply someone to talk to. Your wellbeing is our top priority, and we're here to support you every step of the way.",
                     "Thank You",
-                    "Deepak Phogat"
+                    "Dr. Deepak Kumar"
                 ],
                 order: 1,
                 isActive: true
@@ -849,7 +849,7 @@ const seedData = async () => {
 
         // Seed Counselors - User/Role/Counselor with encrypted password
         const counselorTargets = [
-            { name: "Deepak Phogat", email: "carewho.987@gmail.com" },
+            { name: "Deepak Kumar", email: "carewho.987@gmail.com" },
             { name: "Gargi Tiwary", email: "carewho.987+01@gmail.com" }
         ];
 

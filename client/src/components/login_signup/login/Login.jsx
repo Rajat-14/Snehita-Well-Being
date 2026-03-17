@@ -1,61 +1,80 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "../../login_signup/login_signup.css";
-import { NavLink, redirect, useNavigate } from "react-router-dom";
-import { useLocation } from "react-router-dom";
-// import { sentOtpFunction } from "../services/Apis";
+import { NavLink, useNavigate } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
 import { BASE_URL } from "../../services/helper";
 import axios from "axios";
 
-const Login = (props) => {
-  // let time = props.chk.date.toLocaleString('en-US',{month:'long'})
-  // let year = props.chk.date.getFullYear()
-  const location = useLocation();
+const Login = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const chk = location.state ? location.state.chk : null;
+  const [step, setStep] = useState(1);
   const [email, setEmail] = useState("");
+  const [otp, setOtp] = useState("");
+  const [timer, setTimer] = useState(30);
+  const [canResend, setCanResend] = useState(false);
   const navigate = useNavigate();
-  let [input, setinput] = useState({
-    email: "",
-    password: "",
-  });
-  let fnct2 = (event) => {
-    let { name, value } = event.target;
-    setinput({ ...input, [name]: value });
-  };
 
-  // console.log(val);
-  // const handleChange = (event) => {
-  //   setEmail(event.target.value);
-  // };
+  useEffect(() => {
+    let interval;
+    if (step === 2 && timer > 0) {
+      interval = setInterval(() => {
+        setTimer((prev) => prev - 1);
+      }, 1000);
+    } else if (timer === 0) {
+      setCanResend(true);
+      clearInterval(interval);
+    }
+    return () => clearInterval(interval);
+  }, [step, timer]);
 
-  const login = async (event) => {
-    event.preventDefault();
-    setIsSubmitting(true);
-    if (!input.email || !input.password) {
-      toast.error("All fields are required!");
+  const handleSendOtp = async (event) => {
+    event?.preventDefault();
+    if (!email) {
+      toast.error("Email is required!");
       return;
     }
 
+    setIsSubmitting(true);
     try {
-      const response = await axios.post(`${BASE_URL}/user/login`, input, {
+      await axios.post(`${BASE_URL}/user/sendloginotp`, { email }, {
+        withCredentials: true,
+      });
+      toast.success("OTP sent to your email.");
+      setStep(2);
+      setTimer(30);
+      setCanResend(false);
+    } catch (error) {
+      console.error("Send OTP Error:", error);
+      toast.error(error.response?.data?.message || error.response?.data?.error || "Failed to send OTP.");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const login = async (event) => {
+    event.preventDefault();
+    if (!otp) {
+      toast.error("OTP is required!");
+      return;
+    }
+
+    setIsSubmitting(true);
+    try {
+      const response = await axios.post(`${BASE_URL}/user/login`, { email, otp }, {
         withCredentials: true,
       });
       localStorage.setItem("role", response.data.user.role);
       localStorage.setItem("user", JSON.stringify(response.data.user));
       toast.success("Login successful");
 
-      console.log("logged in");
-
-      // Delay the redirection by 2 seconds
       setTimeout(() => {
-        window.location.href = "/"; // Redirect to home page
+        window.location.href = "/";
       }, 1500);
     } catch (error) {
       console.error("Login Error:", error);
-      toast.error(error.response?.data?.message || error.message || "Login failed. Please try again.");
+      toast.error(error.response?.data?.error || error.response?.data?.message || "Login failed.");
     } finally {
-      setIsSubmitting(false); // Stop form submission
+      setIsSubmitting(false);
     }
   };
 
@@ -65,7 +84,7 @@ const Login = (props) => {
         <div className="form_group">
           <div className="header_form">
             <h1>Login</h1>
-            <p>welcome to login page</p>
+            <p>Welcome to the login page</p>
           </div>
           <form>
             <div className="enter_in_form">
@@ -73,58 +92,75 @@ const Login = (props) => {
               <input
                 type="email"
                 name="email"
-                onChange={fnct2}
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
                 placeholder="Enter your email"
+                disabled={step === 2}
               />
             </div>
-            <div className="enter_in_form">
-              <label htmlFor="email">Password</label>
-              <input
-                type="password"
-                name="password"
-                onChange={fnct2}
-                placeholder="Enter your password"
-              />
-            </div>
-            <div
-              className="text-center"
-              style={{
-                display: "flex",
-                justifyContent: "flex-start",
-                paddingTop: "0.1rem",
-              }}
-              data-testid="forgot"
-            >
-              <div style={{ marginBottom: "0.5rem" }}>
-                <NavLink
-                  to="/email"
-                  style={{
-                    color: "#31363F",
-                    textDecoration: "none",
-                    fontSize: "0.9rem",
-                    fontWeight: "light",
-                  }}
-                >
-                  Forgot Password
-                </NavLink>
+            {step === 2 && (
+              <div className="enter_in_form">
+                <label htmlFor="otp">OTP</label>
+                <input
+                  type="text"
+                  name="otp"
+                  value={otp}
+                  onChange={(e) => setOtp(e.target.value)}
+                  placeholder="Enter the OTP sent to your email"
+                />
               </div>
-            </div>
-            <button
-              type="submit"
-              disabled={isSubmitting}
-              onClick={login}
-              className="btn"
-            >
-              {isSubmitting && <div className="spinner"></div>}
-              {isSubmitting ? "Logging..." : "Login"}
-            </button>
+            )}
 
-            <p className="txt">
-              Don't have account <NavLink to="/signup">Sign Up</NavLink>{" "}
+            {step === 1 ? (
+              <button
+                type="button"
+                disabled={isSubmitting}
+                onClick={handleSendOtp}
+                className="btn"
+              >
+                {isSubmitting && <div className="spinner"></div>}
+                {isSubmitting ? "Sending OTP..." : "Next"}
+              </button>
+            ) : (
+              <>
+                <button
+                  type="submit"
+                  disabled={isSubmitting}
+                  onClick={login}
+                  className="btn"
+                >
+                  {isSubmitting && <div className="spinner"></div>}
+                  {isSubmitting ? "Logging in..." : "Login"}
+                </button>
+                <div style={{ marginTop: '10px', textAlign: 'center' }}>
+                  <span style={{ fontSize: '0.9rem' }}>
+                    Didn't receive code?{' '}
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => handleSendOtp()}
+                    disabled={!canResend || isSubmitting}
+                    style={{
+                      border: 'none',
+                      background: 'none',
+                      color: canResend ? '#20b3f7' : '#aaa',
+                      cursor: canResend ? 'pointer' : 'default',
+                      textDecoration: canResend ? 'underline' : 'none',
+                      padding: 0,
+                      fontSize: '0.9rem'
+                    }}
+                  >
+                    Resend {timer > 0 ? `(${timer}s)` : ""}
+                  </button>
+                </div>
+              </>
+            )}
+
+            <p className="txt" style={{ marginTop: '15px' }}>
+              Don't have an account? <NavLink to="/signup">Sign Up</NavLink>
             </p>
           </form>
         </div>
-        {/* </div> */}
         <ToastContainer />
       </section>
     </>

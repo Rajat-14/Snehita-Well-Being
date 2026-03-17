@@ -30,8 +30,8 @@ const Otp = (props) => {
           person_name: location.state.person_name,
           otp,
           email: location.state.email,
-          password: location.state.password,
-          confirm_password: location.state.confirm_password,
+          mobileNumber: location.state.mobileNumber,
+          gender: location.state.gender,
         };
         await axios.post(`${BASE_URL}/user/register`, data, {
           withCredentials: true,
@@ -42,7 +42,8 @@ const Otp = (props) => {
           window.location.href = "/"; // Redirect to home page
         }, 1500);
       } catch (error) {
-        toast.error("Failed. Please try again.");
+        const errorMsg = error.response?.data?.error || error.response?.data?.message || "Failed to verify. Please try again.";
+        toast.error(errorMsg);
       } finally {
         setIsVerifying(false);
       }
@@ -61,7 +62,8 @@ const Otp = (props) => {
       setFiveMinCounter(300);
       setOtpExpired(false);
     } catch (error) {
-      toast.error("Failed to send OTP. Please try again.");
+      const errorMsg = error.response?.data?.error || error.response?.data?.message || "Failed to send OTP. Please try again.";
+      toast.error(errorMsg);
     } finally {
       setIsResending(false);
     }

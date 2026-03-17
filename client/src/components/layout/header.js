@@ -6,10 +6,7 @@ import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
 import "./header.css";
 import { BASE_URL } from "../services/helper";
-// const handleNavLinkClick = () => {
-//   // Your custom logic here
-//   console.log("Piyush");
-// };
+
 
 const Header = () => {
   const [userdata, setUserdata] = useState({});

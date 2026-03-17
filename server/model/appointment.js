@@ -68,6 +68,11 @@ const Appointment = sequelize.define('Appointment', {
         allowNull: true,
         comment: 'Notes filled by counselor after session'
     },
+    rejectionNote: {
+        type: DataTypes.TEXT,
+        allowNull: true,
+        comment: 'Reason for rejection if any'
+    },
 
     userId: {
         type: DataTypes.INTEGER,

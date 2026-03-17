@@ -10,7 +10,7 @@ const BASE_URL = process.env.BASE_URL;
 const Role = require("../model/role");
 
 exports.register = async (req, res) => {
-    const { person_name, otp, email, password } = req.body;
+    const { person_name, otp, email, mobileNumber, gender } = req.body;
 
     // Email validation regex
     const emailRegex = /^[^!@#$%^&*()_+{}\[\]:;<>,.?~\\/-]+@iitrpr\.ac\.in$/i;
@@ -22,16 +22,24 @@ exports.register = async (req, res) => {
         // Check if user already exists
         const existingUser = await User.findOne({ where: { email: email } });
         if (existingUser) {
+            console.log("Register Error: User already exists", email);
             return res.status(400).json({ error: "User already exists" });
         }
 
         const otpEmailed = await UserOtp.findOne({ where: { email: email } });
         if (otpEmailed && otpEmailed.otp == otp) {
-            // Create user (password hashing is handled by BeforeSave hook in model)
+            const timeDiff = new Date() - new Date(otpEmailed.updatedAt);
+            if (timeDiff > 5 * 60 * 1000) {
+                console.log("Register Error: OTP expired");
+                return res.status(400).json({ error: "OTP has expired" });
+            }
+
+            // Create user
             const register = await User.create({
                 person_name,
                 email,
-                password,
+                mobileNumber,
+                gender
             });
 
             // Create Role entry
@@ -59,26 +67,36 @@ exports.register = async (req, res) => {
                 .status(200)
                 .json({ message: "Success!", user: register });
         } else {
+            console.log(`Register Error: Invalid OTP. Expected: ${otpEmailed ? otpEmailed.otp : 'None'}, Received: ${otp}`);
             res.status(400).json({ error: "Invalid Otp" });
         }
     } catch (error) {
-        console.error(error);
+        console.error("Register Catch Error:", error);
         res.status(400).json({ error: "An error occurred, please try again" });
     }
 };
 
 exports.login = async (req, res) => {
-    const { email, password } = req.body;
+    const { email, otp } = req.body;
 
     try {
         const user = await User.findOne({ where: { email: email } });
         if (!user) {
-            return res.status(400).json({ error: "Invalid email or password" });
+            return res.status(400).json({ error: "User not found" });
         }
-        const correctPassword = await bcrypt.compare(password, user.password);
-        if (!correctPassword) {
-            return res.status(400).json({ error: "Invalid email or password" });
+
+        const otpEmailed = await UserOtp.findOne({ where: { email: email } });
+        if (!otpEmailed || otpEmailed.otp != otp) {
+            return res.status(400).json({ error: "Invalid OTP" });
         }
+
+        const timeDiff = new Date() - new Date(otpEmailed.updatedAt);
+        if (timeDiff > 5 * 60 * 1000) {
+            return res.status(400).json({ error: "OTP has expired" });
+        }
+
+        otpEmailed.isOtpVerified = false;
+        await otpEmailed.save();
 
         const roleEntry = await Role.findOne({ where: { email: email } });
         const role = roleEntry ? roleEntry.role : "client";
@@ -128,13 +146,14 @@ exports.sendOtp = async (req, res) => {
             );
 
             const mailOptions = {
-                from: process.env.EMAIL,
+                from: process.env.MAIL,
                 to: email,
                 subject: "Sending email for otp validation",
                 text: `OTP:- ${OTP}`,
             };
             transporter.sendMail(mailOptions, (error, info) => {
                 if (error) {
+                    console.error("Transporter Error API 1:", error);
                     res.status(400).json({ error: "Email Not Sent" });
                 } else {
                     res.status(200).json({ message: "Email Sent Successfully" });
@@ -147,13 +166,14 @@ exports.sendOtp = async (req, res) => {
             });
 
             const mailOptions = {
-                from: process.env.EMAIL,
+                from: process.env.MAIL,
                 to: email,
                 subject: "Sending email for otp validation",
                 text: `OTP for Registration:- ${OTP}`,
             };
             transporter.sendMail(mailOptions, (error, info) => {
                 if (error) {
+                    console.error("Transporter Error API 2:", error);
                     res.status(400).json({ error: "Email Not Sent" });
                 } else {
                     res.status(200).json({ message: "Email Sent Successfully" });
@@ -166,18 +186,18 @@ exports.sendOtp = async (req, res) => {
     }
 };
 
-exports.sendOtpForgotPassword = async (req, res) => {
+exports.sendLoginOtp = async (req, res) => {
     const { email } = req.body;
 
     if (!email) {
-        return res.status(400).json({ error: "Please Enter Your Registered Email" });
+        return res.status(400).json({ error: "Please Enter Your Email" });
     }
 
     try {
-        const presuer = await User.findOne({ where: { email: email } });
+        const user = await User.findOne({ where: { email: email } });
 
-        if (presuer) {
-            const OTP = Math.floor(100000 + Math.random() * 900000);
+        if (user) {
+            const OTP = Math.floor(1000 + Math.random() * 9000);
 
             const existEmail = await UserOtp.findOne({ where: { email: email } });
 
@@ -188,17 +208,18 @@ exports.sendOtpForgotPassword = async (req, res) => {
                 );
 
                 const mailOptions = {
-                    from: process.env.EMAIL,
+                    from: process.env.MAIL,
                     to: email,
-                    subject: "Sending Email For Otp Validation",
-                    text: `OTP for forgot password:- ${OTP}`,
+                    subject: "Login Verification OTP",
+                    text: `Your login OTP is:- ${OTP}. It expires in 5 minutes.`,
                 };
 
                 transporter.sendMail(mailOptions, (error, info) => {
                     if (error) {
-                        res.status(400).json({ error: "email not send" });
+                        console.error("Transporter Error API 3:", error);
+                        res.status(400).json({ error: "Email not sent" });
                     } else {
-                        res.status(200).json({ message: "Email sent Successfully" });
+                        res.status(200).json({ message: "OTP sent successfully" });
                     }
                 });
             } else {
@@ -208,22 +229,23 @@ exports.sendOtpForgotPassword = async (req, res) => {
                 });
 
                 const mailOptions = {
-                    from: process.env.EMAIL,
+                    from: process.env.MAIL,
                     to: email,
-                    subject: "Sending Email For Otp Validation",
-                    text: `OTP:- ${OTP}`,
+                    subject: "Login Verification OTP",
+                    text: `Your login OTP is:- ${OTP}. It expires in 5 minutes.`,
                 };
 
                 transporter.sendMail(mailOptions, (error, info) => {
                     if (error) {
-                        res.status(400).json({ error: "email not send" });
+                        console.error("Transporter Error API 4:", error);
+                        res.status(400).json({ error: "Email not sent" });
                     } else {
-                        res.status(200).json({ message: "Email sent Successfully" });
+                        res.status(200).json({ message: "OTP sent successfully" });
                     }
                 });
             }
         } else {
-            res.status(400).json({ error: "This User Not Exist In our Database" });
+            res.status(400).json({ error: "User not found" });
         }
     } catch (error) {
         console.error(error);
@@ -237,6 +259,11 @@ exports.otpVerify = async (req, res) => {
     try {
         const otpEmailed = await UserOtp.findOne({ where: { email: email } });
         if (otpEmailed && otpEmailed.otp == otp) {
+            const timeDiff = new Date() - new Date(otpEmailed.updatedAt);
+            if (timeDiff > 5 * 60 * 1000) {
+                return res.status(400).json({ error: "OTP has expired" });
+            }
+
             otpEmailed.isOtpVerified = true;
             await otpEmailed.save();
             res.status(200).json({
@@ -258,32 +285,7 @@ exports.otpVerify = async (req, res) => {
 };
 
 exports.changePassword = async (req, res) => {
-    const { email, password } = req.body;
-
-    try {
-        const user = await User.findOne({ where: { email: email } });
-        const otpEmailed = await UserOtp.findOne({ where: { email: email } });
-        if (!user) {
-            return res.status(400).json({ message: "User not found" });
-        }
-
-        if (!otpEmailed.isOtpVerified) {
-            return res.status(400).json({ message: "OTP not verified" });
-        }
-
-        user.password = password;
-        await user.save();
-
-        otpEmailed.isOtpVerified = false;
-        await otpEmailed.save();
-
-        res.status(200).json({
-            message: "Password reset successfully",
-            myuser: user,
-        });
-    } catch (error) {
-        res.status(500).json({ message: "Error resetting password", error: error });
-    }
+    res.status(400).json({ message: "Password authentication is disabled. Please login using OTP." });
 };
 
 exports.getLoginSuccess = async (req, res) => {
@@ -328,7 +330,7 @@ exports.updateProfile = async (req, res) => {
         if (!user) return res.status(404).json({ error: "User not found" });
 
         const { mobileNumber, gender } = req.body;
-        
+
         user.mobileNumber = mobileNumber || user.mobileNumber;
         user.gender = gender || user.gender;
 

@@ -220,6 +220,7 @@ exports.getCounselorAppointments = async (req, res) => {
 // Update status (Approve/Reject)
 exports.updateAppointmentStatus = async (req, res) => {
     try {
+        console.log("UPDATE STATUS REQUEST RECEIVED:", { id: req.params.id, body: req.body });
         const { id } = req.params;
         const { status, rejectionNote } = req.body; // 'approved' or 'rejected' + optional note
 
@@ -233,6 +234,41 @@ exports.updateAppointmentStatus = async (req, res) => {
             appointment.rejectionNote = rejectionNote;
         }
         await appointment.save();
+
+        if (status === 'rejected' && appointment.email) {
+            const mailOptions = {
+                from: process.env.MAIL,
+                to: appointment.email,
+                subject: "Appointment Update: Snehita Well-Being",
+                html: `
+    <div style="font-family: Arial, sans-serif; color: #333;">
+        <h2 style="color: #6c757d;">Appointment Update</h2>
+        <p>Dear ${appointment.fullName},</p>
+        <p>We wanted to inform you that your requested appointment could not be scheduled at this time.</p>
+        
+        <ul>
+            <li><strong>Counselor:</strong> ${appointment.counselorName}</li>
+            <li><strong>Requested Date:</strong> ${new Date(appointment.appointmentDate).toLocaleDateString()}</li>
+            <li><strong>Time Slot:</strong> ${appointment.timeSlot}</li>
+            ${rejectionNote ? `<li><strong>Note:</strong> ${rejectionNote}</li>` : ''}
+        </ul>
+
+        <p>You are encouraged to log in and choose another available time slot that works best for you.</p>
+        <p>If you need any assistance, we are here to help.</p>
+
+        <hr />
+        <p>Warm regards,<br/>Team Snehita Well-Being</p>
+    </div>
+`
+            };
+            transporter.sendMail(mailOptions, (error, info) => {
+                if (error) {
+                    console.error("Error sending rejection email:", error);
+                } else {
+                    console.log("Rejection email sent successfully:", appointment.email);
+                }
+            });
+        }
 
         res.json(appointment);
     } catch (err) {
@@ -350,7 +386,7 @@ exports.getPublicCounselorAvailability = async (req, res) => {
 exports.blockSlot = async (req, res) => {
     try {
         const { counselorName, appointmentDate, timeSlot } = req.body;
-        
+
         const startOfDay = new Date(appointmentDate);
         startOfDay.setHours(0, 0, 0, 0);
         const endOfDay = new Date(appointmentDate);
