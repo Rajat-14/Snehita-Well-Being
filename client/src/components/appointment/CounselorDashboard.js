@@ -16,6 +16,7 @@ const CounselorDashboard = ({ user }) => {
     const [activeActionId, setActiveActionId] = useState(null); // ID of appointment with open actions dropdown
     const [showRejectConfirm, setShowRejectConfirm] = useState(false);
     const [appointmentToReject, setAppointmentToReject] = useState(null);
+    const [rejectNote, setRejectNote] = useState("");
 
     const [showBlockConfirm, setShowBlockConfirm] = useState(false);
     const [showUnblockConfirm, setShowUnblockConfirm] = useState(false);
@@ -211,9 +212,13 @@ const CounselorDashboard = ({ user }) => {
         }
     };
 
-    const handleStatusUpdate = async (id, newStatus) => {
+    const handleStatusUpdate = async (id, newStatus, note = "") => {
         try {
             await axios.put(`${BASE_URL}/status/${id}`, { status: newStatus }, { withCredentials: true });
+            // If a rejection note was provided, save it alongside the status change
+            if (note && note.trim()) {
+                await axios.put(`${BASE_URL}/notes/${id}`, { notes: note.trim() }, { withCredentials: true });
+            }
             toast.success(`Appointment ${newStatus}`);
             fetchAppointments(); // Refresh list
         } catch (error) {
@@ -255,15 +260,19 @@ const CounselorDashboard = ({ user }) => {
 
     const confirmReject = async () => {
         if (appointmentToReject) {
-            await handleStatusUpdate(appointmentToReject.id, 'rejected');
+            await handleStatusUpdate(appointmentToReject.id, 'rejected', rejectNote);
             setShowRejectConfirm(false);
             setAppointmentToReject(null);
+            setRejectNote("");
+            // If this rejection came from the history modal, close it too
+            if (showHistoryModal) closePatientModal();
         }
     };
 
     const cancelReject = () => {
         setShowRejectConfirm(false);
         setAppointmentToReject(null);
+        setRejectNote("");
     };
 
     // Close dropdown when clicking outside (simple implementation using document listener could be added, 
@@ -624,10 +633,7 @@ const CounselorDashboard = ({ user }) => {
                                         <button
                                             type="button"
                                             className="btn btn-danger"
-                                            onClick={() => {
-                                                handleStatusUpdate(selectedAppointment.id, 'rejected');
-                                                closePatientModal();
-                                            }}
+                                            onClick={(e) => initiateReject(selectedAppointment, e)}
                                         >
                                             Reject Appointment
                                         </button>
@@ -642,7 +648,7 @@ const CounselorDashboard = ({ user }) => {
 
             {/* Reject Confirmation Modal */}
             {showRejectConfirm && (
-                <div className="modal d-block" style={{ backgroundColor: 'rgba(0,0,0,0.5)', zIndex: 1060 }}>
+                <div className="modal d-block" style={{ backgroundColor: 'rgba(0,0,0,0.5)', zIndex: 1070 }}>
                     <div className="modal-dialog modal-dialog-centered">
                         <div className="modal-content">
                             <div className="modal-header bg-danger text-white">
@@ -651,11 +657,32 @@ const CounselorDashboard = ({ user }) => {
                             </div>
                             <div className="modal-body">
                                 <p>Do you really want to reject the appointment for <strong>{appointmentToReject?.fullName}</strong>?</p>
-                                <p className="text-muted small">This action cannot be undone immediately (unless re-requested).</p>
+                                <div className="mb-3">
+                                    <label className="form-label fw-semibold">
+                                        Reason for Rejection <span className="text-danger">*</span>
+                                    </label>
+                                    <textarea
+                                        className="form-control"
+                                        rows="4"
+                                        placeholder="Please provide a reason so the student understands why their appointment was rejected..."
+                                        value={rejectNote}
+                                        onChange={(e) => setRejectNote(e.target.value)}
+                                    />
+                                    {!rejectNote.trim() && (
+                                        <small className="text-muted">A reason is required before rejecting.</small>
+                                    )}
+                                </div>
                             </div>
                             <div className="modal-footer">
                                 <button type="button" className="btn btn-secondary" onClick={cancelReject}>Cancel</button>
-                                <button type="button" className="btn btn-danger" onClick={confirmReject}>Yes, Reject</button>
+                                <button
+                                    type="button"
+                                    className="btn btn-danger"
+                                    onClick={confirmReject}
+                                    disabled={!rejectNote.trim()}
+                                >
+                                    Yes, Reject
+                                </button>
                             </div>
                         </div>
                     </div>

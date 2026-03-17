@@ -221,7 +221,7 @@ exports.getCounselorAppointments = async (req, res) => {
 exports.updateAppointmentStatus = async (req, res) => {
     try {
         const { id } = req.params;
-        const { status } = req.body; // 'approved' or 'rejected'
+        const { status, rejectionNote } = req.body; // 'approved' or 'rejected' + optional note
 
         const appointment = await Appointment.findByPk(id);
         if (!appointment) {
@@ -229,6 +229,9 @@ exports.updateAppointmentStatus = async (req, res) => {
         }
 
         appointment.status = status;
+        if (status === 'rejected' && rejectionNote !== undefined) {
+            appointment.rejectionNote = rejectionNote;
+        }
         await appointment.save();
 
         res.json(appointment);

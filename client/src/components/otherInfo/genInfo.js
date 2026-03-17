@@ -161,7 +161,7 @@ const GenInfo = () => {
 
             {/* ROW 1 */}
             <div className="inputRow">
-              <div className="inputField">
+              <div className="inputField" style={{ width: '100%' }}>
                 <input
                   type="number"
                   name="Age"
@@ -175,7 +175,7 @@ const GenInfo = () => {
 
             {/* ROW 2 */}
             <div className="inputRow">
-              <div className="inputField">
+              <div className="inputField" style={{ width: '100%' }}>
                 <select
                   name="ModeOfReferal"
                   value={formData.ModeOfReferal}
@@ -192,8 +192,11 @@ const GenInfo = () => {
                   <option value="Other">Other</option>
                 </select>
               </div>
+            </div>
 
-              <div className="inputField">
+            {/* ROW 2b */}
+            <div className="inputRow">
+              <div className="inputField" style={{ width: '100%' }}>
                 <select
                   name="Problem_Related_With"
                   value={formData.Problem_Related_With}
@@ -216,7 +219,7 @@ const GenInfo = () => {
 
             {/* ROW 3 */}
             <div className="inputRow">
-              <div className="inputField">
+              <div className="inputField" style={{ width: '100%' }}>
                 <select
                   name="ProblemExtent"
                   value={formData.ProblemExtent}
@@ -231,13 +234,11 @@ const GenInfo = () => {
                   <option value="Severe">Severe</option>
                 </select>
               </div>
-
-
             </div>
 
             {/* ROW 4 */}
             <div className="inputRow">
-              <div className="inputField">
+              <div className="inputField" style={{ width: '100%' }}>
                 <textarea
                   name="ProblemDescription"
                   value={formData.ProblemDescription}
@@ -245,27 +246,28 @@ const GenInfo = () => {
                   onChange={handleInputChange}
                 />
               </div>
+            </div>
 
-              <div className="inputField">
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '15px' }}>
-                  <input
-                    type="checkbox"
-                    id="terms"
-                    required
-                    style={{ width: 'auto', margin: 0, cursor: 'pointer' }}
-                  />
-                  <label htmlFor="terms" style={{ fontSize: '14px', cursor: 'pointer' }}>
-                    I agree to the <span onClick={(e) => { e.preventDefault(); setShowTerms(true); }} style={{ color: 'blue', textDecoration: 'underline' }}>Terms and Conditions</span>
-                  </label>
-                </div>
-                <button
-                  type="submit"
-                  className="buttonSubmit"
-                  disabled={isSubmitting}
-                >
-                  {isSubmitting ? "Submitting..." : "Submit"}
-                </button>
+            {/* ROW 5 – Terms & Submit */}
+            <div className="inputRow" style={{ flexDirection: 'column' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '15px' }}>
+                <input
+                  type="checkbox"
+                  id="terms"
+                  required
+                  style={{ width: 'auto', margin: 0, cursor: 'pointer' }}
+                />
+                <label htmlFor="terms" style={{ fontSize: '14px', cursor: 'pointer' }}>
+                  I agree to the <span onClick={(e) => { e.preventDefault(); setShowTerms(true); }} style={{ color: 'blue', textDecoration: 'underline' }}>Terms and Conditions</span>
+                </label>
               </div>
+              <button
+                type="submit"
+                className="buttonSubmit"
+                disabled={isSubmitting}
+              >
+                {isSubmitting ? "Submitting..." : "Submit"}
+              </button>
             </div>
           </form>
         </div>

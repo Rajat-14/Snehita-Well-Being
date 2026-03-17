@@ -350,6 +350,7 @@ const ClientAppointment = ({ user }) => {
                                         <th>Time</th>
                                         <th>Counselor</th>
                                         <th>Status</th>
+                                        <th>Counselor's Note</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -362,6 +363,28 @@ const ClientAppointment = ({ user }) => {
                                                 <span className={`badge ${appt.status === 'approved' ? 'bg-success' : appt.status === 'rejected' ? 'bg-danger' : 'bg-warning'}`}>
                                                     {appt.status}
                                                 </span>
+                                            </td>
+                                            <td>
+                                                {appt.status === 'rejected' && appt.notes ? (
+                                                    <div style={{
+                                                        background: '#fff5f5',
+                                                        border: '1px solid #f5c6cb',
+                                                        borderLeft: '4px solid #dc3545',
+                                                        borderRadius: '6px',
+                                                        padding: '8px 12px',
+                                                        color: '#721c24',
+                                                        fontSize: '0.85rem',
+                                                        maxWidth: '220px',
+                                                        textAlign: 'left'
+                                                    }}>
+                                                        <strong style={{ display: 'block', marginBottom: '3px' }}>ℹ️ Reason:</strong>
+                                                        {appt.notes}
+                                                    </div>
+                                                ) : appt.status === 'rejected' ? (
+                                                    <span className="text-muted" style={{ fontSize: '0.8rem' }}>No reason provided</span>
+                                                ) : (
+                                                    <span className="text-muted">—</span>
+                                                )}
                                             </td>
                                         </tr>
                                     ))}
