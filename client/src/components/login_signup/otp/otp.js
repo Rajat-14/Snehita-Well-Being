@@ -37,6 +37,30 @@ const Otp = (props) => {
           withCredentials: true,
         });
 
+        // Upload profile photo if one was selected (croppedDataUrl is a base64 string)
+        const croppedDataUrl = location.state.croppedDataUrl;
+        if (croppedDataUrl) {
+          try {
+            // Convert base64 data URL to Blob
+            const [header, base64Data] = croppedDataUrl.split(',');
+            const mime = header.match(/:(.*?);/)[1];
+            const byteString = atob(base64Data);
+            const ab = new ArrayBuffer(byteString.length);
+            const ia = new Uint8Array(ab);
+            for (let i = 0; i < byteString.length; i++) ia[i] = byteString.charCodeAt(i);
+            const blob = new Blob([ab], { type: mime });
+
+            const formData = new FormData();
+            formData.append('profilePic', blob, 'profile.jpg');
+            await axios.post(`${BASE_URL}/user/upload-profile-pic`, formData, {
+              withCredentials: true,
+              headers: { 'Content-Type': 'multipart/form-data' },
+            });
+          } catch (uploadErr) {
+            console.error("Profile photo upload failed (non-critical):", uploadErr);
+          }
+        }
+
         toast.success("Registration successful");
         setTimeout(() => {
           window.location.href = "/"; // Redirect to home page
@@ -49,6 +73,7 @@ const Otp = (props) => {
       }
     }
   };
+
 
   const otpResendHandler = async (e) => {
     e.preventDefault();

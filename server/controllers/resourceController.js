@@ -1,8 +1,9 @@
 const Blog = require("../model/blog");
 const Quiz = require("../model/quiz");
 const Testimonial = require("../model/testimonial");
-
 const Counselor = require("../model/counselor");
+const fs = require("fs");
+const path = require("path");
 
 exports.getBlogs = async (req, res) => {
     try {
@@ -46,7 +47,7 @@ exports.getTestimonials = async (req, res) => {
 
 exports.createBlog = async (req, res) => {
     try {
-        const { title, content, type, link } = req.body;
+        const { title, type, link } = req.body;
 
         // Map types to folder names (Must match upload middleware)
         const folderMap = {
@@ -68,7 +69,6 @@ exports.createBlog = async (req, res) => {
 
         const newBlog = await Blog.create({
             title,
-            content,
             type,
             link,
             pic
@@ -90,8 +90,22 @@ exports.deleteBlog = async (req, res) => {
             return res.status(404).json({ error: "Blog not found" });
         }
 
+        // Delete the physical image file
+        if (blog.pic && blog.pic !== 'default.jpg') {
+            const imagePath = path.join(__dirname, '../../client/src/components/assets/BlogsPics', blog.pic);
+            try {
+                if (fs.existsSync(imagePath)) {
+                    fs.unlinkSync(imagePath);
+                    console.log(`Successfully deleted blog image: ${imagePath}`);
+                }
+            } catch (err) {
+                console.error(`Error deleting blog image ${imagePath}:`, err);
+                // Proceed with deleting the database record even if file deletion fails
+            }
+        }
+
         await blog.destroy();
-        res.json({ message: "Blog deleted successfully" });
+        res.json({ message: "Blog and image deleted successfully" });
     } catch (error) {
         console.error("Error deleting blog:", error);
         res.status(500).json({ error: "Failed to delete blog" });

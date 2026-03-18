@@ -10,14 +10,41 @@ const Articles = () => {
 
   const [newBlog, setNewBlog] = useState({
     title: "",
-    content: "",
     type: "",   // IMPORTANT: starts empty
     link: "",
     pic: null
   });
 
   const handleFileChange = (e) => {
-    setNewBlog({ ...newBlog, pic: e.target.files[0] });
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const img = new window.Image();
+    img.onload = () => {
+      const width = img.width;
+      const height = img.height;
+      const ratio = width / height;
+
+      // Ensure horizontal orientation and an aspect ratio around 1.6
+      if (width <= height) {
+        alert("Please upload a horizontal (landscape) image. Vertical or square images will distort the blog layout.");
+        e.target.value = "";
+        setNewBlog({ ...newBlog, pic: null });
+      } else if (ratio < 1.3 || ratio > 1.9) {
+        alert(`The selected image has an extreme aspect ratio (${ratio.toFixed(2)}). For best results, please use an image with an aspect ratio of 1.6 (like a 400x250 or 800x500 rectangle).`);
+        e.target.value = "";
+        setNewBlog({ ...newBlog, pic: null });
+      } else {
+        setNewBlog({ ...newBlog, pic: file });
+      }
+      URL.revokeObjectURL(img.src);
+    };
+    img.onerror = () => {
+      alert("Invalid image file selected.");
+      e.target.value = "";
+      setNewBlog({ ...newBlog, pic: null });
+    };
+    img.src = URL.createObjectURL(file);
   };
 
   const handleAddBlog = async (e) => {
@@ -30,7 +57,6 @@ const Articles = () => {
 
     const formData = new FormData();
     formData.append("title", newBlog.title);
-    formData.append("content", newBlog.content);
     formData.append("type", newBlog.type);
     formData.append("link", newBlog.link);
     if (newBlog.pic) formData.append("pic", newBlog.pic);
@@ -165,18 +191,6 @@ const Articles = () => {
                   value={newBlog.title}
                   onChange={(e) =>
                     setNewBlog({ ...newBlog, title: e.target.value })
-                  }
-                />
-              </div>
-
-              <div className="mb-2">
-                <textarea
-                  className="form-control"
-                  placeholder="Short Description/Content"
-                  required
-                  value={newBlog.content}
-                  onChange={(e) =>
-                    setNewBlog({ ...newBlog, content: e.target.value })
                   }
                 />
               </div>

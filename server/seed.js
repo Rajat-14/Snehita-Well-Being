@@ -847,7 +847,7 @@ const seedData = async () => {
             console.log('Team Members seeded');
         }
 
-        // Seed Counselors - User/Role/Counselor with encrypted password
+        // Seed Counselors - User/Role/Counselor (no password, OTP-only login)
         const counselorTargets = [
             { name: "Deepak Kumar", email: "carewho.987@gmail.com" },
             { name: "Gargi Tiwary", email: "carewho.987+01@gmail.com" }
@@ -857,13 +857,10 @@ const seedData = async () => {
             // 1. Ensure User
             let user = await User.findOne({ where: { email: t.email } });
             if (!user) {
-                // Determine password - default or specific? Using Snehita@123 as default
-                const passwordHash = await bcrypt.hash("Snehita@123", 10);
                 await User.create({
                     person_name: t.name,
-                    email: t.email,
-                    password: passwordHash
-                }, { hooks: false }); // Bypass hook to avoid double hashing if it were to run
+                    email: t.email
+                });
                 console.log(`Seeded User: ${t.name}`);
             }
 

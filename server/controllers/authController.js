@@ -334,6 +334,12 @@ exports.updateProfile = async (req, res) => {
         user.mobileNumber = mobileNumber || user.mobileNumber;
         user.gender = gender || user.gender;
 
+        // Handle profile pic upload via multer (base64 stored in DB)
+        if (req.file) {
+            const base64 = `data:${req.file.mimetype};base64,${req.file.buffer.toString('base64')}`;
+            user.profilePic = base64;
+        }
+
         await user.save();
 
         res.status(200).json({ message: "Profile updated successfully", user });
@@ -342,3 +348,43 @@ exports.updateProfile = async (req, res) => {
         res.status(500).json({ error: "Server error" });
     }
 };
+
+exports.uploadProfilePic = async (req, res) => {
+    try {
+        const token = req.cookies.usertoken;
+        if (!token) return res.status(401).json({ error: "Not authorized" });
+
+        const decoded = jwt.verify(token, "abcdef");
+        const user = await User.findByPk(decoded.id);
+
+        if (!user) return res.status(404).json({ error: "User not found" });
+        if (!req.file) return res.status(400).json({ error: "No file uploaded" });
+
+        // Convert to base64 data URL and store in DB
+        const base64 = `data:${req.file.mimetype};base64,${req.file.buffer.toString('base64')}`;
+        user.profilePic = base64;
+        await user.save();
+
+        res.status(200).json({
+            message: "Profile photo uploaded successfully",
+            profilePic: base64   // Return the data URL directly
+        });
+    } catch (error) {
+        console.error("Profile pic upload error:", error);
+        res.status(500).json({ error: "Server error" });
+    }
+};
+
+exports.getUserProfilePic = async (req, res) => {
+    try {
+        const { userId } = req.params;
+        const user = await User.findByPk(userId, { attributes: ['id', 'person_name', 'profilePic'] });
+        if (!user) return res.status(404).json({ error: "User not found" });
+        // profilePic is already a base64 data URL
+        res.json({ profilePic: user.profilePic, person_name: user.person_name });
+    } catch (error) {
+        console.error("Get user profile pic error:", error);
+        res.status(500).json({ error: "Server error" });
+    }
+};
+

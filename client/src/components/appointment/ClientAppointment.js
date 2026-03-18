@@ -48,6 +48,37 @@ const ClientAppointment = ({ user }) => {
     const [counselorAvailability, setCounselorAvailability] = useState([]);
     const [loadingAvailability, setLoadingAvailability] = useState(false);
 
+    // Cancellation State
+    const [showCancelModal, setShowCancelModal] = useState(false);
+    const [cancelReason, setCancelReason] = useState("");
+    const [cancelingApptId, setCancelingApptId] = useState(null);
+    const [sendingCancel, setSendingCancel] = useState(false);
+
+    const openCancelModal = (apptId) => {
+        setCancelingApptId(apptId);
+        setCancelReason("");
+        setShowCancelModal(true);
+    };
+
+    const handleCancelSubmit = async () => {
+        if (!cancelReason.trim()) {
+            toast.warn("Please provide a reason for cancellation");
+            return;
+        }
+
+        setSendingCancel(true);
+        try {
+            await axios.post(`${BASE_URL}/request-cancellation/${cancelingApptId}`, { reason: cancelReason }, { withCredentials: true });
+            toast.success("Cancellation request sent to counselor successfully");
+            setShowCancelModal(false);
+        } catch (error) {
+            console.error("Error sending cancellation request:", error);
+            toast.error("Failed to send cancellation request");
+        } finally {
+            setSendingCancel(false);
+        }
+    };
+
     useEffect(() => {
         fetchCounselors();
         fetchPreviousAppointments();
@@ -350,6 +381,7 @@ const ClientAppointment = ({ user }) => {
                                         <th>Time</th>
                                         <th>Counselor</th>
                                         <th>Status</th>
+                                        <th>Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -359,9 +391,27 @@ const ClientAppointment = ({ user }) => {
                                             <td>{appt.timeSlot}</td>
                                             <td>{appt.counselorName}</td>
                                             <td>
-                                                <span className={`badge ${appt.status === 'approved' ? 'bg-success' : appt.status === 'rejected' ? 'bg-secondary' : 'bg-warning'}`}>
-                                                    {appt.status === 'rejected' ? 'Not available' : appt.status}
+                                                <span className={`badge ${appt.status === 'approved' ? 'bg-success' :
+                                                    appt.status === 'rejected' ? 'bg-secondary' :
+                                                        appt.status === 'resolved' ? 'bg-info' :
+                                                            appt.status === 'followup' ? 'bg-warning text-dark' :
+                                                                'bg-secondary'
+                                                    }`}>
+                                                    {appt.status === 'rejected' ? 'Not available' :
+                                                        appt.status === 'followup' ? 'Follow-Up Needed' :
+                                                            appt.status === 'resolved' ? 'Resolved' :
+                                                                appt.status}
                                                 </span>
+                                            </td>
+                                            <td>
+                                                {(appt.status === 'pending' || appt.status === 'approved') && new Date(appt.appointmentDate) >= new Date(new Date().setHours(0, 0, 0, 0)) && (
+                                                    <button
+                                                        className="btn btn-sm btn-outline-danger"
+                                                        onClick={() => openCancelModal(appt.id)}
+                                                    >
+                                                        Request Cancellation
+                                                    </button>
+                                                )}
                                             </td>
                                         </tr>
                                     ))}
@@ -373,6 +423,38 @@ const ClientAppointment = ({ user }) => {
                     </div>
                 </div>
             </div>
+
+            {/* Request Cancellation Modal */}
+            {showCancelModal && (
+                <div className="modal d-block" style={{ backgroundColor: 'rgba(0,0,0,0.5)', zIndex: 1050 }}>
+                    <div className="modal-dialog modal-dialog-centered">
+                        <div className="modal-content">
+                            <div className="modal-header bg-danger text-white">
+                                <h5 className="modal-title">Request Appointment Cancellation</h5>
+                                <button type="button" className="btn-close btn-close-white" onClick={() => setShowCancelModal(false)}></button>
+                            </div>
+                            <div className="modal-body">
+                                <p>Please provide a reason for cancelling this appointment. This will be sent to the counselor for review.</p>
+                                <textarea
+                                    className="form-control"
+                                    rows="4"
+                                    placeholder="Reason for cancellation..."
+                                    value={cancelReason}
+                                    onChange={(e) => setCancelReason(e.target.value)}
+                                    required
+                                ></textarea>
+                            </div>
+                            <div className="modal-footer">
+                                <button type="button" className="btn btn-secondary" onClick={() => setShowCancelModal(false)}>Close</button>
+                                <button type="button" className="btn btn-danger" onClick={handleCancelSubmit} disabled={sendingCancel}>
+                                    {sendingCancel ? "Sending..." : "Submit Request"}
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
+
             <ToastContainer />
         </div>
     );

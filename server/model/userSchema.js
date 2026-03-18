@@ -1,6 +1,5 @@
 const { DataTypes } = require('sequelize');
 const sequelize = require('../db/database');
-const bcrypt = require('bcrypt');
 
 const User = sequelize.define('User', {
   person_name: {
@@ -27,19 +26,13 @@ const User = sequelize.define('User', {
       isEmail: { msg: "Must be a valid email" }
     }
   },
-  password: {
-    type: DataTypes.STRING,
+  profilePic: {
+    type: DataTypes.TEXT,
     allowNull: true,
+    comment: 'Base64-encoded profile photo stored directly in DB'
   }
 }, {
-  timestamps: true,
-  hooks: {
-    beforeSave: async (user) => {
-      if (user.changed('password') && user.password) {
-        user.password = await bcrypt.hash(user.password, 10);
-      }
-    }
-  }
+  timestamps: true
 });
 
 module.exports = User;

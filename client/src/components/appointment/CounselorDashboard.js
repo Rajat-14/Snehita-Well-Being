@@ -17,6 +17,9 @@ const CounselorDashboard = ({ user }) => {
     const [showRejectConfirm, setShowRejectConfirm] = useState(false);
     const [appointmentToReject, setAppointmentToReject] = useState(null);
     const [rejectNote, setRejectNote] = useState("");
+    const [clientProfilePic, setClientProfilePic] = useState(null);
+    const [priorCounts, setPriorCounts] = useState({});
+    const [historyTimeFilter, setHistoryTimeFilter] = useState('all'); // 'week', 'month', 'all'
 
     const [showBlockConfirm, setShowBlockConfirm] = useState(false);
     const [showUnblockConfirm, setShowUnblockConfirm] = useState(false);
@@ -142,17 +145,25 @@ const CounselorDashboard = ({ user }) => {
     const openPatientModal = (appt) => {
         setSelectedAppointment(appt);
         setShowHistoryModal(true);
+        setClientProfilePic(null); // reset while loading
         if (appt.userId) {
             fetchPatientHistory(appt.userId);
+            // Fetch profile pic (returned as base64 data URL)
+            axios.get(`${BASE_URL}/user/profile-pic/${appt.userId}`, { withCredentials: true })
+                .then(res => {
+                    if (res.data.profilePic) {
+                        setClientProfilePic(res.data.profilePic); // Already a data URL
+                    }
+                })
+                .catch(() => setClientProfilePic(null));
         }
     };
 
     const closePatientModal = () => {
         setShowHistoryModal(false);
-        // setSelectedAppointment(null); // Keep selected for smoother transition or clear? Let's keep it to avoid flicker if re-opened. 
-        // Actually clearing it is safer to reset state.
         setSelectedAppointment(null);
         setPatientHistory([]);
+        setClientProfilePic(null);
     };
 
     const [showCalendar, setShowCalendar] = useState(false);
@@ -183,30 +194,84 @@ const CounselorDashboard = ({ user }) => {
 
     const fetchAppointments = async () => {
         setLoading(true);
+
         try {
-            // If user checks 'approved', we might also want to see 'completed' ones or just approved
-            // For now, let's fetch based on status
             let params = {
                 counselorName: user.person_name,
-                status: filter === 'history' ? 'approved' : filter
             };
 
-            if (filter === 'approved') {
+            // 🔥 Handle filters properly
+            if (filter === 'pending') {
+                params.status = 'pending';
+            }
+            else if (filter === 'approved') {
+                // Upcoming appointments
+                params.status = ['approved', 'resolved', 'followup'];
                 params.timeframe = 'future';
-            } else if (filter === 'history') {
+            }
+            else if (filter === 'history') {
+                // Past appointments
+                params.status = ['approved', 'resolved', 'followup'];
                 params.timeframe = 'past';
             }
-            // 'pending' doesn't need timeframe, usually we want to see all pending requests regardless of date
 
-            const response = await axios.get(`${BASE_URL}/counselor/appointments`, {
-                params: params,
-                withCredentials: true,
+            const response = await axios.get(
+                `${BASE_URL}/counselor/appointments`,
+                {
+                    params: params,
+                    withCredentials: true,
+                }
+            );
+
+            const fetched = response.data;
+            setAppointments(fetched);
+
+            // 🔥 Fetch prior appointment counts (FIXED)
+            const countResults = await Promise.all(
+                fetched.map(async (appt) => {
+                    if (!appt.userId || !appt.appointmentDate) {
+                        return { id: appt.id, count: 0 };
+                    }
+
+                    try {
+                        const countRes = await axios.get(
+                            `${BASE_URL}/counselor/prior-count`,
+                            {
+                                params: {
+                                    userId: appt.userId,
+                                    counselorName: user.person_name,
+                                    appointmentDate: appt.appointmentDate // ✅ FIX
+                                },
+                                withCredentials: true,
+                            }
+                        );
+
+                        return { id: appt.id, count: countRes.data.count };
+
+                    } catch (err) {
+                        console.error("Error fetching prior count:", err);
+                        return { id: appt.id, count: 0 };
+                    }
+                })
+            );
+
+            // 🧠 Convert array → map
+            const countsMap = {};
+            countResults.forEach(({ id, count }) => {
+                countsMap[id] = count;
             });
 
-            setAppointments(response.data);
+            setPriorCounts(countsMap);
+
         } catch (error) {
             console.error("Error fetching appointments:", error);
-            toast.error("Failed to fetch appointments");
+
+            if (error.response && error.response.data?.error) {
+                toast.error(error.response.data.error);
+            } else {
+                toast.error("Failed to fetch appointments");
+            }
+
         } finally {
             setLoading(false);
         }
@@ -320,6 +385,31 @@ const CounselorDashboard = ({ user }) => {
                             {showCalendar ? 'Hide Weekly Plan' : 'Weekly Plan'}
                         </button>
                     </div>
+
+                    {/* History sub-filters */}
+                    {filter === 'history' && (
+                        <div className="d-flex align-items-center gap-2 mt-2 mb-0 px-3">
+                            <span className="text-muted fw-semibold small">Date Range:</span>
+                            <button
+                                className={`btn btn-sm ${historyTimeFilter === 'week' ? 'btn-primary' : 'btn-outline-primary'}`}
+                                onClick={() => setHistoryTimeFilter('week')}
+                            >
+                                Last 7 Days
+                            </button>
+                            <button
+                                className={`btn btn-sm ${historyTimeFilter === 'month' ? 'btn-primary' : 'btn-outline-primary'}`}
+                                onClick={() => setHistoryTimeFilter('month')}
+                            >
+                                Last 30 Days
+                            </button>
+                            <button
+                                className={`btn btn-sm ${historyTimeFilter === 'all' ? 'btn-primary' : 'btn-outline-primary'}`}
+                                onClick={() => setHistoryTimeFilter('all')}
+                            >
+                                All History
+                            </button>
+                        </div>
+                    )}
 
                     <div className="white-board-container">
                         {showCalendar ? (
@@ -449,62 +539,111 @@ const CounselorDashboard = ({ user }) => {
                                                 <th>Problem Related</th>
                                                 <th>Reference</th>
                                                 <th>Status</th>
+                                                <th class="text-center">Prior Appts</th>
                                                 <th>Actions</th>
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            {appointments.map((appt) => (
-                                                <tr key={appt.id} onClick={() => openPatientModal(appt)} style={{ cursor: 'pointer' }}>
-                                                    <td>{new Date(appt.appointmentDate).toLocaleDateString()}</td>
-                                                    <td>{appt.timeSlot}</td>
-                                                    <td>{appt.fullName}</td>
-                                                    <td>{appt.mobileNumber}</td>
-                                                    <td>
-                                                        <div style={{ maxWidth: '200px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }} title={appt.problemDescription}>
-                                                            <span className={`severity-badge severity-${(appt.problemExtent || '').toLowerCase()}`}>
-                                                                {appt.problemExtent}
+                                            {appointments
+                                                .filter((appt) => {
+                                                    if (filter !== 'history' || historyTimeFilter === 'all') return true;
+                                                    // DB stores "2026-01-23 05:30:00+05:30" — replace space with T for reliable parsing
+                                                    const dateStr = String(appt.appointmentDate).replace(' ', 'T');
+                                                    const raw = new Date(dateStr);
+                                                    if (isNaN(raw.getTime())) return true; // safety: show if unparseable
+                                                    const apptDate = new Date(raw.getFullYear(), raw.getMonth(), raw.getDate());
+                                                    // Normalize "now" to local midnight
+                                                    const now = new Date();
+                                                    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+                                                    if (historyTimeFilter === 'week') {
+                                                        const cutoff = new Date(today);
+                                                        cutoff.setDate(today.getDate() - 7);
+                                                        return apptDate >= cutoff;
+                                                    }
+                                                    if (historyTimeFilter === 'month') {
+                                                        const cutoff = new Date(today);
+                                                        cutoff.setMonth(today.getMonth() - 1);
+                                                        return apptDate >= cutoff;
+                                                    }
+                                                    return true;
+                                                })
+                                                .map((appt) => (
+                                                    <tr key={appt.id} onClick={() => openPatientModal(appt)} style={{ cursor: 'pointer' }}>
+                                                        <td>{new Date(appt.appointmentDate).toLocaleDateString()}</td>
+                                                        <td>{appt.timeSlot}</td>
+                                                        <td>{appt.fullName}</td>
+                                                        <td>{appt.mobileNumber}</td>
+                                                        <td className="long-text-cell">
+                                                            <div title={appt.problemDescription}>
+                                                                <span className={`severity-badge severity-${(appt.problemExtent || '').toLowerCase()}`}>
+                                                                    {appt.problemExtent}
+                                                                </span>
+                                                                {' - '}{appt.problemDescription}
+                                                            </div>
+                                                        </td>
+                                                        <td>{appt.problemRelatedWith || '-'}</td>
+                                                        <td>{appt.modeOfReferral || 'N/A'}</td>
+                                                        <td>
+                                                            <span className={`badge rounded-pill ${appt.status === 'approved' ? 'bg-success' :
+                                                                appt.status === 'rejected' ? 'bg-danger' :
+                                                                    appt.status === 'resolved' ? 'bg-info' :
+                                                                        appt.status === 'followup' ? 'bg-warning text-dark' :
+                                                                            'bg-secondary text-dark'
+                                                                }`}>
+                                                                {appt.status === 'followup' ? 'Follow-Up' :
+                                                                    appt.status === 'resolved' ? 'Resolved' :
+                                                                        appt.status.charAt(0).toUpperCase() + appt.status.slice(1)}
                                                             </span>
-                                                            {' - '}{appt.problemDescription}
-                                                        </div>
-                                                    </td>
-                                                    <td>{appt.problemRelatedWith || '-'}</td>
-                                                    <td>{appt.modeOfReferral || 'N/A'}</td>
-                                                    <td>
-                                                        <span className={`badge rounded-pill ${appt.status === 'approved' ? 'bg-success' :
-                                                            appt.status === 'rejected' ? 'bg-danger' :
-                                                                'bg-warning text-dark'
-                                                            }`}>
-                                                            {appt.status.charAt(0).toUpperCase() + appt.status.slice(1)}
-                                                        </span>
-                                                    </td>
-                                                    <td className="actions-cell" onClick={(e) => e.stopPropagation()}>
-                                                        {filter === 'pending' ? (
-                                                            <div className="btn-group btn-group-sm">
-                                                                <button className="btn btn-action btn-accept" onClick={() => handleStatusUpdate(appt.id, 'approved')}>Accept</button>
-                                                                <button className="btn btn-action btn-reject" onClick={(e) => initiateReject(appt, e)}>Reject</button>
-                                                            </div>
-                                                        ) : (
-                                                            <div className="actions-wrapper">
-                                                                <button className="btn btn-sm btn-outline-secondary dropdown-toggle" onClick={(e) => toggleActions(appt.id, e)}>
-                                                                    Actions
-                                                                </button>
-                                                                {activeActionId === appt.id && (
-                                                                    <div className="actions-dropdown-menu">
-                                                                        <button className="dropdown-item" onClick={(e) => { e.stopPropagation(); openNoteModal(appt); }}>
-                                                                            {appt.notes ? 'Edit Notes' : 'Add Notes'}
-                                                                        </button>
-                                                                        {filter !== 'history' && (
-                                                                            <button className="dropdown-item text-danger" onClick={(e) => initiateReject(appt, e)}>
-                                                                                Reject
+                                                        </td>
+                                                        <td className="text-center">
+                                                            <span
+                                                                className={`badge rounded-pill ${(priorCounts[appt.id] || 0) > 0
+                                                                    ? 'bg-primary'
+                                                                    : 'bg-light text-muted border'
+                                                                    }`}
+                                                                title="Count of prior resolved/follow-up appointments with this counselor"
+                                                            >
+                                                                {priorCounts[appt.id] ?? '—'}
+                                                            </span>
+                                                        </td>
+                                                        <td className="actions-cell" onClick={(e) => e.stopPropagation()}>
+                                                            {filter === 'pending' ? (
+                                                                <div className="btn-group btn-group-sm">
+                                                                    <button className="btn btn-action btn-accept" onClick={() => handleStatusUpdate(appt.id, 'approved')}>Accept</button>
+                                                                    <button className="btn btn-action btn-reject" onClick={(e) => initiateReject(appt, e)}>Reject</button>
+                                                                </div>
+                                                            ) : (
+                                                                <div className="actions-wrapper">
+                                                                    <button className="btn btn-sm btn-outline-secondary dropdown-toggle" onClick={(e) => toggleActions(appt.id, e)}>
+                                                                        Actions
+                                                                    </button>
+                                                                    {activeActionId === appt.id && (
+                                                                        <div className="actions-dropdown-menu">
+                                                                            <button className="dropdown-item" onClick={(e) => { e.stopPropagation(); openNoteModal(appt); }}>
+                                                                                {appt.notes ? 'Edit Notes' : 'Add Notes'}
                                                                             </button>
-                                                                        )}
-                                                                    </div>
-                                                                )}
-                                                            </div>
-                                                        )}
-                                                    </td>
-                                                </tr>
-                                            ))}
+                                                                            {appt.status !== 'resolved' && (
+                                                                                <button className="dropdown-item text-info" onClick={(e) => { e.stopPropagation(); handleStatusUpdate(appt.id, 'resolved'); setActiveActionId(null); }}>
+                                                                                    Mark as Resolved
+                                                                                </button>
+                                                                            )}
+                                                                            {appt.status !== 'followup' && (
+                                                                                <button className="dropdown-item" style={{ color: '#e67e22' }} onClick={(e) => { e.stopPropagation(); handleStatusUpdate(appt.id, 'followup'); setActiveActionId(null); }}>
+                                                                                    Request Follow-Up
+                                                                                </button>
+                                                                            )}
+                                                                            {filter !== 'history' && appt.status !== 'rejected' && (
+                                                                                <button className="dropdown-item text-danger" onClick={(e) => initiateReject(appt, e)}>
+                                                                                    Reject
+                                                                                </button>
+                                                                            )}
+                                                                        </div>
+                                                                    )}
+                                                                </div>
+                                                            )}
+                                                        </td>
+                                                    </tr>
+                                                ))}
                                         </tbody>
                                     </table>
                                 ) : (
@@ -560,6 +699,23 @@ const CounselorDashboard = ({ user }) => {
                                 <button type="button" className="btn-close btn-close-white" onClick={closePatientModal}></button>
                             </div>
                             <div className="modal-body">
+                                {/* Client Profile Photo */}
+                                <div className="text-center mb-3">
+                                    <img
+                                        src={clientProfilePic || `https://ui-avatars.com/api/?background=0d6efd&color=fff&size=128&name=${encodeURIComponent(selectedAppointment.fullName)}`}
+                                        alt={selectedAppointment.fullName}
+                                        style={{
+                                            width: "90px",
+                                            height: "90px",
+                                            borderRadius: "50%",
+                                            objectFit: "cover",
+                                            border: "3px solid #0d6efd",
+                                            boxShadow: "0 2px 8px rgba(0,0,0,0.15)"
+                                        }}
+                                    />
+                                    <div className="mt-1 fw-semibold text-muted">{selectedAppointment.fullName}</div>
+                                </div>
+
                                 {/* Current Appointment Details */}
                                 <div className="card mb-4 shadow-sm">
                                     <div className="card-header bg-light">
@@ -571,6 +727,7 @@ const CounselorDashboard = ({ user }) => {
                                                 <p><strong>Date:</strong> {new Date(selectedAppointment.appointmentDate).toLocaleDateString()}</p>
                                                 <p><strong>Time:</strong> {selectedAppointment.timeSlot}</p>
                                                 <p><strong>Status:</strong> <span className={`badge ${selectedAppointment.status === 'approved' ? 'bg-success' : selectedAppointment.status === 'rejected' ? 'bg-danger' : 'bg-warning text-dark'}`}>{selectedAppointment.status}</span></p>
+                                                <p><strong>Gender:</strong> {selectedAppointment.gender || <span className="text-muted">Not specified</span>}</p>
                                             </div>
                                             <div className="col-md-6">
                                                 <p><strong>Problem:</strong> {selectedAppointment.problemDescription}</p>
@@ -586,26 +743,28 @@ const CounselorDashboard = ({ user }) => {
                                 {historyLoading ? (
                                     <div className="text-center"><div className="spinner-border text-primary" role="status"></div></div>
                                 ) : (
-                                    <div className="table-responsive">
+                                    <div className="custom-table-container">
                                         {patientHistory.filter(h => h.id !== selectedAppointment.id).length > 0 ? (
-                                            <table className="table table-sm table-striped">
+                                            <table className="table table-sm table-striped history-table">
                                                 <thead className="table-secondary">
                                                     <tr>
-                                                        <th>Date</th>
-                                                        <th>Problem</th>
-                                                        <th>Problem Related</th>
-                                                        {/* <th>Status</th> Removed */}
-                                                        <th>Notes</th>
+                                                        <th className="cell-min-width-sm">Date</th>
+                                                        <th className="cell-min-width-md">Counselor</th>
+                                                        <th className="cell-min-width-sm">Status</th>
+                                                        <th className="cell-min-width-lg">Problem</th>
+                                                        <th className="cell-min-width-md">Problem Related</th>
+                                                        <th className="cell-min-width-lg">Notes</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody>
                                                     {patientHistory.filter(h => h.id !== selectedAppointment.id).map((hist) => (
                                                         <tr key={hist.id}>
                                                             <td>{new Date(hist.appointmentDate).toLocaleDateString()}</td>
-                                                            <td>{hist.problemDescription}</td>
+                                                            <td>{hist.counselorName || '-'}</td>
+                                                            <td>{hist.status || '-'}</td>
+                                                            <td className="long-text-cell">{hist.problemDescription}</td>
                                                             <td>{hist.problemRelatedWith || '-'}</td>
-                                                            {/* Status removed as per request */}
-                                                            <td><small>{hist.notes || '-'}</small></td>
+                                                            <td className="long-text-cell"><small>{hist.notes || '-'}</small></td>
                                                         </tr>
                                                     ))}
                                                 </tbody>
@@ -618,25 +777,41 @@ const CounselorDashboard = ({ user }) => {
                             </div>
                             <div className="modal-footer justify-content-between">
                                 <div>
-                                    {selectedAppointment.status !== 'approved' && (
+                                    {selectedAppointment.status !== 'approved' && selectedAppointment.status !== 'resolved' && selectedAppointment.status !== 'followup' && (
                                         <button
                                             type="button"
                                             className="btn btn-success me-2"
-                                            onClick={() => {
-                                                handleStatusUpdate(selectedAppointment.id, 'approved');
-                                                closePatientModal();
-                                            }}
+                                            onClick={() => { handleStatusUpdate(selectedAppointment.id, 'approved'); closePatientModal(); }}
                                         >
-                                            Approve Appointment
+                                            Approve
                                         </button>
                                     )}
-                                    {selectedAppointment.status !== 'rejected' && (
+                                    {selectedAppointment.status !== 'resolved' && (
+                                        <button
+                                            type="button"
+                                            className="btn btn-info me-2 text-white"
+                                            onClick={() => { handleStatusUpdate(selectedAppointment.id, 'resolved'); closePatientModal(); }}
+                                        >
+                                            Mark Resolved
+                                        </button>
+                                    )}
+                                    {selectedAppointment.status !== 'followup' && (
+                                        <button
+                                            type="button"
+                                            className="btn me-2"
+                                            style={{ background: '#e67e22', color: '#fff' }}
+                                            onClick={() => { handleStatusUpdate(selectedAppointment.id, 'followup'); closePatientModal(); }}
+                                        >
+                                            Request Follow-Up
+                                        </button>
+                                    )}
+                                    {selectedAppointment.status !== 'rejected' && selectedAppointment.status !== 'resolved' && (
                                         <button
                                             type="button"
                                             className="btn btn-danger"
                                             onClick={(e) => initiateReject(selectedAppointment, e)}
                                         >
-                                            Reject Appointment
+                                            Reject
                                         </button>
                                     )}
                                 </div>
@@ -662,10 +837,29 @@ const CounselorDashboard = ({ user }) => {
                                     <label className="form-label fw-semibold">
                                         Reason for Rejection <span className="text-danger">*</span>
                                     </label>
+
+                                    <div className="mb-2 d-flex flex-wrap gap-2">
+                                        {[
+                                            "I am busy due to a prior commitment.",
+                                            "I have an urgent meeting to attend.",
+                                            "As per the student's request, I am cancelling the appointment.",
+                                            "I am on unexpected leave today."
+                                        ].map((reason, i) => (
+                                            <span
+                                                key={i}
+                                                className={`badge border rounded-pill ${rejectNote === reason ? 'bg-primary text-white' : 'bg-light text-dark fw-normal'}`}
+                                                style={{ cursor: 'pointer', transition: 'all 0.2s' }}
+                                                onClick={() => setRejectNote(reason)}
+                                            >
+                                                {reason}
+                                            </span>
+                                        ))}
+                                    </div>
+
                                     <textarea
                                         className="form-control"
-                                        rows="4"
-                                        placeholder="Please provide a reason so the student understands why their appointment was rejected..."
+                                        rows="3"
+                                        placeholder="Type a custom reason or select an option above..."
                                         value={rejectNote}
                                         onChange={(e) => setRejectNote(e.target.value)}
                                     />
