@@ -18,6 +18,7 @@ router.get("/logout", authController.logout);
 router.put("/user/profile", upload.single('profilePic'), authController.updateProfile);
 router.post("/user/upload-profile-pic", upload.single('profilePic'), authController.uploadProfilePic);
 router.get("/user/profile-pic/:userId", authController.getUserProfilePic);
+router.put("/user/star/:userId", authController.toggleStar);
 
 module.exports = router;
 

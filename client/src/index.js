@@ -45,6 +45,7 @@ const OtpForget = React.lazy(() => import ('./components/login_signup/forgotPass
 const Email = React.lazy(() => import ( './components/login_signup/forgotPassword/email')); 
 const Otp = React.lazy(() => import ('./components/login_signup/otp/otp'));
 const Profile = React.lazy(() => import('./components/login_signup/Profile'));
+const CounselorAnalytics = React.lazy(() => import('./components/appointment/CounselorAnalytics'));
 
 const appRouter = createBrowserRouter([
   {  
@@ -202,6 +203,10 @@ const appRouter = createBrowserRouter([
       {
         path: '/loading',
         element : <LoadingPage/>
+      },
+      {
+        path: '/counselor/analytics',
+        element: <CounselorAnalytics />
       },
       
     ],

@@ -30,6 +30,11 @@ const User = sequelize.define('User', {
     type: DataTypes.TEXT,
     allowNull: true,
     comment: 'Base64-encoded profile photo stored directly in DB'
+  },
+  isStarred: {
+    type: DataTypes.BOOLEAN,
+    defaultValue: false,
+    comment: 'Global star marker for patients by counselors'
   }
 }, {
   timestamps: true

@@ -224,6 +224,25 @@ const CounselorDashboard = ({ user }) => {
             );
 
             const fetched = response.data;
+
+            // Identify only the LATEST appointment for each starred user
+            const seenStarredUsers = new Set();
+            const latestStarredApptIds = new Set();
+            
+            for (let appt of fetched) {
+                if (appt.user?.isStarred && !seenStarredUsers.has(appt.userId)) {
+                    seenStarredUsers.add(appt.userId);
+                    latestStarredApptIds.add(appt.id);
+                }
+            }
+
+            // Sort so ONLY the single latest starred appointment appears at the top
+            fetched.sort((a, b) => {
+                const aStar = latestStarredApptIds.has(a.id) ? 1 : 0;
+                const bStar = latestStarredApptIds.has(b.id) ? 1 : 0;
+                return bStar - aStar; // stable sort preserves original date order
+            });
+
             setAppointments(fetched);
 
             // 🔥 Fetch prior appointment counts (FIXED)
@@ -290,6 +309,56 @@ const CounselorDashboard = ({ user }) => {
         } catch (error) {
             console.error("Error updating status:", error);
             toast.error("Failed to update status");
+        }
+    };
+
+    const handleToggleStar = async (userId, e) => {
+        e.stopPropagation();
+        if (!userId) {
+            toast.warn("Patient ID not found");
+            return;
+        }
+        try {
+            const res = await axios.put(`${BASE_URL}/user/star/${userId}`, {}, { withCredentials: true });
+            const isStarred = res.data.isStarred;
+
+            // Update local state without full refetch
+            setAppointments(prev => {
+                let updated = prev.map(appt =>
+                    appt.userId === userId
+                        ? { ...appt, user: { ...appt.user, isStarred: isStarred } }
+                        : appt
+                );
+
+                // 1. Revert array back to raw chronological order depending on filter tab
+                updated.sort((a, b) => {
+                    const dateA = new Date(String(a.appointmentDate).replace(' ', 'T')).getTime() || 0;
+                    const dateB = new Date(String(b.appointmentDate).replace(' ', 'T')).getTime() || 0;
+                    return filter === 'history' ? dateB - dateA : dateA - dateB;
+                });
+
+                // 2. Identify the single latest appointment for all starred users
+                const seenStarredUsers = new Set();
+                const latestStarredApptIds = new Set();
+                
+                for (let appt of updated) {
+                    if (appt.user?.isStarred && !seenStarredUsers.has(appt.userId)) {
+                        seenStarredUsers.add(appt.userId);
+                        latestStarredApptIds.add(appt.id);
+                    }
+                }
+
+                // 3. Float only those single identified appointments to the top
+                return updated.sort((a, b) => {
+                    const aStar = latestStarredApptIds.has(a.id) ? 1 : 0;
+                    const bStar = latestStarredApptIds.has(b.id) ? 1 : 0;
+                    return bStar - aStar;
+                });
+            });
+            toast.success("Star status updated");
+        } catch (error) {
+            console.error("Error toggling star:", error);
+            toast.error("Failed to update star status");
         }
     };
 
@@ -571,7 +640,16 @@ const CounselorDashboard = ({ user }) => {
                                                     <tr key={appt.id} onClick={() => openPatientModal(appt)} style={{ cursor: 'pointer' }}>
                                                         <td>{new Date(appt.appointmentDate).toLocaleDateString()}</td>
                                                         <td>{appt.timeSlot}</td>
-                                                        <td>{appt.fullName}</td>
+                                                        <td>
+                                                            <span
+                                                                onClick={(e) => handleToggleStar(appt.userId, e)}
+                                                                style={{ cursor: 'pointer', marginRight: '5px', fontSize: '1.2rem', color: appt.user?.isStarred ? '#ffc107' : '#ccc' }}
+                                                                title={appt.user?.isStarred ? "Unstar Patient" : "Star Patient"}
+                                                            >
+                                                                {appt.user?.isStarred ? '★' : '☆'}
+                                                            </span>
+                                                            {appt.fullName}
+                                                        </td>
                                                         <td>{appt.mobileNumber}</td>
                                                         <td className="long-text-cell">
                                                             <div title={appt.problemDescription}>

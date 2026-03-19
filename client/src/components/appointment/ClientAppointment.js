@@ -333,6 +333,12 @@ const ClientAppointment = ({ user }) => {
                                                                         const ampm = hour >= 12 ? 'PM' : 'AM';
                                                                         const slotString = `${hour12.toString().padStart(2, '0')}:00 ${ampm}`;
 
+                                                                        // Check if it's in the past
+                                                                        const isToday = isoDate === new Date().toISOString().split('T')[0];
+                                                                        const currentHour = new Date().getHours();
+                                                                        // Cannot book if current hour is greater than or equal to the slot start hour
+                                                                        const isPastSlot = isToday && currentHour >= hour;
+
                                                                         // Check if booked
                                                                         // API returns appointments with { appointmentDate, timeSlot }
                                                                         const isBooked = counselorAvailability.some(appt => {
@@ -348,11 +354,11 @@ const ClientAppointment = ({ user }) => {
                                                                         return (
                                                                             <td
                                                                                 key={hour}
-                                                                                className={`align-middle ${isBooked ? 'bg-danger text-white' : 'clickable-slot'}`}
-                                                                                onClick={() => !isBooked && handleSlotSelect(isoDate, `${slotString} - ${hour12 + 1 > 12 ? hour12 + 1 - 12 : hour12 + 1}:00 ${hour + 1 >= 12 ? 'PM' : 'AM'}`)}
-                                                                                style={{ cursor: isBooked ? 'not-allowed' : 'pointer', height: '60px' }}
+                                                                                className={`align-middle ${isBooked ? 'bg-danger text-white' : isPastSlot ? 'bg-light text-muted opacity-50' : 'clickable-slot'}`}
+                                                                                onClick={() => !isBooked && !isPastSlot && handleSlotSelect(isoDate, `${slotString} - ${hour12 + 1 > 12 ? hour12 + 1 - 12 : hour12 + 1}:00 ${hour + 1 >= 12 ? 'PM' : 'AM'}`)}
+                                                                                style={{ cursor: isBooked || isPastSlot ? 'not-allowed' : 'pointer', height: '60px' }}
                                                                             >
-                                                                                {isBooked ? "Booked" : "Free"}
+                                                                                {isBooked ? "Booked" : isPastSlot ? "Passed" : "Free"}
                                                                             </td>
                                                                         );
                                                                     })}

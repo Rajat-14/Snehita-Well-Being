@@ -61,6 +61,7 @@ const Header = () => {
       link: "/appointment",
       title: "APPOINTMENT",
     },
+    // The Analytics link will be added dynamically below if the user is a counselor
     {
       link: "/contactus",
       title: "CONTACT US",
@@ -128,6 +129,22 @@ const Header = () => {
                 </li>
               );
             })}
+            {userdata && userdata.user && userdata.user.role === 'counselor' && (
+              <li
+                className={`nav-item mx-1 page-nav-item-hover ${location.pathname === '/counselor/analytics' ? "page-nav-item" : ""}`}
+                data-bs-toggle="collapse"
+                data-bs-target="#navbarSupportedContent"
+                onClick={() => handleNavItemClick('/counselor/analytics')}
+              >
+                <NavLink
+                  className="nav-link active fw-bold mx-1 mb-1"
+                  aria-current="page"
+                  to="/counselor/analytics"
+                >
+                  ANALYTICS
+                </NavLink>
+              </li>
+            )}
             {Object.keys(userdata).length > 0 ? (
               <>
 

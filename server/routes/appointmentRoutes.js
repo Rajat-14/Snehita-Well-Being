@@ -8,6 +8,7 @@ router.get("/data", authenticate, appointmentController.getAppointments);
 router.post("/send-email", authenticate, appointmentController.sendEmail);
 router.get("/bookedSlots", authenticate, appointmentController.getBookedSlots);
 router.get("/counselor/appointments", authenticate, appointmentController.getCounselorAppointments);
+router.get("/counselor/analytics", authenticate, appointmentController.getAnalyticsData);
 router.put("/status/:id", authenticate, appointmentController.updateAppointmentStatus);
 router.put("/notes/:id", authenticate, appointmentController.updateAppointmentNotes);
 router.post("/request-cancellation/:id", authenticate, appointmentController.requestCancellationEmail);

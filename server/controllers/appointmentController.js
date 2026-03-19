@@ -1,4 +1,5 @@
 const Appointment = require("../model/appointment");
+const User = require("../model/userSchema");
 const jwt = require("jsonwebtoken");
 const transporter = require("../config/emailConfig");
 const { Op } = require("sequelize");
@@ -209,19 +210,60 @@ exports.getCounselorAppointments = async (req, res) => {
             whereClause.status = { [Op.in]: statusArray };
         }
 
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
+        const todayDate = new Date();
+        todayDate.setHours(0, 0, 0, 0);
 
         if (timeframe === 'future') {
-            whereClause.appointmentDate = { [Op.gte]: today };
+            whereClause.appointmentDate = { [Op.gte]: todayDate };
         } else if (timeframe === 'past') {
-            whereClause.appointmentDate = { [Op.lt]: today };
+            whereClause.appointmentDate = { [Op.lte]: todayDate };
         }
 
-        const appointments = await Appointment.findAll({
+        let appointments = await Appointment.findAll({
             where: whereClause,
+            include: [{
+                model: User,
+                as: 'user',
+                attributes: ['isStarred']
+            }],
             order: [['appointmentDate', timeframe === 'past' ? 'DESC' : 'ASC']]
         });
+
+        if (timeframe === 'future' || timeframe === 'past') {
+            const now = new Date();
+            const currentHour = now.getHours();
+            const currentMins = now.getMinutes();
+
+            appointments = appointments.filter(appt => {
+                const apptDate = new Date(appt.appointmentDate);
+                apptDate.setHours(0, 0, 0, 0);
+
+                if (apptDate.getTime() !== todayDate.getTime()) {
+                    if (timeframe === 'future') return apptDate > todayDate;
+                    if (timeframe === 'past') return apptDate < todayDate;
+                    return true;
+                }
+
+                // Parse end time of timeSlot (e.g. "09:00 AM - 10:00 AM")
+                let endTimeStr = appt.timeSlot.split('-')[1];
+                if (!endTimeStr) return true; // fail-safe
+
+                endTimeStr = endTimeStr.trim();
+                let [time, modifier] = endTimeStr.split(' ');
+                if (!time || !modifier) return true; // fail-safe
+                
+                let [hours, minutes] = time.split(':');
+                hours = parseInt(hours, 10);
+                if (modifier === 'PM' && hours < 12) hours += 12;
+                if (modifier === 'AM' && hours === 12) hours = 0;
+
+                const isPast = (currentHour > hours) || (currentHour === hours && currentMins >= parseInt(minutes || 0, 10));
+
+                if (timeframe === 'future') return !isPast;
+                if (timeframe === 'past') return isPast;
+                return true;
+            });
+        }
 
         res.json(appointments);
     } catch (err) {
@@ -229,6 +271,34 @@ exports.getCounselorAppointments = async (req, res) => {
         res.status(500).send("Server Error");
     }
 };
+
+exports.getAnalyticsData = async (req, res) => {
+    try {
+        const { counselorName } = req.query;
+
+        console.log("Fetching analytics for counselor:", counselorName);
+
+        if (!counselorName) {
+            return res.status(400).json({ error: "counselorName is required" });
+        }
+
+        const appointments = await Appointment.findAll({
+            where: {
+                counselorName: counselorName,
+                status: {
+                    [Op.in]: ['approved', 'resolved', 'completed', 'followup', 'pending']
+                }
+            },
+            attributes: ['appointmentDate', 'gender', 'problemExtent', 'problemRelatedWith', 'status', 'age', 'modeOfReferral']
+        });
+
+        res.json(appointments);
+    } catch (err) {
+        console.error("Error fetching counselor analytics:", err);
+        res.status(500).send("Server Error");
+    }
+};
+
 exports.updateAppointmentStatus = async (req, res) => {
     try {
         console.log("UPDATE STATUS REQUEST RECEIVED:", { id: req.params.id, body: req.body });
