@@ -46,6 +46,8 @@ const Email = React.lazy(() => import ( './components/login_signup/forgotPasswor
 const Otp = React.lazy(() => import ('./components/login_signup/otp/otp'));
 const Profile = React.lazy(() => import('./components/login_signup/Profile'));
 const CounselorAnalytics = React.lazy(() => import('./components/appointment/CounselorAnalytics'));
+const AdminLogin = React.lazy(() => import('./components/admin/AdminLogin'));
+const AdminDashboard = React.lazy(() => import('./components/admin/AdminDashboard'));
 
 const appRouter = createBrowserRouter([
   {  
@@ -211,6 +213,22 @@ const appRouter = createBrowserRouter([
       
     ],
     errorElement: <Error />,
+  },
+  {
+    path: '/admin/login',
+    element: (
+      <React.Suspense fallback={<div><LoadingPage/></div>}>
+        <AdminLogin />
+      </React.Suspense>
+    ),
+  },
+  {
+    path: '/admin/dashboard',
+    element: (
+      <React.Suspense fallback={<div><LoadingPage/></div>}>
+        <AdminDashboard />
+      </React.Suspense>
+    ),
   },
 ]);
 

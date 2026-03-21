@@ -28,6 +28,7 @@ const appointmentRoutes = require("./routes/appointmentRoutes");
 const resourceRoutes = require("./routes/resourceRoutes");
 const mediaRoutes = require("./routes/mediaRoutes");
 const infoRoutes = require("./routes/infoRoutes");
+const adminRoutes = require("./routes/adminRoutes");
 
 // Middleware
 app.use(cors({
@@ -65,6 +66,7 @@ app.use("/", authRoutes);
 app.use("/", appointmentRoutes);
 app.use("/api", resourceRoutes);
 app.use("/api", infoRoutes);
+app.use("/api", adminRoutes);
 app.use("/home", mediaRoutes);
 
 // Error handling middleware
