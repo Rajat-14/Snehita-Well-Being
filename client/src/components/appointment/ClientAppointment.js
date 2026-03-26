@@ -54,6 +54,34 @@ const ClientAppointment = ({ user }) => {
     const [cancelingApptId, setCancelingApptId] = useState(null);
     const [sendingCancel, setSendingCancel] = useState(false);
 
+    // Reschedule State
+    const [reschedulingApptId, setReschedulingApptId] = useState(null);
+
+    const openRescheduleCalendar = (appt) => {
+        setFormData(prev => ({
+            ...prev,
+            counselorName: appt.counselorName
+        }));
+        setReschedulingApptId(appt.id);
+        setShowCalendar(true);
+    };
+
+    const handleRescheduleSubmit = async (date, slot) => {
+        try {
+            await axios.put(`${BASE_URL}/appointment/${reschedulingApptId}/reschedule`, {
+                appointmentDate: date,
+                timeSlot: slot
+            }, { withCredentials: true });
+            toast.success("Appointment rescheduled successfully, awaiting counselor confirmation.");
+            setShowCalendar(false);
+            setReschedulingApptId(null);
+            fetchPreviousAppointments();
+        } catch (error) {
+             console.error("Error rescheduling:", error);
+             toast.error(error.response?.data?.error || "Failed to reschedule appointment");
+        }
+    };
+
     const openCancelModal = (apptId) => {
         setCancelingApptId(apptId);
         setCancelReason("");
@@ -172,6 +200,10 @@ const ClientAppointment = ({ user }) => {
     };
 
     const handleSlotSelect = (date, slot) => {
+        if (reschedulingApptId) {
+            handleRescheduleSubmit(date, slot);
+            return;
+        }
         setFormData(prev => ({
             ...prev,
             appointmentDate: date,
@@ -262,6 +294,7 @@ const ClientAppointment = ({ user }) => {
                                         toast.warn("Please select a counselor first");
                                         return;
                                     }
+                                    setReschedulingApptId(null);
                                     setShowCalendar(true);
                                 }}
                             >
@@ -285,7 +318,7 @@ const ClientAppointment = ({ user }) => {
                             <div className="modal-content">
                                 <div className="modal-header bg-primary text-white">
                                     <h5 className="modal-title">Select Time Slot for {formData.counselorName}</h5>
-                                    <button type="button" className="btn-close btn-close-white" onClick={() => setShowCalendar(false)}></button>
+                                    <button type="button" className="btn-close btn-close-white" onClick={() => { setShowCalendar(false); setReschedulingApptId(null); }}></button>
                                 </div>
                                 <div className="modal-body p-0">
                                     {loadingAvailability ? (
@@ -397,26 +430,40 @@ const ClientAppointment = ({ user }) => {
                                             <td>{appt.timeSlot}</td>
                                             <td>{appt.counselorName}</td>
                                             <td>
-                                                <span className={`badge ${appt.status === 'approved' ? 'bg-success' :
+                                                <span className={`badge ${appt.status === 'confirmed' ? 'bg-success' :
                                                     appt.status === 'rejected' ? 'bg-secondary' :
                                                         appt.status === 'resolved' ? 'bg-info' :
                                                             appt.status === 'followup' ? 'bg-warning text-dark' :
+                                                                appt.status === 'postponed' ? 'bg-danger text-white' :
+                                                                    appt.status === 'absent' ? 'bg-danger' :
                                                                 'bg-secondary'
                                                     }`}>
                                                     {appt.status === 'rejected' ? 'Not available' :
                                                         appt.status === 'followup' ? 'Follow-Up Needed' :
                                                             appt.status === 'resolved' ? 'Resolved' :
+                                                                appt.status === 'postponed' ? 'Postponed' :
+                                                                    appt.status === 'absent' ? 'Absent' :
                                                                 appt.status}
                                                 </span>
                                             </td>
                                             <td>
-                                                {(appt.status === 'pending' || appt.status === 'approved') && new Date(appt.appointmentDate) >= new Date(new Date().setHours(0, 0, 0, 0)) && (
+                                                {(appt.status === 'pending' || appt.status === 'confirmed') && new Date(appt.appointmentDate) >= new Date(new Date().setHours(0, 0, 0, 0)) && (
                                                     <button
                                                         className="btn btn-sm btn-outline-danger"
                                                         onClick={() => openCancelModal(appt.id)}
                                                     >
                                                         Request Cancellation
                                                     </button>
+                                                )}
+                                                {appt.status === 'postponed' && (
+                                                    <div className="d-flex flex-column gap-1">
+                                                        <button
+                                                            className="btn btn-sm btn-outline-primary"
+                                                            onClick={() => openRescheduleCalendar(appt)}
+                                                        >
+                                                            Choose Slot
+                                                        </button>
+                                                    </div>
                                                 )}
                                             </td>
                                         </tr>

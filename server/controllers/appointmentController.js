@@ -48,7 +48,7 @@ exports.createAppointment = async (req, res) => {
                 counselorName,
                 appointmentDate,
                 timeSlot,
-                status: { [Op.not]: 'rejected' } // Only non-rejected appointments count as a conflict
+                status: { [Op.notIn]: ['rejected', 'postponed'] } // Only non-rejected/postponed appointments count as a conflict
             }
         });
 
@@ -111,7 +111,7 @@ exports.getBookedSlots = async (req, res) => {
             where: {
                 counselorName: counselorName,
                 appointmentDate: new Date(appointmentDate),
-                status: { [Op.not]: 'rejected' } // Rejected slots are free again
+                status: { [Op.notIn]: ['rejected', 'postponed'] } // Rejected/postponed slots are free again
             }
         });
         const bookedSlots = appointments.map(
@@ -199,7 +199,7 @@ exports.getCounselorAppointments = async (req, res) => {
             if (Array.isArray(status)) {
                 statusArray = status;
             } else if (typeof status === 'object') {
-                // Handles axios sending {0: 'approved', 1: 'resolved', ...}
+                // Handles axios sending {0: 'confirmed', 1: 'resolved', ...}
                 statusArray = Object.values(status);
             } else if (typeof status === 'string' && status.includes(',')) {
                 statusArray = status.split(',');
@@ -251,7 +251,7 @@ exports.getCounselorAppointments = async (req, res) => {
                 endTimeStr = endTimeStr.trim();
                 let [time, modifier] = endTimeStr.split(' ');
                 if (!time || !modifier) return true; // fail-safe
-                
+
                 let [hours, minutes] = time.split(':');
                 hours = parseInt(hours, 10);
                 if (modifier === 'PM' && hours < 12) hours += 12;
@@ -286,7 +286,7 @@ exports.getAnalyticsData = async (req, res) => {
             where: {
                 counselorName: counselorName,
                 status: {
-                    [Op.in]: ['approved', 'resolved', 'completed', 'followup', 'pending']
+                    [Op.in]: ['confirmed', 'resolved', 'completed', 'followup', 'pending']
                 }
             },
             attributes: ['appointmentDate', 'gender', 'problemExtent', 'problemRelatedWith', 'status', 'age', 'modeOfReferral']
@@ -319,7 +319,7 @@ exports.updateAppointmentStatus = async (req, res) => {
 
         // ❌ Only block FUTURE dates
         if (
-            (status === 'followup' || status === 'resolved') &&
+            (status === 'followup' || status === 'resolved' || status === 'absent') &&
             appointmentDate > today
         ) {
             return res.status(400).json({
@@ -331,11 +331,42 @@ exports.updateAppointmentStatus = async (req, res) => {
         // ✅ Update status
         appointment.status = status;
 
-        if (status === 'rejected' && rejectionNote !== undefined) {
+        if ((status === 'rejected' || status === 'postponed') && rejectionNote !== undefined) {
             appointment.rejectionNote = rejectionNote;
         }
 
         await appointment.save();
+
+        // ─── Postpone email ───────────────────────────────────────────────
+        if (status === 'postponed' && appointment.email) {
+            const mailOptions = {
+                from: process.env.MAIL,
+                to: appointment.email,
+                subject: "Appointment Postponed: Snehita Well-Being",
+                html: `
+    <div style="font-family: Arial, sans-serif; color: #333;">
+        <h2 style="color: #e67e22;">Appointment Postponed</h2>
+        <p>Dear ${appointment.fullName},</p>
+        <p>Your counselor <strong>${appointment.counselorName}</strong> has postponed your scheduled appointment.</p>
+        
+        <div style="background:#fff8f0; border-left: 4px solid #e67e22; padding: 12px 16px; border-radius: 4px; margin: 16px 0;">
+            <p><strong>Reason:</strong> ${rejectionNote || 'No reason provided.'}</p>
+        </div>
+
+        <p>Please log in to your dashboard to choose a new time slot from the counselor's available schedule.</p>
+        <p>If you need any assistance, we are here to help.</p>
+
+        <hr />
+        <p>Warm regards,<br/>Team Snehita Well-Being</p>
+    </div>
+`
+            };
+
+            transporter.sendMail(mailOptions, (error) => {
+                if (error) console.error("Error sending postpone email:", error);
+                else console.log("Postpone email sent to:", appointment.email);
+            });
+        }
 
         // ─── Rejection email ───────────────────────────────────────────────
         if (status === 'rejected' && appointment.email) {
@@ -400,10 +431,44 @@ exports.updateAppointmentStatus = async (req, res) => {
     </div>
 `
             };
-
             transporter.sendMail(mailOptions, (error) => {
                 if (error) console.error("Error sending follow-up email:", error);
                 else console.log("Follow-up email sent to:", appointment.email);
+            });
+        }
+
+        // ─── Confirmation Email (for Accept) ──────────────────────────────
+        if (status === 'confirmed' && appointment.email) {
+            const mailOptions = {
+                from: process.env.MAIL,
+                to: appointment.email,
+                subject: "Appointment Confirmed: Snehita Well-Being",
+                html: `
+    <div style="font-family: Arial, sans-serif; color: #333; max-width: 600px; margin: auto;">
+        <h2 style="color: #27ae60;">Appointment Confirmed</h2>
+        <p>Dear ${appointment.fullName},</p>
+        <p>Your appointment request has been <strong>confirmed</strong>. We look forward to seeing you.</p>
+
+        <div style="background:#f1f8e9; border-left: 4px solid #27ae60; padding: 12px 16px; border-radius: 4px; margin: 16px 0;">
+            <p style="margin:0;"><strong>Appointment Details:</strong></p>
+            <ul style="margin: 8px 0 0;">
+                <li><strong>Date:</strong> ${new Date(appointment.appointmentDate).toLocaleDateString()}</li>
+                <li><strong>Time Slot:</strong> ${appointment.timeSlot}</li>
+                <li><strong>Counselor:</strong> ${appointment.counselorName}</li>
+            </ul>
+        </div>
+
+        <p>If you need to reschedule or have any questions, please contact us.</p>
+
+        <hr />
+        <p>Warm regards,<br/>Team Snehita Well-Being</p>
+    </div>
+`
+            };
+
+            transporter.sendMail(mailOptions, (error) => {
+                if (error) console.error("Error sending confirmation email:", error);
+                else console.log("Confirmation email sent to:", appointment.email);
             });
         }
 
@@ -492,7 +557,7 @@ exports.getPatientHistory = async (req, res) => {
             where: {
                 userId: userId,
                 status: {
-                    [Op.in]: ['approved', 'resolved', 'followup']
+                    [Op.in]: ['confirmed', 'resolved', 'followup', 'absent']
                 },
                 appointmentDate: { [Op.lt]: today }
             },
@@ -530,7 +595,7 @@ exports.getPublicCounselorAvailability = async (req, res) => {
         const appointments = await Appointment.findAll({
             where: {
                 counselorName: counselorName,
-                status: { [Op.ne]: 'rejected' }, // Include pending and approved
+                status: { [Op.notIn]: ['rejected', 'postponed'] }, // Include pending and confirmed
                 appointmentDate: { [Op.gte]: today }
             },
             attributes: ['appointmentDate', 'timeSlot']
@@ -560,12 +625,12 @@ exports.blockSlot = async (req, res) => {
         const endOfDay = new Date(appointmentDate);
         endOfDay.setHours(23, 59, 59, 999);
 
-        // Ensure no actual pending/approved/blocked appointment exists
+        // Ensure no actual pending/confirmed/blocked appointment exists
         const existingAppointment = await Appointment.findOne({
             where: {
                 counselorName,
                 timeSlot,
-                status: { [Op.not]: 'rejected' },
+                status: { [Op.notIn]: ['rejected', 'postponed'] },
                 appointmentDate: {
                     [Op.between]: [startOfDay, endOfDay]
                 }
@@ -654,7 +719,7 @@ exports.blockDay = async (req, res) => {
         const existingAppointments = await Appointment.findAll({
             where: {
                 counselorName,
-                status: { [Op.not]: 'rejected' },
+                status: { [Op.notIn]: ['rejected', 'postponed'] },
                 appointmentDate: {
                     [Op.between]: [startOfDay, endOfDay]
                 }
@@ -772,5 +837,48 @@ exports.requestCancellationEmail = async (req, res) => {
     } catch (err) {
         console.error("Error sending cancellation request:", err);
         res.status(500).json({ error: "Server Error" });
+    }
+};
+
+exports.rescheduleAppointment = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { appointmentDate, timeSlot } = req.body;
+
+        const appointment = await Appointment.findByPk(id);
+        if (!appointment) {
+            return res.status(404).json({ error: "Appointment not found" });
+        }
+
+        const startOfDay = new Date(appointmentDate);
+        startOfDay.setHours(0, 0, 0, 0);
+        const endOfDay = new Date(appointmentDate);
+        endOfDay.setHours(23, 59, 59, 999);
+
+        const existingAppointment = await Appointment.findOne({
+            where: {
+                counselorName: appointment.counselorName,
+                timeSlot,
+                status: { [Op.notIn]: ['rejected', 'postponed'] },
+                appointmentDate: {
+                    [Op.between]: [startOfDay, endOfDay]
+                }
+            }
+        });
+
+        if (existingAppointment) {
+            return res.status(409).json({ error: "Time slot already booked or blocked." });
+        }
+
+        appointment.appointmentDate = appointmentDate;
+        appointment.timeSlot = timeSlot;
+        appointment.status = 'pending';
+        appointment.rejectionNote = null; // Clear the postpone reason
+        await appointment.save();
+
+        res.json(appointment);
+    } catch (err) {
+        console.error("Error rescheduling:", err);
+        res.status(500).send("Server Error");
     }
 };

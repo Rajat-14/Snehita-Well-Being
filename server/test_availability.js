@@ -17,7 +17,7 @@ async function testAvailability() {
         const appointments = await Appointment.findAll({
             where: {
                 counselorName: counselorName,
-                status: 'approved',
+                status: 'confirmed',
                 appointmentDate: { [Op.gte]: today }
             },
             attributes: ['appointmentDate', 'timeSlot']

@@ -6,7 +6,7 @@ import "./appointment.css";
 
 const CounselorDashboard = ({ user }) => {
     const [appointments, setAppointments] = useState([]);
-    const [filter, setFilter] = useState('pending'); // 'pending' or 'approved'
+    const [filter, setFilter] = useState('pending'); // 'pending' or 'confirmed'
     const [loading, setLoading] = useState(true);
     const [selectedAppointment, setSelectedAppointment] = useState(null);
     const [noteText, setNoteText] = useState("");
@@ -17,6 +17,9 @@ const CounselorDashboard = ({ user }) => {
     const [showRejectConfirm, setShowRejectConfirm] = useState(false);
     const [appointmentToReject, setAppointmentToReject] = useState(null);
     const [rejectNote, setRejectNote] = useState("");
+    const [showPostponeConfirm, setShowPostponeConfirm] = useState(false);
+    const [appointmentToPostpone, setAppointmentToPostpone] = useState(null);
+    const [postponeNote, setPostponeNote] = useState("");
     const [clientProfilePic, setClientProfilePic] = useState(null);
     const [priorCounts, setPriorCounts] = useState({});
     const [historyTimeFilter, setHistoryTimeFilter] = useState('all'); // 'week', 'month', 'all'
@@ -181,8 +184,8 @@ const CounselorDashboard = ({ user }) => {
             const response = await axios.get(`${BASE_URL}/counselor/appointments`, {
                 params: {
                     counselorName: user.person_name,
-                    status: 'approved,blocked',
-                    timeframe: 'future' // Fetch all future approved/blocked for calendar
+                    status: 'confirmed,blocked',
+                    timeframe: 'future' // Fetch all future confirmed/blocked for calendar
                 },
                 withCredentials: true,
             });
@@ -204,14 +207,14 @@ const CounselorDashboard = ({ user }) => {
             if (filter === 'pending') {
                 params.status = 'pending';
             }
-            else if (filter === 'approved') {
+            else if (filter === 'confirmed') {
                 // Upcoming appointments
-                params.status = ['approved', 'resolved', 'followup'];
+                params.status = ['confirmed', 'resolved', 'followup', 'absent'];
                 params.timeframe = 'future';
             }
             else if (filter === 'history') {
                 // Past appointments
-                params.status = ['approved', 'resolved', 'followup'];
+                params.status = ['confirmed', 'resolved', 'followup', 'absent'];
                 params.timeframe = 'past';
             }
 
@@ -376,6 +379,29 @@ const CounselorDashboard = ({ user }) => {
         setRejectNote("");
     };
 
+    const initiatePostpone = (appt, e) => {
+        e.stopPropagation();
+        setAppointmentToPostpone(appt);
+        setShowPostponeConfirm(true);
+        setActiveActionId(null);
+    };
+
+    const confirmPostpone = async () => {
+        if (appointmentToPostpone) {
+            await handleStatusUpdate(appointmentToPostpone.id, 'postponed', postponeNote);
+            setShowPostponeConfirm(false);
+            setAppointmentToPostpone(null);
+            setPostponeNote("");
+            if (showHistoryModal) closePatientModal();
+        }
+    };
+
+    const cancelPostpone = () => {
+        setShowPostponeConfirm(false);
+        setAppointmentToPostpone(null);
+        setPostponeNote("");
+    };
+
     // Close dropdown when clicking outside (simple implementation using document listener could be added, 
     // but for now, clicking another row or action closes it via logic)
     useEffect(() => {
@@ -400,8 +426,8 @@ const CounselorDashboard = ({ user }) => {
                             </button>
                             <button
                                 type="button"
-                                className={`btn ${filter === 'approved' ? 'btn-primary' : 'btn-outline-primary'}`}
-                                onClick={() => setFilter('approved')}
+                                className={`btn ${filter === 'confirmed' ? 'btn-primary' : 'btn-outline-primary'}`}
+                                onClick={() => setFilter('confirmed')}
                             >
                                 Upcoming Appointments
                             </button>
@@ -603,7 +629,7 @@ const CounselorDashboard = ({ user }) => {
                                                     return true;
                                                 })
                                                 .map((appt) => (
-                                                    <tr key={appt.id} onClick={() => openPatientModal(appt)} style={{ 
+                                                    <tr key={appt.id} onClick={() => openPatientModal(appt)} style={{
                                                         cursor: 'pointer',
                                                         backgroundColor: appt.user?.isStarred ? '#fffacd' : 'transparent',
                                                         borderLeft: appt.user?.isStarred ? '4px solid #ffc107' : 'none'
@@ -632,15 +658,17 @@ const CounselorDashboard = ({ user }) => {
                                                         <td>{appt.problemRelatedWith || '-'}</td>
                                                         <td>{appt.modeOfReferral || 'N/A'}</td>
                                                         <td>
-                                                            <span className={`badge rounded-pill ${appt.status === 'approved' ? 'bg-success' :
-                                                                appt.status === 'rejected' ? 'bg-danger' :
+                                                            <span className={`badge rounded-pill ${appt.status === 'confirmed' ? 'bg-success' :
+                                                                appt.status === 'rejected' ? 'bg-secondary' :
                                                                     appt.status === 'resolved' ? 'bg-info' :
                                                                         appt.status === 'followup' ? 'bg-warning text-dark' :
-                                                                            'bg-secondary text-dark'
+                                                                            appt.status === 'absent' ? 'bg-danger' :
+                                                                                'bg-secondary text-dark'
                                                                 }`}>
                                                                 {appt.status === 'followup' ? 'Follow-Up' :
                                                                     appt.status === 'resolved' ? 'Resolved' :
-                                                                        appt.status.charAt(0).toUpperCase() + appt.status.slice(1)}
+                                                                        appt.status === 'absent' ? 'Absent' :
+                                                                            appt.status.charAt(0).toUpperCase() + appt.status.slice(1)}
                                                             </span>
                                                         </td>
                                                         <td className="text-center">
@@ -657,7 +685,7 @@ const CounselorDashboard = ({ user }) => {
                                                         <td className="actions-cell" onClick={(e) => e.stopPropagation()}>
                                                             {filter === 'pending' ? (
                                                                 <div className="btn-group btn-group-sm">
-                                                                    <button className="btn btn-action btn-accept" onClick={() => handleStatusUpdate(appt.id, 'approved')}>Accept</button>
+                                                                    <button className="btn btn-action btn-accept" onClick={() => handleStatusUpdate(appt.id, 'confirmed')}>Accept</button>
                                                                     <button className="btn btn-action btn-reject" onClick={(e) => initiateReject(appt, e)}>Reject</button>
                                                                 </div>
                                                             ) : (
@@ -680,10 +708,20 @@ const CounselorDashboard = ({ user }) => {
                                                                                     Request Follow-Up
                                                                                 </button>
                                                                             )}
-                                                                            {filter !== 'history' && appt.status !== 'rejected' && (
-                                                                                <button className="dropdown-item text-danger" onClick={(e) => initiateReject(appt, e)}>
-                                                                                    Reject
+                                                                            {appt.status !== 'absent' && (
+                                                                                <button className="dropdown-item text-danger" onClick={(e) => { e.stopPropagation(); handleStatusUpdate(appt.id, 'absent'); setActiveActionId(null); }}>
+                                                                                    Mark as Absent
                                                                                 </button>
+                                                                            )}
+                                                                            {filter !== 'history' && appt.status !== 'rejected' && appt.status !== 'postponed' && (
+                                                                                <>
+                                                                                    <button className="dropdown-item text-danger" onClick={(e) => initiateReject(appt, e)}>
+                                                                                        Reject
+                                                                                    </button>
+                                                                                    <button className="dropdown-item text-warning" onClick={(e) => initiatePostpone(appt, e)}>
+                                                                                        Postpone
+                                                                                    </button>
+                                                                                </>
                                                                             )}
                                                                         </div>
                                                                     )}
@@ -774,7 +812,7 @@ const CounselorDashboard = ({ user }) => {
                                             <div className="col-md-6">
                                                 <p><strong>Date:</strong> {new Date(selectedAppointment.appointmentDate).toLocaleDateString()}</p>
                                                 <p><strong>Time:</strong> {selectedAppointment.timeSlot}</p>
-                                                <p><strong>Status:</strong> <span className={`badge ${selectedAppointment.status === 'approved' ? 'bg-success' : selectedAppointment.status === 'rejected' ? 'bg-danger' : 'bg-warning text-dark'}`}>{selectedAppointment.status}</span></p>
+                                                <p><strong>Status:</strong> <span className={`badge ${selectedAppointment.status === 'confirmed' ? 'bg-success' : selectedAppointment.status === 'rejected' ? 'bg-secondary' : selectedAppointment.status === 'absent' ? 'bg-danger' : 'bg-warning text-dark'}`}>{selectedAppointment.status}</span></p>
                                                 <p><strong>Gender:</strong> {selectedAppointment.gender || <span className="text-muted">Not specified</span>}</p>
                                             </div>
                                             <div className="col-md-6">
@@ -809,7 +847,20 @@ const CounselorDashboard = ({ user }) => {
                                                         <tr key={hist.id}>
                                                             <td>{new Date(hist.appointmentDate).toLocaleDateString()}</td>
                                                             <td>{hist.counselorName || '-'}</td>
-                                                            <td>{hist.status || '-'}</td>
+                                                            <td>
+                                                                <span className={`badge rounded-pill ${hist.status === 'confirmed' ? 'bg-success' :
+                                                                    hist.status === 'rejected' ? 'bg-secondary' :
+                                                                        hist.status === 'resolved' ? 'bg-info' :
+                                                                            hist.status === 'followup' ? 'bg-warning text-dark' :
+                                                                                hist.status === 'absent' ? 'bg-danger' :
+                                                                                    'bg-secondary text-dark'
+                                                                    }`}>
+                                                                    {hist.status === 'followup' ? 'Follow-Up' :
+                                                                        hist.status === 'resolved' ? 'Resolved' :
+                                                                            hist.status === 'absent' ? 'Absent' :
+                                                                                hist.status ? hist.status.charAt(0).toUpperCase() + hist.status.slice(1) : '-'}
+                                                                </span>
+                                                            </td>
                                                             <td className="long-text-cell">{hist.problemDescription}</td>
                                                             <td>{hist.problemRelatedWith || '-'}</td>
                                                             <td className="long-text-cell"><small>{hist.notes || '-'}</small></td>
@@ -825,11 +876,11 @@ const CounselorDashboard = ({ user }) => {
                             </div>
                             <div className="modal-footer justify-content-between">
                                 <div>
-                                    {selectedAppointment.status !== 'approved' && selectedAppointment.status !== 'resolved' && selectedAppointment.status !== 'followup' && (
+                                    {selectedAppointment.status !== 'confirmed' && selectedAppointment.status !== 'resolved' && selectedAppointment.status !== 'followup' && (
                                         <button
                                             type="button"
                                             className="btn btn-success me-2"
-                                            onClick={() => { handleStatusUpdate(selectedAppointment.id, 'approved'); closePatientModal(); }}
+                                            onClick={() => { handleStatusUpdate(selectedAppointment.id, 'confirmed'); closePatientModal(); }}
                                         >
                                             Approve
                                         </button>
@@ -851,6 +902,15 @@ const CounselorDashboard = ({ user }) => {
                                             onClick={() => { handleStatusUpdate(selectedAppointment.id, 'followup'); closePatientModal(); }}
                                         >
                                             Request Follow-Up
+                                        </button>
+                                    )}
+                                    {selectedAppointment.status !== 'absent' && selectedAppointment.status !== 'resolved' && (
+                                        <button
+                                            type="button"
+                                            className="btn btn-warning me-2 text-dark"
+                                            onClick={() => { handleStatusUpdate(selectedAppointment.id, 'absent'); closePatientModal(); }}
+                                        >
+                                            Mark Absent
                                         </button>
                                     )}
                                     {selectedAppointment.status !== 'rejected' && selectedAppointment.status !== 'resolved' && (
@@ -925,6 +985,68 @@ const CounselorDashboard = ({ user }) => {
                                     disabled={!rejectNote.trim()}
                                 >
                                     Yes, Reject
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Postpone Confirmation Modal */}
+            {showPostponeConfirm && (
+                <div className="modal d-block" style={{ backgroundColor: 'rgba(0,0,0,0.5)', zIndex: 1070 }}>
+                    <div className="modal-dialog modal-dialog-centered">
+                        <div className="modal-content">
+                            <div className="modal-header bg-warning text-dark">
+                                <h5 className="modal-title">Confirm Postpone</h5>
+                                <button type="button" className="btn-close" onClick={cancelPostpone}></button>
+                            </div>
+                            <div className="modal-body">
+                                <p>Do you really want to postpone the appointment for <strong>{appointmentToPostpone?.fullName}</strong>?</p>
+                                <div className="mb-3">
+                                    <label className="form-label fw-semibold">
+                                        Reason for Postponement <span className="text-danger">*</span>
+                                    </label>
+
+                                    <div className="mb-2 d-flex flex-wrap gap-2">
+                                        {[
+                                            "I am busy due to a prior commitment.",
+                                            "I have an urgent meeting to attend.",
+                                            "As per the student's request, I am postponing the appointment.",
+                                            "I am on unexpected leave today."
+                                        ].map((reason, i) => (
+                                            <span
+                                                key={i}
+                                                className={`badge border rounded-pill ${postponeNote === reason ? 'bg-primary text-white' : 'bg-light text-dark fw-normal'}`}
+                                                style={{ cursor: 'pointer', transition: 'all 0.2s' }}
+                                                onClick={() => setPostponeNote(reason)}
+                                            >
+                                                {reason}
+                                            </span>
+                                        ))}
+                                    </div>
+
+                                    <textarea
+                                        className="form-control"
+                                        rows="3"
+                                        placeholder="Type a custom reason or select an option above..."
+                                        value={postponeNote}
+                                        onChange={(e) => setPostponeNote(e.target.value)}
+                                    />
+                                    {!postponeNote.trim() && (
+                                        <small className="text-muted">A reason is required before postponing.</small>
+                                    )}
+                                </div>
+                            </div>
+                            <div className="modal-footer">
+                                <button type="button" className="btn btn-secondary" onClick={cancelPostpone}>Cancel</button>
+                                <button
+                                    type="button"
+                                    className="btn btn-warning text-dark"
+                                    onClick={confirmPostpone}
+                                    disabled={!postponeNote.trim()}
+                                >
+                                    Yes, Postpone
                                 </button>
                             </div>
                         </div>

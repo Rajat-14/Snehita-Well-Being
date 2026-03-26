@@ -14,7 +14,7 @@ exports.blockSlot = async (req, res) => {
         const endOfDay = new Date(appointmentDate);
         endOfDay.setHours(23, 59, 59, 999);
 
-        // Ensure no actual pending/approved/blocked appointment exists
+        // Ensure no actual pending/confirmed/blocked appointment exists
         const existingAppointment = await Appointment.findOne({
             where: {
                 counselorName,

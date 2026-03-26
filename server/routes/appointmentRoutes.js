@@ -12,6 +12,7 @@ router.get("/counselor/analytics", authenticate, appointmentController.getAnalyt
 router.put("/status/:id", authenticate, appointmentController.updateAppointmentStatus);
 router.put("/notes/:id", authenticate, appointmentController.updateAppointmentNotes);
 router.post("/request-cancellation/:id", authenticate, appointmentController.requestCancellationEmail);
+router.put("/appointment/:id/reschedule", authenticate, appointmentController.rescheduleAppointment);
 
 router.get("/public-availability", appointmentController.getPublicCounselorAvailability); // Public endpoint, no auth required
 router.get("/counselor/prior-count", authenticate, appointmentController.getPriorAppointmentCount);
