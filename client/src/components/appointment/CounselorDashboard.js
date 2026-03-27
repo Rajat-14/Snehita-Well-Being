@@ -443,7 +443,7 @@ const CounselorDashboard = ({ user }) => {
                             className={`btn ${showCalendar ? 'btn-info text-white' : 'btn-outline-info'} ms-3`}
                             onClick={() => setShowCalendar(!showCalendar)}
                         >
-                            {showCalendar ? 'Hide Weekly Plan' : 'Weekly Plan'}
+                            {showCalendar ? 'Hide Monthly Plan' : 'Monthly Plan'}
                         </button>
                     </div>
 
@@ -475,7 +475,7 @@ const CounselorDashboard = ({ user }) => {
                     <div className="white-board-container">
                         {showCalendar ? (
                             <div className="calendar-view p-3">
-                                <h4 className="text-center mb-4 text-primary">Weekly Plan (Next 7 Days)</h4>
+                                <h4 className="text-center mb-4 text-primary">Monthly Plan (Next 30 Days)</h4>
                                 <div className="table-responsive">
                                     <table className="table table-bordered text-center calendar-table">
                                         <thead className="table-primary">
@@ -493,7 +493,7 @@ const CounselorDashboard = ({ user }) => {
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            {Array.from({ length: 7 }).map((_, dayIndex) => {
+                                            {Array.from({ length: 30 }).map((_, dayIndex) => {
                                                 const date = new Date();
                                                 date.setDate(date.getDate() + dayIndex);
                                                 const dateString = date.toLocaleDateString();

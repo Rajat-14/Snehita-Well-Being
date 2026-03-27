@@ -342,7 +342,7 @@ const ClientAppointment = ({ user }) => {
                                                         </tr>
                                                     </thead>
                                                     <tbody>
-                                                        {Array.from({ length: 7 }).map((_, dayIndex) => {
+                                                        {Array.from({ length: 30 }).map((_, dayIndex) => {
                                                             const date = new Date();
                                                             date.setDate(date.getDate() + dayIndex);
                                                             const dateString = date.toLocaleDateString(); // MM/DD/YYYY or similar depending on locale
