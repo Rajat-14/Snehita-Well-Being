@@ -1,0 +1,76 @@
+/* AdminBar — fixed bottom strip, only visible to admins */
+.admin-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 9999;
+  background: #1a1a2e;
+  border-top: 3px solid #20b3f7;
+  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.3);
+  font-family: 'Exo', sans-serif;
+  animation: adminBarIn 0.3s ease;
+}
+
+@keyframes adminBarIn {
+  from { transform: translateY(100%); }
+  to   { transform: translateY(0); }
+}
+
+.admin-bar-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 8px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.admin-bar-badge {
+  background: #20b3f7;
+  color: #fff;
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 4px 12px;
+  border-radius: 20px;
+  letter-spacing: 0.05em;
+  white-space: nowrap;
+}
+
+.admin-bar-hint {
+  color: rgba(255, 255, 255, 0.65);
+  font-size: 0.82rem;
+  flex: 1;
+  text-align: center;
+}
+
+.admin-bar-hint strong {
+  color: #20b3f7;
+}
+
+.admin-bar-logout {
+  background: transparent;
+  border: 1.5px solid rgba(231, 76, 60, 0.5);
+  color: #ff9999;
+  font-family: 'Exo', sans-serif;
+  font-size: 0.8rem;
+  font-weight: 600;
+  padding: 5px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.18s;
+  white-space: nowrap;
+}
+
+.admin-bar-logout:hover {
+  background: rgba(231, 76, 60, 0.2);
+  border-color: #e74c3c;
+  color: #fff;
+}
+
+@media (max-width: 600px) {
+  .admin-bar-hint { display: none; }
+  .admin-bar-inner { justify-content: space-between; }
+}

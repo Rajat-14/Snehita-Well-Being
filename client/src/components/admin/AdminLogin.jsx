@@ -15,7 +15,7 @@ const AdminLogin = () => {
   // If already logged in as admin, redirect to dashboard
   useEffect(() => {
     axios.get(`${BASE_URL}/api/admin/verify`, { withCredentials: true })
-      .then(() => navigate('/admin/dashboard'))
+      .then(() => navigate('/'))
       .catch(() => {}); // not logged in, stay on page
   }, [navigate]);
 
@@ -29,7 +29,7 @@ const AdminLogin = () => {
     try {
       await axios.post(`${BASE_URL}/api/admin/login`, { email, password }, { withCredentials: true });
       toast.success('Admin login successful!');
-      setTimeout(() => navigate('/admin/dashboard'), 800);
+      setTimeout(() => navigate('/'), 800);
     } catch (err) {
       toast.error(err.response?.data?.error || 'Login failed. Check credentials.');
     } finally {

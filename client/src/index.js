@@ -8,6 +8,7 @@ import { Provider } from 'react-redux';
 import store from './redux/store/index'; 
 import LoadingPage from './components/templates/loadingPage';
 import AboutWebsite from './components/aboutWebsite/aboutWebsite';
+import { AdminProvider } from './components/admin/AdminContext';
 
 // Lazy load your components
 const Home = React.lazy(() => import('./components/home/home'));
@@ -47,7 +48,6 @@ const Otp = React.lazy(() => import ('./components/login_signup/otp/otp'));
 const Profile = React.lazy(() => import('./components/login_signup/Profile'));
 const CounselorAnalytics = React.lazy(() => import('./components/appointment/CounselorAnalytics'));
 const AdminLogin = React.lazy(() => import('./components/admin/AdminLogin'));
-const AdminDashboard = React.lazy(() => import('./components/admin/AdminDashboard'));
 
 const appRouter = createBrowserRouter([
   {  
@@ -210,7 +210,7 @@ const appRouter = createBrowserRouter([
         path: '/counselor/analytics',
         element: <CounselorAnalytics />
       },
-      
+
     ],
     errorElement: <Error />,
   },
@@ -222,19 +222,14 @@ const appRouter = createBrowserRouter([
       </React.Suspense>
     ),
   },
-  {
-    path: '/admin/dashboard',
-    element: (
-      <React.Suspense fallback={<div><LoadingPage/></div>}>
-        <AdminDashboard />
-      </React.Suspense>
-    ),
-  },
+
 ]);
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <Provider store={store}>
-    <RouterProvider router={appRouter} />
+    <AdminProvider>
+      <RouterProvider router={appRouter} />
+    </AdminProvider>
   </Provider>
 );

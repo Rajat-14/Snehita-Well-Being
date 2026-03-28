@@ -72,3 +72,31 @@
     visibility: hidden;
   }
 }
+
+/* Admin inline edit button (appears under section when admin is logged in) */
+.adm-inline-edit-wrap {
+  display: flex;
+  justify-content: center;
+  margin-top: 8px;
+  margin-bottom: 16px;
+}
+
+.adm-inline-edit-btn {
+  background: #ebf3f7;
+  border: 1.5px solid #20b3f7;
+  color: #17759c;
+  font-size: 0.82rem;
+  font-weight: 700;
+  padding: 6px 18px;
+  border-radius: 20px;
+  cursor: pointer;
+  font-family: 'Exo', sans-serif;
+  transition: background 0.15s, box-shadow 0.15s;
+  box-shadow: 0 2px 8px rgba(32, 179, 247, 0.15);
+}
+
+.adm-inline-edit-btn:hover {
+  background: #d8ecf6;
+  box-shadow: 0 4px 12px rgba(32, 179, 247, 0.25);
+}
+
