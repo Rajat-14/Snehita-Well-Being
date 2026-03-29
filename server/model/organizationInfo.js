@@ -18,6 +18,10 @@ const OrganizationInfo = sequelize.define('OrganizationInfo', {
     type: {
         type: DataTypes.STRING,
         allowNull: false
+    },
+    order: {
+        type: DataTypes.INTEGER,
+        defaultValue: 0
     }
 }, {
     timestamps: true

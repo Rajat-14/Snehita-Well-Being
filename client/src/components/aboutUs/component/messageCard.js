@@ -19,17 +19,11 @@ const MessageCard = (props) => {
                 </div>
             </div>
             <div className="row my-3 mx-2">
-                {message[0]}
-                <br /><br />
-                {message[1]}
-                <br /><br />
-                {message[2]},
-                <br />
-                <br />
-                {props.telephoneNo === '' ? message[3] : ""}
-                <div className="fw-bold p-0">
-                    {props.telephoneNo !== '' ? message[3] : ""}
-                    <br />
+                {Array.isArray(message) ? message.map((msg, i) => (
+                    msg ? <p key={i} className="mb-2">{msg}</p> : null
+                )) : message}
+                
+                <div className="fw-bold p-0 mt-3">
                     {props.emailId}
                     <br />
                     {props.telephoneNo}

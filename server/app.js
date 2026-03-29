@@ -66,7 +66,7 @@ app.use("/", authRoutes);
 app.use("/", appointmentRoutes);
 app.use("/api", resourceRoutes);
 app.use("/api", infoRoutes);
-app.use("/api", adminRoutes);
+app.use("/api/admin", adminRoutes);
 app.use("/home", mediaRoutes);
 
 // Error handling middleware

@@ -1,35 +1,40 @@
-const express = require('express');
+const express = require("express");
 const router = express.Router();
-const adminController = require('../controllers/adminController');
-const isAdmin = require('../middleware/isAdmin');
+const adminController = require("../controllers/adminController");
+const isAdmin = require("../middleware/isAdmin");
 
-// ──────────────────────────────────────────────
-// Auth (no middleware needed here)
-// ──────────────────────────────────────────────
-router.post('/admin/login', adminController.adminLogin);
-router.get('/admin/logout', adminController.adminLogout);
-router.get('/admin/verify', isAdmin, adminController.verifyAdmin);
+const multer = require("multer");
+const path = require("path");
 
-// ──────────────────────────────────────────────
-// Organization Info (About Us)
-// ──────────────────────────────────────────────
-router.get('/admin/organization-info', isAdmin, adminController.getOrganizationInfo);
-router.post('/admin/organization-info', isAdmin, adminController.createOrganizationInfo);
-router.put('/admin/organization-info/:id', isAdmin, adminController.updateOrganizationInfo);
-router.delete('/admin/organization-info/:id', isAdmin, adminController.deleteOrganizationInfo);
+// Configure multer for disk storage
+const storage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        cb(null, path.join(__dirname, "../uploads"));
+    },
+    filename: (req, file, cb) => {
+        cb(null, Date.now() + path.extname(file.originalname));
+    }
+});
+const upload = multer({ storage });
 
-// ──────────────────────────────────────────────
-// Contact Details
-// ──────────────────────────────────────────────
-router.get('/admin/contact-details', isAdmin, adminController.getContactDetails);
-router.post('/admin/contact-detail', isAdmin, adminController.createContactDetail);
-router.put('/admin/contact-detail/:id', isAdmin, adminController.updateContactDetail);
+// Admin Middleware applies to all nested routes
+router.use(isAdmin);
 
-// ──────────────────────────────────────────────
-// Counselors
-// ──────────────────────────────────────────────
-router.get('/admin/counselors', isAdmin, adminController.getCounselors);
-router.post('/admin/counselor', isAdmin, adminController.addCounselor);
-router.delete('/admin/counselor/:id', isAdmin, adminController.deleteCounselor);
+// Organization Info
+router.get("/org-info", adminController.getOrgInfo);
+router.post("/org-info", adminController.addOrgInfo);
+router.post("/org-info/reorder", adminController.reorderOrgInfo);
+router.put("/org-info/:id", adminController.updateOrgInfo);
+router.delete("/org-info/:id", adminController.deleteOrgInfo);
+
+// Team Members
+router.get("/team", adminController.getTeamMembers);
+router.post("/team", adminController.addTeamMember);
+router.post("/team/reorder", adminController.reorderTeamMembers);
+router.put("/team/:id", adminController.updateTeamMember);
+router.delete("/team/:id", adminController.deleteTeamMember);
+
+// Upload endpoint
+router.post("/upload", upload.single("image"), adminController.uploadImage);
 
 module.exports = router;

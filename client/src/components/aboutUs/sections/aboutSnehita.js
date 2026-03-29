@@ -2,7 +2,7 @@ import './aboutSnehita.css';
 import { useEffect, useState } from 'react';
 
 const AboutSnehita = () => {
-  const [orgInfo, setOrgInfo] = useState(null);
+  const [orgInfo, setOrgInfo] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -14,9 +14,7 @@ const AboutSnehita = () => {
           throw new Error('Failed to fetch about information');
         }
         const data = await response.json();
-        if (data.length > 0) {
-          setOrgInfo(data[0]);
-        }
+        setOrgInfo(Array.isArray(data) ? data : []);
         setError(null);
       } catch (error) {
         console.error('Error fetching about information:', error);
@@ -37,13 +35,20 @@ const AboutSnehita = () => {
     return <div><p>Error: {error}</p></div>;
   }
 
-  if (!orgInfo) {
+  if (!orgInfo || orgInfo.length === 0) {
     return <div><p>No information available</p></div>;
   }
 
   return (
     <div>
-      <span className="text-primary aboutSnehitaHighlighting">Snehita - Well Being Cell</span> {orgInfo.description}
+      {orgInfo.map((info, idx) => (
+        <div key={info.id || idx} style={{ marginBottom: '20px' }}>
+          <span className="text-primary aboutSnehitaHighlighting" style={{ display: 'block', marginBottom: '8px', fontSize: '1.2rem' }}>
+            {info.title}
+          </span>
+          <p style={{ whiteSpace: 'pre-wrap' }}>{info.description}</p>
+        </div>
+      ))}
     </div>
   );
 };

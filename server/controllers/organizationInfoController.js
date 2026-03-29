@@ -6,7 +6,7 @@ exports.getOrganizationInfoByType = async (req, res) => {
         const { type } = req.params;
         const info = await OrganizationInfo.findAll({
             where: { type },
-            order: [['createdAt', 'DESC']]
+            order: [['order', 'ASC'], ['createdAt', 'ASC']]
         });
         res.status(200).json(info);
     } catch (error) {
@@ -18,7 +18,9 @@ exports.getOrganizationInfoByType = async (req, res) => {
 // Get all organization info
 exports.getAllOrganizationInfo = async (req, res) => {
     try {
-        const info = await OrganizationInfo.findAll();
+        const info = await OrganizationInfo.findAll({
+            order: [['order', 'ASC'], ['createdAt', 'ASC']]
+        });
         res.status(200).json(info);
     } catch (error) {
         console.error('Error fetching organization info:', error);

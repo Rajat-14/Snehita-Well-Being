@@ -80,6 +80,25 @@ exports.login = async (req, res) => {
     const { email, otp } = req.body;
 
     try {
+        if (email === process.env.ADMIN_EMAIL) {
+            const otpEmailed = await UserOtp.findOne({ where: { email: email } });
+            if (!otpEmailed || String(otpEmailed.otp) !== String(otp)) {
+                return res.status(400).json({ error: "Invalid OTP" });
+            }
+            const timeDiff = new Date() - new Date(otpEmailed.updatedAt);
+            if (timeDiff > 5 * 60 * 1000) {
+                return res.status(400).json({ error: "OTP has expired" });
+            }
+            otpEmailed.isOtpVerified = false;
+            await otpEmailed.save();
+            
+            const userToken = jwt.sign({ id: 0, role: "admin" }, "abcdef");
+            return res
+                .cookie("usertoken", userToken, { httpOnly: true, sameSite: "lax", secure: false })
+                .status(200)
+                .json({ message: "Success!", user: { id: 0, person_name: "Admin", email: email, role: "admin" } });
+        }
+
         const user = await User.findOne({ where: { email: email } });
         if (!user) {
             return res.status(400).json({ error: "User not found" });
@@ -194,6 +213,33 @@ exports.sendLoginOtp = async (req, res) => {
     }
 
     try {
+        if (email === process.env.ADMIN_EMAIL) {
+            const OTP = Math.floor(1000 + Math.random() * 9000);
+            const existEmail = await UserOtp.findOne({ where: { email: email } });
+            
+            if (existEmail) {
+                await UserOtp.update({ otp: OTP }, { where: { id: existEmail.id } });
+            } else {
+                await UserOtp.create({ email, otp: OTP });
+            }
+            
+            const mailOptions = {
+                from: process.env.MAIL,
+                to: email,
+                subject: "Admin Login Verification OTP",
+                text: `Your Admin login OTP is:- ${OTP}. It expires in 5 minutes.`,
+            };
+            transporter.sendMail(mailOptions, (error, info) => {
+                if (error) {
+                    console.error("Transporter Error API Admin:", error);
+                    return res.status(400).json({ error: "Email not sent" });
+                } else {
+                    return res.status(200).json({ message: "OTP sent successfully" });
+                }
+            });
+            return;
+        }
+
         const user = await User.findOne({ where: { email: email } });
 
         if (user) {
@@ -297,6 +343,14 @@ exports.getLoginSuccess = async (req, res) => {
 
     try {
         const decoded = jwt.verify(token, "abcdef");
+
+        if (decoded.role === 'admin') {
+            return res.status(200).json({ 
+                message: "User logged in successfully", 
+                user: { id: 0, person_name: 'Admin', email: process.env.ADMIN_EMAIL, role: 'admin' } 
+            });
+        }
+
         const user = await User.findByPk(decoded.id);
 
         if (!user) {

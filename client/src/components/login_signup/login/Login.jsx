@@ -68,7 +68,11 @@ const Login = () => {
       toast.success("Login successful");
 
       setTimeout(() => {
-        window.location.href = "/";
+        if (response.data.user.role === 'admin') {
+            window.location.href = "/admin/dashboard";
+        } else {
+            window.location.href = "/";
+        }
       }, 1500);
     } catch (error) {
       console.error("Login Error:", error);

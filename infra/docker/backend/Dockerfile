@@ -10,4 +10,3 @@ COPY . .
 
 # Create uploads directory for serving static files
 RUN mkdir -p uploads/team/buddies
-

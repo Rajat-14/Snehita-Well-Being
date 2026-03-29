@@ -109,7 +109,7 @@ const Header = () => {
           id="navbarSupportedContent"
         >
           <ul className="navbar-nav px-1  ">
-            {navItems.map((item, index) => {
+            {navItems.filter(item => !(item.title === "APPOINTMENT" && userdata?.user?.role === "admin")).map((item, index) => {
               return (
                 <li
                   className={`nav-item mx-1 page-nav-item-hover ${location.pathname === item.link ? "page-nav-item" : ""
@@ -142,6 +142,22 @@ const Header = () => {
                   to="/counselor/analytics"
                 >
                   ANALYTICS
+                </NavLink>
+              </li>
+            )}
+            {userdata && userdata.user && userdata.user.role === 'admin' && (
+              <li
+                className={`nav-item mx-1 page-nav-item-hover ${location.pathname === '/admin/dashboard' ? "page-nav-item" : ""}`}
+                data-bs-toggle="collapse"
+                data-bs-target="#navbarSupportedContent"
+                onClick={() => handleNavItemClick('/admin/dashboard')}
+              >
+                <NavLink
+                  className="nav-link active fw-bold mx-1 mb-1"
+                  aria-current="page"
+                  to="/admin/dashboard"
+                >
+                  ADMIN DASHBOARD
                 </NavLink>
               </li>
             )}
