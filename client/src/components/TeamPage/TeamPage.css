@@ -1,7 +1,4 @@
 .page-sticky-head-holder {
-    position: sticky;
-    top: 80px;
-    z-index: 10;
     margin-bottom: 30px;
 }
 .page-sticky-head {

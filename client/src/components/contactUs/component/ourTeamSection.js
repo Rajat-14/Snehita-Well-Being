@@ -68,9 +68,12 @@ const OurTeamSection = () => {
           ) : (
             teamMembers.map((profile) => {
               // message can be string or array (from backend parsing)
-              const description = Array.isArray(profile.message)
-                ? profile.message.join(' ')
-                : (profile.message || '');
+              // description corresponds to 'experience' field, message is for 'About Us'
+              const description = profile.experience || (
+                Array.isArray(profile.message)
+                  ? profile.message.join(' ')
+                  : (profile.message || '')
+              );
               return (
                 <div className="col-lg-6 col-xl-4 mb-3 " key={profile.id || profile.name}>
                   <TeamCard

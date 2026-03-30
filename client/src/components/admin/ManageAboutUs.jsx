@@ -184,7 +184,7 @@ const SnehitaManager = ({ orgInfo, refresh }) => {
 // Generic single role manager (Director, Dean)
 const TeamRoleManager = ({ role, data, refresh }) => {
   const [form, setForm] = useState({
-    name: '', designation: '', email: '', telephoneNo: '', message: '', image: '', type: role
+    name: '', designation: '', email: '', telephoneNo: '', message: '', experience: '', image: '', type: role
   });
   const [showCropper, setShowCropper] = useState(false);
   const [tempImageSrc, setTempImageSrc] = useState(null);
@@ -274,7 +274,12 @@ const TeamRoleManager = ({ role, data, refresh }) => {
         </div>
 
         <div className="admin-form-group">
-          <label>Message/Text</label>
+          <label>Experience / Description (Displayed on Team pages)</label>
+          <textarea value={form.experience} onChange={e => setForm({...form, experience: e.target.value})} className="admin-textarea" />
+        </div>
+
+        <div className="admin-form-group">
+          <label>Message/Text (Displayed on About Us)</label>
           <textarea required value={form.message} onChange={e => setForm({...form, message: e.target.value})} className="admin-textarea" />
         </div>
 
@@ -292,7 +297,7 @@ const TeamRoleManager = ({ role, data, refresh }) => {
 const FacultyManager = ({ team, refresh }) => {
   // Can be implemented remarkably similar to ManageCounselors since both handle lists.
   // For brevity, we re-use the component style.
-  const [form, setForm] = useState({ name: '', designation: '', type: 'faculty_advisor', email: '', telephoneNo: '', message: '', image: '' });
+  const [form, setForm] = useState({ name: '', designation: '', type: 'faculty_advisor', email: '', telephoneNo: '', message: '', experience: '', image: '' });
   const [editingId, setEditingId] = useState(null);
   const [showCropper, setShowCropper] = useState(false);
   const [tempImageSrc, setTempImageSrc] = useState(null);
@@ -334,7 +339,7 @@ const FacultyManager = ({ team, refresh }) => {
       }
       toast.success("Faculty Saved");
       setEditingId(null);
-      setForm({ name: '', designation: '', type: 'faculty_advisor', email: '', telephoneNo: '', message: '', image: '' });
+      setForm({ name: '', designation: '', type: 'faculty_advisor', email: '', telephoneNo: '', message: '', experience: '', image: '' });
       refresh();
     } catch (err) { toast.error("Save failed"); }
   };
@@ -420,12 +425,16 @@ const FacultyManager = ({ team, refresh }) => {
               </div>
             </div>
             <div className="admin-form-group">
-              <label>Message/Text</label>
+              <label>Experience / Description (Displayed on Team pages)</label>
+              <textarea value={form.experience} onChange={e => setForm({...form, experience: e.target.value})} className="admin-textarea" />
+            </div>
+            <div className="admin-form-group">
+              <label>Message/Text (Displayed on About Us)</label>
               <textarea required value={form.message} onChange={e => setForm({...form, message: e.target.value})} className="admin-textarea" />
             </div>
             <div style={{ display: 'flex', gap: '10px' }}>
               <button type="submit" className="admin-btn">Save</button>
-              {editingId && <button type="button" onClick={() => {setEditingId(null); setForm({name: '', designation: '', type: 'faculty_advisor', message: '', image: ''})}} className="admin-btn" style={{backgroundColor: '#95a5a6'}}>Cancel</button>}
+              {editingId && <button type="button" onClick={() => {setEditingId(null); setForm({name: '', designation: '', type: 'faculty_advisor', message: '', experience: '', image: ''})}} className="admin-btn" style={{backgroundColor: '#95a5a6'}}>Cancel</button>}
             </div>
         </form>
       </div>

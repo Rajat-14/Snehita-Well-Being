@@ -191,7 +191,7 @@ const AddressManager = ({ contactDetails, refresh }) => {
 
 // ─── Shared Team Member Form + List ──────────────────────────────────────────
 const MemberForm = ({ title, typeOptions, initialType, onSave, onCancel, existingData }) => {
-  const emptyForm = { name: '', designation: '', type: initialType, email: '', telephoneNo: '', message: '', image: '' };
+const emptyForm = { name: '', designation: '', type: initialType, email: '', telephoneNo: '', message: '', image: '', experience: '' };
   const [formData, setFormData] = useState(existingData || emptyForm);
   const [showCropper, setShowCropper] = useState(false);
   const [tempImageSrc, setTempImageSrc] = useState(null);
@@ -295,10 +295,16 @@ const MemberForm = ({ title, typeOptions, initialType, onSave, onCancel, existin
           </div>
         </div>
 
-        {/* Description */}
+        {/* Experience */}
         <div className="admin-form-group">
-          <label>Description / Message</label>
-          <textarea name="message" value={formData.message} onChange={handleChange} className="admin-textarea" placeholder="Enter description. New lines are respected." />
+          <label>Experience / Description (Displayed on Team / Contact pages)</label>
+          <textarea name="experience" value={formData.experience} onChange={handleChange} className="admin-textarea" placeholder="Enter experience or short description." />
+        </div>
+
+        {/* Message */}
+        <div className="admin-form-group">
+          <label>Message / Long Description (Displayed on About Us page)</label>
+          <textarea name="message" value={formData.message} onChange={handleChange} className="admin-textarea" placeholder="Enter descriptive message. New lines are respected." />
         </div>
 
         <div style={{ display: 'flex', gap: '10px' }}>

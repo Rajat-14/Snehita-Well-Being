@@ -12,7 +12,7 @@ const ManageCounselors = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [currentId, setCurrentId] = useState(null);
   const [formData, setFormData] = useState({
-    name: '', designation: '', type: 'counsellor', email: '', telephoneNo: '', message: '', image: ''
+    name: '', designation: '', type: 'counsellor', email: '', telephoneNo: '', message: '', experience: '', image: ''
   });
 
   // Cropper states
@@ -114,6 +114,7 @@ const ManageCounselors = () => {
       email: counselor.email || '',
       telephoneNo: counselor.telephoneNo || '',
       message: textMessage,
+      experience: counselor.experience || '',
       image: counselor.image || ''
     });
     setCurrentId(counselor.id);
@@ -133,7 +134,7 @@ const ManageCounselors = () => {
   };
 
   const resetForm = () => {
-    setFormData({ name: '', designation: '', type: 'counsellor', email: '', telephoneNo: '', message: '', image: '' });
+    setFormData({ name: '', designation: '', type: 'counsellor', email: '', telephoneNo: '', message: '', experience: '', image: '' });
     setIsEditing(false);
     setCurrentId(null);
   };
@@ -219,7 +220,12 @@ const ManageCounselors = () => {
           </div>
 
           <div className="admin-form-group">
-            <label>Message / Description (Displayed in About Us)</label>
+            <label>Experience / Description (Displayed on Team pages)</label>
+            <textarea name="experience" value={formData.experience} onChange={handleInputChange} className="admin-textarea" placeholder="Enter short description or experience..." />
+          </div>
+
+          <div className="admin-form-group">
+            <label>Message / Long Description (Displayed in About Us)</label>
             <textarea name="message" value={formData.message} onChange={handleInputChange} className="admin-textarea" placeholder="Enter message text... New lines are respected." />
           </div>
 
