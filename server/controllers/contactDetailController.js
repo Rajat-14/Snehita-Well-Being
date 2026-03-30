@@ -59,16 +59,16 @@ exports.updateContactDetail = async (req, res) => {
             return res.status(404).json({ error: 'Contact detail not found' });
         }
         await contact.update({
-            location: location || contact.location,
-            addressLine1: addressLine1 || contact.addressLine1,
-            addressLine2: addressLine2 || contact.addressLine2,
-            addressLine3: addressLine3 || contact.addressLine3,
-            city: city || contact.city,
-            state: state || contact.state,
-            country: country || contact.country,
-            postalCode: postalCode || contact.postalCode,
-            email: email || contact.email,
-            mapsLink: mapsLink || contact.mapsLink,
+            location: location !== undefined ? location : contact.location,
+            addressLine1: addressLine1 !== undefined ? addressLine1 : contact.addressLine1,
+            addressLine2: addressLine2 !== undefined ? addressLine2 : contact.addressLine2,
+            addressLine3: addressLine3 !== undefined ? addressLine3 : contact.addressLine3,
+            city: city !== undefined ? city : contact.city,
+            state: state !== undefined ? state : contact.state,
+            country: country !== undefined ? country : contact.country,
+            postalCode: postalCode !== undefined ? postalCode : contact.postalCode,
+            email: email !== undefined ? email : contact.email,
+            mapsLink: mapsLink !== undefined ? mapsLink : contact.mapsLink,
             isActive: isActive !== undefined ? isActive : contact.isActive
         });
         res.status(200).json(contact);

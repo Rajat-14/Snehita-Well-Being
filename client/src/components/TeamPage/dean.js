@@ -41,14 +41,20 @@ const Dean = () => {
     return <div><p>No dean information available</p></div>;
   }
 
+  const baseUrl = process.env.REACT_APP_API_URL || 'http://localhost:8000';
+  const imageUrl = dean.image
+    ? (dean.image.startsWith('http') ? dean.image : `${baseUrl}${dean.image}`)
+    : '';
+
   return (
     <div className="my-2">
       <FacultyCard
-        pic={`http://localhost:8000${dean.image || ''}`}
+        pic={imageUrl}
         name={dean.name}
         designation={dean.designation}
         emailId={dean.email}
         experience={dean.experience}
+        message={Array.isArray(dean.message) ? dean.message.join(' ') : (dean.message || '')}
         telephoneNo={dean.telephoneNo}
       />
     </div>

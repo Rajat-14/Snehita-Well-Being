@@ -38,14 +38,19 @@ const FA = () => {
   return (
     <div>
       {facultyAdvisors.map((item, index) => {
+        const baseUrl = process.env.REACT_APP_API_URL || 'http://localhost:8000';
+        const imageUrl = item.image
+          ? (item.image.startsWith('http') ? item.image : `${baseUrl}${item.image}`)
+          : '';
         return (
           <div className="my-2" key={index}>
             <FacultyCard
-              pic={`http://localhost:8000${item.image || ''}`}
+              pic={imageUrl}
               name={item.name}
               designation={item.designation}
               emailId={item.email}
               experience={item.experience}
+              message={Array.isArray(item.message) ? item.message.join(' ') : (item.message || '')}
               telephoneNo={item.telephoneNo}
             />
           </div>

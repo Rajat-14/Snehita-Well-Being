@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const adminController = require("../controllers/adminController");
+const contactDetailController = require("../controllers/contactDetailController");
 const isAdmin = require("../middleware/isAdmin");
 
 const multer = require("multer");
@@ -33,6 +34,12 @@ router.post("/team", adminController.addTeamMember);
 router.post("/team/reorder", adminController.reorderTeamMembers);
 router.put("/team/:id", adminController.updateTeamMember);
 router.delete("/team/:id", adminController.deleteTeamMember);
+
+// Contact Details (admin-protected)
+router.get("/contact-details", contactDetailController.getAllContactDetails);
+router.post("/contact-details", contactDetailController.createContactDetail);
+router.put("/contact-details/:id", contactDetailController.updateContactDetail);
+router.delete("/contact-details/:id", contactDetailController.deleteContactDetail);
 
 // Upload endpoint
 router.post("/upload", upload.single("image"), adminController.uploadImage);

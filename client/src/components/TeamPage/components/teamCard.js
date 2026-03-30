@@ -24,21 +24,26 @@ const TeamCard = (props) => {
           </div>
           <div className="back">
             <div className="social-media-wrapper">
-              {props.phoneNo && <a href={`https://wa.me/${props.phoneNo}`} target='_blank' className="social-icon">
-                <FaWhatsapp />
-              </a>}
-              {props.emailId && <a href={"mailto:" + props.emailId} target='_blank' className="social-icon">
-                <MdOutlineMailOutline />
-              </a>}
-              {props.telephoneNo && <a href={"callto:" + props.telephoneNo} target='_blank' className="social-icon">
-                <MdOutlinePhoneInTalk />
-              </a>}
-              {props.instaId && <a href={props.instaId} target='_blank' className="social-icon">
-                <FaInstagram />
-              </a>}
-              {props.linkedinId && <a href={props.linkedinId} target='_blank' className="social-icon">
-                <CiLinkedin />
-              </a>}
+              {props.description && (
+                <p className="back-description">{props.description}</p>
+              )}
+              <div className="back-icons-row">
+                {props.phoneNo && <a href={`https://wa.me/${props.phoneNo}`} target='_blank' rel="noreferrer" className="social-icon">
+                  <FaWhatsapp />
+                </a>}
+                {props.emailId && <a href={"mailto:" + props.emailId} target='_blank' rel="noreferrer" className="social-icon">
+                  <MdOutlineMailOutline />
+                </a>}
+                {props.telephoneNo && <a href={"callto:" + props.telephoneNo} target='_blank' rel="noreferrer" className="social-icon">
+                  <MdOutlinePhoneInTalk />
+                </a>}
+                {props.instaId && <a href={props.instaId} target='_blank' rel="noreferrer" className="social-icon">
+                  <FaInstagram />
+                </a>}
+                {props.linkedinId && <a href={props.linkedinId} target='_blank' rel="noreferrer" className="social-icon">
+                  <CiLinkedin />
+                </a>}
+              </div>
             </div>
           </div>
         </div>

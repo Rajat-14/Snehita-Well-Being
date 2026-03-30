@@ -67,11 +67,16 @@ const OurTeamSection = () => {
             </div>
           ) : (
             teamMembers.map((profile) => {
+              // message can be string or array (from backend parsing)
+              const description = Array.isArray(profile.message)
+                ? profile.message.join(' ')
+                : (profile.message || '');
               return (
                 <div className="col-lg-6 col-xl-4 mb-3 " key={profile.id || profile.name}>
                   <TeamCard
                     name={profile.name}
-                    designation={profile.designation} // Using designation as backend doesn't seem to have fullDesignation populated in seed for everyone, or I should use designation
+                    designation={profile.designation}
+                    description={description}
                     emailId={profile.email}
                     pic={getImageUrl(profile.image)}
                     telephoneNo={profile.telephoneNo}

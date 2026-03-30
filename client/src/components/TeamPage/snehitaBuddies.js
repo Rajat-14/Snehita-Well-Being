@@ -51,7 +51,8 @@ const SnehitaBuddies = () => {
           <div className="col mb-4 mr-1" key={index}>
             <TeamCard
               name={item.name}
-              designation={item.course}
+              designation={item.course || item.designation}
+              description={Array.isArray(item.message) ? item.message.join(' ') : (item.message || '')}
               phoneNo={item.telephoneNo}
               emailId={item.email}
               pic={getImageUrl(item.image)}
