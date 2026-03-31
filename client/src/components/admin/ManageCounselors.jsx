@@ -12,7 +12,7 @@ const ManageCounselors = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [currentId, setCurrentId] = useState(null);
   const [formData, setFormData] = useState({
-    name: '', designation: '', type: 'counsellor', email: '', telephoneNo: '', message: '', experience: '', image: ''
+    name: '', designation: '', type: 'counsellor', email: '', telephoneNo: '', message: '', experience: '', image: '', location: ''
   });
 
   // Cropper states
@@ -115,7 +115,8 @@ const ManageCounselors = () => {
       telephoneNo: counselor.telephoneNo || '',
       message: textMessage,
       experience: counselor.experience || '',
-      image: counselor.image || ''
+      image: counselor.image || '',
+      location: counselor.location || ''
     });
     setCurrentId(counselor.id);
     setIsEditing(true);
@@ -134,7 +135,7 @@ const ManageCounselors = () => {
   };
 
   const resetForm = () => {
-    setFormData({ name: '', designation: '', type: 'counsellor', email: '', telephoneNo: '', message: '', experience: '', image: '' });
+    setFormData({ name: '', designation: '', type: 'counsellor', email: '', telephoneNo: '', message: '', experience: '', image: '', location: '' });
     setIsEditing(false);
     setCurrentId(null);
   };
@@ -217,6 +218,11 @@ const ManageCounselors = () => {
               <label>Telephone</label>
               <input type="text" name="telephoneNo" value={formData.telephoneNo} onChange={handleInputChange} className="admin-input" placeholder="+91 XXXXX XXXXX" />
             </div>
+          </div>
+          
+          <div className="admin-form-group">
+            <label>Location</label>
+            <input type="text" name="location" value={formData.location} onChange={handleInputChange} className="admin-input" placeholder="e.g. Room 101, Main Building" />
           </div>
 
           <div className="admin-form-group">

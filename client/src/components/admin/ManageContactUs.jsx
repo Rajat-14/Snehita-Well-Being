@@ -326,16 +326,12 @@ const emptyForm = { name: '', designation: '', type: initialType, email: '', tel
   );
 };
 
-const MemberList = ({ members, onEdit, onDelete, onMoveUp, onMoveDown }) => (
+const MemberList = ({ members, onEdit, onDelete }) => (
   <div className="admin-list-container" style={{ marginTop: '20px' }}>
     {members.map((member, index) => (
       <div
         key={member.id}
         className="admin-listItem"
-        draggable
-        onDragStart={(e) => e.dataTransfer.setData('sourceIndex', index)}
-        onDragOver={(e) => e.preventDefault()}
-        style={{ cursor: 'grab' }}
       >
         <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', gap: '15px', flexGrow: 1 }}>
           <img
@@ -356,8 +352,6 @@ const MemberList = ({ members, onEdit, onDelete, onMoveUp, onMoveDown }) => (
           </div>
         </div>
         <div className="admin-listItem-actions">
-          <button className="admin-btn" onClick={() => onMoveUp(index)} disabled={index === 0} style={{ padding: '6px 10px', fontSize: '1rem', backgroundColor: '#e2e8f0', color: '#333' }}>↑</button>
-          <button className="admin-btn" onClick={() => onMoveDown(index)} disabled={index === members.length - 1} style={{ padding: '6px 10px', fontSize: '1rem', backgroundColor: '#e2e8f0', color: '#333' }}>↓</button>
           <button onClick={() => onEdit(member)} className="admin-btn" style={{ padding: '5px 12px', fontSize: '0.9rem' }}>Edit</button>
           <button onClick={() => onDelete(member.id)} className="admin-btn admin-btn-delete" style={{ padding: '5px 12px', fontSize: '0.9rem' }}>Delete</button>
         </div>
@@ -406,28 +400,6 @@ const TeamManager = ({ teamMembers, refresh }) => {
     }
   };
 
-  const reorder = async (items) => {
-    const payload = items.map((m, idx) => ({ id: m.id, order: idx }));
-    try {
-      await axios.post(`${BASE_URL}/api/admin/team/reorder`, { items: payload }, { withCredentials: true });
-      refresh(false);
-    } catch { toast.error('Reorder failed'); }
-  };
-
-  const handleMoveUp = (index) => {
-    if (index === 0) return;
-    const items = [...teamMembers];
-    [items[index], items[index - 1]] = [items[index - 1], items[index]];
-    reorder(items);
-  };
-
-  const handleMoveDown = (index) => {
-    if (index === teamMembers.length - 1) return;
-    const items = [...teamMembers];
-    [items[index], items[index + 1]] = [items[index + 1], items[index]];
-    reorder(items);
-  };
-
   const handleEdit = (member) => { setEditingMember(member); setIsAdding(false); };
   const handleCancelEdit = () => { setEditingMember(null); setIsAdding(false); };
 
@@ -457,8 +429,6 @@ const TeamManager = ({ teamMembers, refresh }) => {
         members={teamMembers}
         onEdit={handleEdit}
         onDelete={handleDelete}
-        onMoveUp={handleMoveUp}
-        onMoveDown={handleMoveDown}
       />
     </div>
   );
@@ -501,28 +471,6 @@ const BuddiesManager = ({ buddies, refresh }) => {
     }
   };
 
-  const reorder = async (items) => {
-    const payload = items.map((m, idx) => ({ id: m.id, order: idx }));
-    try {
-      await axios.post(`${BASE_URL}/api/admin/team/reorder`, { items: payload }, { withCredentials: true });
-      refresh(false);
-    } catch { toast.error('Reorder failed'); }
-  };
-
-  const handleMoveUp = (index) => {
-    if (index === 0) return;
-    const items = [...buddies];
-    [items[index], items[index - 1]] = [items[index - 1], items[index]];
-    reorder(items);
-  };
-
-  const handleMoveDown = (index) => {
-    if (index === buddies.length - 1) return;
-    const items = [...buddies];
-    [items[index], items[index + 1]] = [items[index + 1], items[index]];
-    reorder(items);
-  };
-
   const handleEdit = (buddy) => { setEditingBuddy(buddy); setIsAdding(false); };
   const handleCancelEdit = () => { setEditingBuddy(null); setIsAdding(false); };
 
@@ -533,7 +481,7 @@ const BuddiesManager = ({ buddies, refresh }) => {
       <div className="admin-card">
         <h3>{editingBuddy ? 'Edit Snehita Buddy' : isAdding ? 'Add New Snehita Buddy' : 'Snehita Buddies'}</h3>
         <p style={{ color: '#666', fontSize: '0.9rem', margin: '0 0 12px 0' }}>
-          Snehita Buddies appear on the Team Page. You can add, edit, reorder, or remove them here.
+          Snehita Buddies appear on the Team Page. You can add, edit, or remove them here.
         </p>
         {!showForm ? (
           <button className="admin-btn" onClick={() => { setIsAdding(true); setEditingBuddy(null); }} style={{ alignSelf: 'flex-start' }}>
@@ -552,8 +500,6 @@ const BuddiesManager = ({ buddies, refresh }) => {
         members={buddies}
         onEdit={handleEdit}
         onDelete={handleDelete}
-        onMoveUp={handleMoveUp}
-        onMoveDown={handleMoveDown}
       />
     </div>
   );

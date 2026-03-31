@@ -28,6 +28,26 @@ const CounselorDashboard = ({ user }) => {
     const [showUnblockConfirm, setShowUnblockConfirm] = useState(false);
     const [slotToManage, setSlotToManage] = useState(null); // { date, timeSlot }
 
+    // Follow-up Booking State
+    const [showFollowupForm, setShowFollowupForm] = useState(false);
+    const [followupData, setFollowupData] = useState({
+        fullName: "",
+        mobileNumber: "",
+        email: "",
+        appointmentDate: "",
+        timeSlot: "",
+        problemDescription: "",
+        problemExtent: "Moderate",
+        problemRelatedWith: "",
+        modeOfReferral: "",
+        userId: null,
+        previousAppointmentId: null
+    });
+    const [bookingFollowup, setBookingFollowup] = useState(false);
+    const [counselorAvailability, setCounselorAvailability] = useState([]);
+    const [loadingAvailability, setLoadingAvailability] = useState(false);
+    const [showFollowupCalendar, setShowFollowupCalendar] = useState(false);
+
     const openBlockConfirm = (date, slotString) => {
         setSlotToManage({ appointmentDate: date, timeSlot: slotString });
         setShowBlockConfirm(true);
@@ -400,6 +420,98 @@ const CounselorDashboard = ({ user }) => {
         setShowPostponeConfirm(false);
         setAppointmentToPostpone(null);
         setPostponeNote("");
+    };
+
+    const isAppointmentPast = (appt) => {
+        if (!appt || !appt.appointmentDate || !appt.timeSlot) return false;
+        const now = new Date();
+        const apptDate = new Date(appt.appointmentDate);
+        apptDate.setHours(0, 0, 0, 0);
+
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+
+        if (apptDate < today) return true;
+        if (apptDate > today) return false;
+
+        // It's today, check time slot end
+        let endTimeStr = appt.timeSlot.split('-')[1];
+        if (!endTimeStr) return false;
+        endTimeStr = endTimeStr.trim();
+        let [time, modifier] = endTimeStr.split(' ');
+        let [hours, minutes] = time.split(':');
+        hours = parseInt(hours, 10);
+        if (modifier === 'PM' && hours < 12) hours += 12;
+        if (modifier === 'AM' && hours === 12) hours = 0;
+
+        return (now.getHours() > hours) || (now.getHours() === hours && now.getMinutes() >= parseInt(minutes || 0, 10));
+    };
+
+    const initiateFollowupBooking = (appt) => {
+        setFollowupData({
+            fullName: appt.fullName || "",
+            mobileNumber: appt.mobileNumber || "",
+            email: appt.email || "",
+            appointmentDate: "", // Must select new
+            timeSlot: "",        // Must select new
+            problemDescription: appt.problemDescription || "",
+            problemExtent: appt.problemExtent || "Moderate",
+            problemRelatedWith: appt.problemRelatedWith || "",
+            modeOfReferral: appt.modeOfReferral || "",
+            age: appt.age || "",
+            gender: appt.gender || "",
+            userId: appt.userId,
+            counselorName: user.person_name,
+            previousAppointmentId: appt.id
+        });
+        setShowFollowupForm(true);
+    };
+
+    const handleFollowupSubmit = async (e) => {
+        e.preventDefault();
+        if (!followupData.appointmentDate || !followupData.timeSlot) {
+            toast.warn("Please select a date and time slot");
+            return;
+        }
+        setBookingFollowup(true);
+        try {
+            await axios.post(`${BASE_URL}/book-followup`, followupData, { withCredentials: true });
+            toast.success("Follow-up appointment booked successfully");
+            setShowFollowupForm(false);
+            closePatientModal();
+            fetchAppointments();
+            if (showCalendar) fetchCalendarAppointments();
+        } catch (error) {
+            console.error("Error booking follow-up:", error);
+            toast.error(error.response?.data?.error || "Failed to book follow-up");
+        } finally {
+            setBookingFollowup(false);
+        }
+    };
+
+    const fetchCounselorAvailability = async () => {
+        setLoadingAvailability(true);
+        try {
+            const response = await axios.get(`${BASE_URL}/public-availability`, {
+                params: { counselorName: user.person_name },
+                withCredentials: true
+            });
+            setCounselorAvailability(response.data);
+        } catch (error) {
+            console.error("Error fetching availability:", error);
+            toast.error("Failed to fetch counselor availability");
+        } finally {
+            setLoadingAvailability(false);
+        }
+    };
+
+    const handleFollowupSlotSelect = (date, slot) => {
+        setFollowupData(prev => ({
+            ...prev,
+            appointmentDate: date,
+            timeSlot: slot
+        }));
+        setShowFollowupCalendar(false);
     };
 
     // Close dropdown when clicking outside (simple implementation using document listener could be added, 
@@ -922,6 +1034,15 @@ const CounselorDashboard = ({ user }) => {
                                             Reject
                                         </button>
                                     )}
+                                    {isAppointmentPast(selectedAppointment) && (
+                                        <button
+                                            type="button"
+                                            className="btn btn-primary ms-2"
+                                            onClick={() => initiateFollowupBooking(selectedAppointment)}
+                                        >
+                                            Book Appointment
+                                        </button>
+                                    )}
                                 </div>
                                 <button type="button" className="btn btn-secondary" onClick={closePatientModal}>Close</button>
                             </div>
@@ -1136,6 +1257,178 @@ const CounselorDashboard = ({ user }) => {
                             <div className="modal-footer">
                                 <button type="button" className="btn btn-secondary" onClick={() => setShowUnblockDayConfirm(false)}>Cancel</button>
                                 <button type="button" className="btn btn-info" onClick={confirmUnblockDay}>Yes, Unblock Day</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Follow-up Booking Modal */}
+            {showFollowupForm && (
+                <div className="modal d-block" style={{ backgroundColor: 'rgba(0,0,0,0.6)', zIndex: 1080 }}>
+                    <div className="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+                        <div className="modal-content">
+                            <div className="modal-header bg-primary text-white">
+                                <h5 className="modal-title">Book Follow-up Appointment</h5>
+                                <button type="button" className="btn-close btn-close-white" onClick={() => setShowFollowupForm(false)}></button>
+                            </div>
+                            <form onSubmit={handleFollowupSubmit}>
+                                <div className="modal-body">
+                                    <div className="row g-3">
+                                        <div className="col-md-6">
+                                            <label className="form-label fw-bold">Client Name</label>
+                                            <input type="text" className="form-control bg-light" value={followupData.fullName} readOnly />
+                                        </div>
+                                        <div className="col-md-6">
+                                            <label className="form-label fw-bold">Email</label>
+                                            <input type="email" className="form-control bg-light" value={followupData.email} readOnly />
+                                        </div>
+                                        <div className="col-md-6">
+                                            <label className="form-label fw-bold">Mobile Number</label>
+                                            <input type="text" className="form-control bg-light" value={followupData.mobileNumber} readOnly />
+                                        </div>
+                                        <div className="col-md-6">
+                                            <label className="form-label fw-bold">Counselor</label>
+                                            <input type="text" className="form-control bg-light" value={followupData.counselorName} readOnly />
+                                        </div>
+                                        <div className="col-md-6">
+                                            <label className="form-label fw-bold">Mode of Referral</label>
+                                            <input type="text" className="form-control" value={followupData.modeOfReferral} readOnly />
+                                        </div>
+                                        <div className="col-md-6">
+                                            <label className="form-label fw-bold">Problem Related With</label>
+                                            <select
+                                                className="form-select"
+                                                value={followupData.problemRelatedWith}
+                                                onChange={(e) => setFollowupData({ ...followupData, problemRelatedWith: e.target.value })}
+                                                required
+                                            >
+                                                <option value="" disabled>Select Problem Area</option>
+                                                <option value="Academics">Academics</option>
+                                                <option value="Relationship">Relationship</option>
+                                                <option value="Family">Family</option>
+                                                <option value="Finance">Finance</option>
+                                                <option value="Health">Health</option>
+                                                <option value="Lifestyle related">Lifestyle related</option>
+                                                <option value="Others">Others</option>
+                                            </select>
+                                        </div>
+                                        <div className="col-12">
+                                            <label className="form-label fw-bold">Problem Description</label>
+                                            <textarea className="form-control" rows="2" value={followupData.problemDescription} onChange={(e) => setFollowupData({ ...followupData, problemDescription: e.target.value })}></textarea>
+                                        </div>
+
+                                        <div className="col-12 border-top pt-3">
+                                            <h6 className="text-primary mb-3">Select New Slot</h6>
+                                            <button
+                                                type="button"
+                                                className="btn btn-outline-primary w-100"
+                                                onClick={() => {
+                                                    fetchCounselorAvailability();
+                                                    setShowFollowupCalendar(true);
+                                                }}
+                                            >
+                                                {followupData.appointmentDate && followupData.timeSlot
+                                                    ? `${new Date(followupData.appointmentDate).toLocaleDateString()} at ${followupData.timeSlot}`
+                                                    : "Open Calendar to Select Slot"}
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div className="modal-footer">
+                                    <button type="button" className="btn btn-secondary" onClick={() => setShowFollowupForm(false)}>Cancel</button>
+                                    <button type="submit" className="btn btn-primary" disabled={bookingFollowup}>
+                                        {bookingFollowup ? "Booking..." : "Submit Follow-Up"}
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Follow-up Calendar Modal */}
+            {showFollowupCalendar && (
+                <div className="modal d-block" style={{ backgroundColor: 'rgba(0,0,0,0.7)', zIndex: 1100 }}>
+                    <div className="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+                        <div className="modal-content">
+                            <div className="modal-header bg-primary text-white">
+                                <h5 className="modal-title">Select Time Slot for {user.person_name}</h5>
+                                <button type="button" className="btn-close btn-close-white" onClick={() => setShowFollowupCalendar(false)}></button>
+                            </div>
+                            <div className="modal-body p-0">
+                                {loadingAvailability ? (
+                                    <div className="text-center p-5">Loading schedule...</div>
+                                ) : (
+                                    <div className="calendar-view">
+                                        <div className="table-responsive">
+                                            <table className="table table-bordered text-center calendar-table mb-0">
+                                                <thead className="table-light sticky-top">
+                                                    <tr>
+                                                        <th style={{ minWidth: '100px' }}>Date</th>
+                                                        <th>9 AM - 10 AM</th>
+                                                        <th>10 AM - 11 AM</th>
+                                                        <th>11 AM - 12 PM</th>
+                                                        <th>12 PM - 1 PM</th>
+                                                        <th className="bg-secondary text-white">1 PM - 2 PM</th>
+                                                        <th>2 PM - 3 PM</th>
+                                                        <th>3 PM - 4 PM</th>
+                                                        <th>4 PM - 5 PM</th>
+                                                        <th>5 PM - 6 PM</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    {Array.from({ length: 30 }).map((_, dayIndex) => {
+                                                        const date = new Date();
+                                                        date.setDate(date.getDate() + dayIndex);
+                                                        const dateString = date.toLocaleDateString();
+                                                        const isoDate = date.toISOString().split('T')[0];
+                                                        const dayName = date.toLocaleDateString('en-US', { weekday: 'short' });
+                                                        const timeSlots = [9, 10, 11, 12, 13, 14, 15, 16, 17];
+
+                                                        return (
+                                                            <tr key={dayIndex}>
+                                                                <td className="fw-bold bg-light align-middle">
+                                                                    {dateString} <br /> <small className="text-muted">{dayName}</small>
+                                                                </td>
+                                                                {timeSlots.map(hour => {
+                                                                    if (hour === 13) {
+                                                                        return <td key={hour} className="bg-secondary text-white align-middle">Lunch</td>;
+                                                                    }
+
+                                                                    const hour12 = hour > 12 ? hour - 12 : hour;
+                                                                    const ampm = hour >= 12 ? 'PM' : 'AM';
+                                                                    const slotString = `${hour12.toString().padStart(2, '0')}:00 ${ampm}`;
+
+                                                                    const isToday = isoDate === new Date().toISOString().split('T')[0];
+                                                                    const currentHour = new Date().getHours();
+                                                                    const isPastSlot = isToday && currentHour >= hour;
+
+                                                                    const isBooked = counselorAvailability.some(appt => {
+                                                                        const apptDateObj = new Date(appt.appointmentDate);
+                                                                        const apptIsoDate = apptDateObj.toISOString().split('T')[0];
+                                                                        return apptIsoDate === isoDate && appt.timeSlot.startsWith(slotString);
+                                                                    });
+
+                                                                    return (
+                                                                        <td
+                                                                            key={hour}
+                                                                            className={`align-middle ${isBooked ? 'bg-danger text-white' : isPastSlot ? 'bg-light text-muted opacity-50' : 'clickable-slot'}`}
+                                                                            onClick={() => !isBooked && !isPastSlot && handleFollowupSlotSelect(isoDate, `${slotString} - ${hour12 + 1 > 12 ? hour12 + 1 - 12 : hour12 + 1}:00 ${hour + 1 >= 12 ? 'PM' : 'AM'}`)}
+                                                                            style={{ cursor: isBooked || isPastSlot ? 'not-allowed' : 'pointer', minWidth: '100px' }}
+                                                                        >
+                                                                            {isBooked ? "Booked" : isPastSlot ? "Passed" : "Free"}
+                                                                        </td>
+                                                                    );
+                                                                })}
+                                                            </tr>
+                                                        );
+                                                    })}
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                )}
                             </div>
                         </div>
                     </div>

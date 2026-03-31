@@ -17,6 +17,7 @@ router.put("/appointment/:id/reschedule", authenticate, appointmentController.re
 router.get("/public-availability", appointmentController.getPublicCounselorAvailability); // Public endpoint, no auth required
 router.get("/counselor/prior-count", authenticate, appointmentController.getPriorAppointmentCount);
 router.get("/counselor/patient-history/:userId", authenticate, appointmentController.getPatientHistory);
+router.post("/book-followup", authenticate, appointmentController.bookFollowUp);
 router.get("/:id", authenticate, appointmentController.getAppointmentById);
 
 router.post("/counselor/block-slot", authenticate, appointmentController.blockSlot);

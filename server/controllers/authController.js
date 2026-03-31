@@ -10,7 +10,7 @@ const BASE_URL = process.env.BASE_URL;
 const Role = require("../model/role");
 
 exports.register = async (req, res) => {
-    const { person_name, otp, email, mobileNumber, gender } = req.body;
+    const { person_name, otp, email, mobileNumber, gender, entryNumber } = req.body;
 
     // Email validation regex
     const emailRegex = /^[^!@#$%^&*()_+{}\[\]:;<>,.?~\\/-]+@iitrpr\.ac\.in$/i;
@@ -39,6 +39,7 @@ exports.register = async (req, res) => {
                 person_name,
                 email,
                 mobileNumber,
+                entryNumber,
                 gender
             });
 

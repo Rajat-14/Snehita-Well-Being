@@ -19,6 +19,7 @@ const Register = () => {
     person_name: "",
     email: "",
     mobileNumber: "",
+    entryNumber: "",
     gender: "",
   });
 
@@ -156,6 +157,10 @@ const Register = () => {
             <div className="enter_in_form">
               <label htmlFor="mobileNumber">Mobile Number</label>
               <input type="text" name="mobileNumber" onChange={fnct2} placeholder="Enter your mobile number" required />
+            </div>
+            <div className="enter_in_form">
+              <label htmlFor="entryNumber">Entry Number</label>
+              <input type="text" name="entryNumber" onChange={fnct2} placeholder="Enter your entry number" required />
             </div>
             <div className="enter_in_form">
               <label htmlFor="gender">Gender</label>

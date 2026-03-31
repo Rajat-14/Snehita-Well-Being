@@ -75,9 +75,9 @@ exports.getTeamMembers = async (req, res) => {
 
 exports.addTeamMember = async (req, res) => {
     try {
-        const { name, designation, type, email, telephoneNo, image, experience, academicDesignation, message, course, instaId, linkedinId, order, isActive } = req.body;
+        const { name, designation, type, email, telephoneNo, image, experience, academicDesignation, message, course, instaId, linkedinId, order, isActive, location } = req.body;
         const member = await TeamMember.create({
-            name, designation, type, email, telephoneNo, image, experience, academicDesignation, message, course, instaId, linkedinId, order, isActive
+            name, designation, type, email, telephoneNo, image, experience, academicDesignation, message, course, instaId, linkedinId, order, isActive, location
         });
 
         // Special handling for counselor setup
@@ -89,7 +89,7 @@ exports.addTeamMember = async (req, res) => {
             }
             const existingCounselor = await Counselor.findOne({ where: { email } });
             if (!existingCounselor) {
-                await Counselor.create({ name, email });
+                await Counselor.create({ name, email, location });
             }
         }
 
@@ -129,10 +129,10 @@ exports.updateTeamMember = async (req, res) => {
                 if (!user) {
                     await User.create({ person_name: member.name, email: currentEmail, mobileNumber: member.telephoneNo });
                     await Role.create({ email: currentEmail, role: 'counselor' });
-                    await Counselor.create({ name: member.name, email: currentEmail });
+                    await Counselor.create({ name: member.name, email: currentEmail, location: member.location });
                 } else {
                     await User.update({ person_name: member.name, mobileNumber: member.telephoneNo }, { where: { email: currentEmail } });
-                    await Counselor.update({ name: member.name }, { where: { email: currentEmail } });
+                    await Counselor.update({ name: member.name, location: member.location }, { where: { email: currentEmail } });
                 }
             }
         }
@@ -201,3 +201,4 @@ exports.reorderTeamMembers = async (req, res) => {
         res.status(200).json({ message: "Reordered successfully" });
     } catch (error) { res.status(500).json({ error: "Server error" }); }
 };
+

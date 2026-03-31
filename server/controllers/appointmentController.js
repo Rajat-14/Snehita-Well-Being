@@ -3,6 +3,7 @@ const User = require("../model/userSchema");
 const jwt = require("jsonwebtoken");
 const transporter = require("../config/emailConfig");
 const { Op } = require("sequelize");
+const Counselor = require("../model/counselor"); // Import Counselor model
 
 exports.createAppointment = async (req, res) => {
     try {
@@ -124,7 +125,7 @@ exports.getBookedSlots = async (req, res) => {
     }
 };
 
-const Counselor = require("../model/counselor"); // Import Counselor model
+
 
 // Helper function to send email
 const sendAppointmentEmail = async (formData) => {
@@ -439,6 +440,17 @@ exports.updateAppointmentStatus = async (req, res) => {
 
         // ─── Confirmation Email (for Accept) ──────────────────────────────
         if (status === 'confirmed' && appointment.email) {
+            let counselorLocation = "To be announced";
+            try {
+                const Counselor = require("../model/counselor");
+                const counselor = await Counselor.findOne({ where: { name: appointment.counselorName } });
+                if (counselor && counselor.location) {
+                    counselorLocation = counselor.location;
+                }
+            } catch (err) {
+                console.error("Error fetching counselor location:", err);
+            }
+
             const mailOptions = {
                 from: process.env.MAIL,
                 to: appointment.email,
@@ -455,6 +467,7 @@ exports.updateAppointmentStatus = async (req, res) => {
                 <li><strong>Date:</strong> ${new Date(appointment.appointmentDate).toLocaleDateString()}</li>
                 <li><strong>Time Slot:</strong> ${appointment.timeSlot}</li>
                 <li><strong>Counselor:</strong> ${appointment.counselorName}</li>
+                <li><strong>Location:</strong> ${counselorLocation}</li>
             </ul>
         </div>
 
@@ -781,6 +794,106 @@ exports.unblockDay = async (req, res) => {
         res.json({ message: "Day unblocked successfully", unblockedCount: deletedCount });
     } catch (err) {
         console.error("Error unblocking day:", err);
+        res.status(500).send("Server Error");
+    }
+};
+
+exports.requestCancellationEmail = async (req, res) => {
+    // ... existing code ...
+};
+
+exports.bookFollowUp = async (req, res) => {
+    try {
+        const {
+            fullName,
+            mobileNumber,
+            email,
+            age,
+            gender,
+            problemDescription,
+            problemExtent,
+            problemRelatedWith,
+            modeOfReferral,
+            appointmentDate,
+            timeSlot,
+            counselorName,
+            userId,
+            previousAppointmentId // ID of the appointment being followed up
+        } = req.body;
+
+        // 1. Create the new CONFIRMED appointment
+        const newAppointment = await Appointment.create({
+            fullName,
+            mobileNumber,
+            email,
+            age,
+            gender,
+            problemDescription,
+            problemExtent,
+            problemRelatedWith,
+            modeOfReferral,
+            appointmentDate,
+            timeSlot,
+            counselorName,
+            status: "confirmed", // Counselor books it as confirmed
+            userId,
+        });
+
+        // 2. Update the previous appointment to 'followup' STATUS (Directly, skip email)
+        if (previousAppointmentId) {
+            await Appointment.update(
+                { status: 'followup' },
+                { where: { id: previousAppointmentId } }
+            );
+        }
+
+        // 3. Send confirmation email for the NEW appointment
+        // We reuse the existing logic but since it's confirmed, we'll trigger the confirmation email block
+        // Actually, let's just call a manual send if needed or let the existing logic handle it.
+        // The user wants a confirmation email to client.
+        
+        // Fetch counselor location for the email
+        let counselorLocation = "To be announced";
+        const counselor = await Counselor.findOne({ where: { name: counselorName } });
+        if (counselor && counselor.location) {
+            counselorLocation = counselor.location;
+        }
+
+        const mailOptions = {
+            from: process.env.MAIL,
+            to: email,
+            subject: "Appointment Confirmed: Snehita Well-Being",
+            html: `
+<div style="font-family: Arial, sans-serif; color: #333; max-width: 600px; margin: auto;">
+    <h2 style="color: #27ae60;">Appointment Confirmed (Follow-up)</h2>
+    <p>Dear ${fullName},</p>
+    <p>A follow-up appointment has been <strong>confirmed</strong> by your counselor.</p>
+
+    <div style="background:#f1f8e9; border-left: 4px solid #27ae60; padding: 12px 16px; border-radius: 4px; margin: 16px 0;">
+        <p style="margin:0;"><strong>Appointment Details:</strong></p>
+        <ul style="margin: 8px 0 0;">
+            <li><strong>Date:</strong> ${new Date(appointmentDate).toLocaleDateString()}</li>
+            <li><strong>Time Slot:</strong> ${timeSlot}</li>
+            <li><strong>Counselor:</strong> ${counselorName}</li>
+            <li><strong>Location:</strong> ${counselorLocation}</li>
+        </ul>
+    </div>
+
+    <p>If you need to reschedule or have any questions, please contact us.</p>
+    <hr />
+    <p>Warm regards,<br/>Team Snehita Well-Being</p>
+</div>
+`
+        };
+
+        transporter.sendMail(mailOptions, (error) => {
+            if (error) console.error("Error sending follow-up confirmation email:", error);
+            else console.log("Follow-up confirmation email sent to:", email);
+        });
+
+        res.status(201).json(newAppointment);
+    } catch (err) {
+        console.error("Error booking follow-up appointment:", err);
         res.status(500).send("Server Error");
     }
 };

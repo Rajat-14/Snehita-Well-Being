@@ -12,6 +12,10 @@ const Counselor = sequelize.define('Counselor', {
         type: DataTypes.STRING,
         allowNull: false
     },
+    location: {
+        type: DataTypes.STRING,
+        allowNull: true
+    },
     email: {
         type: DataTypes.STRING,
         allowNull: false,

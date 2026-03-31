@@ -28,6 +28,10 @@ const TeamMember = sequelize.define('TeamMember', {
         type: DataTypes.STRING,
         allowNull: true
     },
+    location: {
+        type: DataTypes.STRING,
+        allowNull: true
+    },
     image: {
         type: DataTypes.STRING,
         allowNull: true

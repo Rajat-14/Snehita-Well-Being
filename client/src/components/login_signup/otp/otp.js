@@ -31,6 +31,7 @@ const Otp = (props) => {
           otp,
           email: location.state.email,
           mobileNumber: location.state.mobileNumber,
+          entryNumber: location.state.entryNumber,
           gender: location.state.gender,
         };
         await axios.post(`${BASE_URL}/user/register`, data, {
