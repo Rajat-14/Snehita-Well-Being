@@ -631,299 +631,193 @@ input[type="number"]::-webkit-outer-spin-button {
   border: 1px solid #f5c6cb;
 }
 
-/* =========================================================
-   CALENDAR SLOT WINDOW — PREMIUM REDESIGN
-   ========================================================= */
+/* ====================================================
+   CALENDAR — CLEAN & SIMPLE DESIGN
+   ==================================================== */
 
-/* --- Keyframe Animations --- */
-@keyframes calendarSlideIn {
-  from {
-    opacity: 0;
-    transform: translateY(30px) scale(0.97);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
-}
-
-@keyframes rowFadeIn {
-  from {
-    opacity: 0;
-    transform: translateX(-12px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
-}
-
-@keyframes slotPulse {
-  0%, 100% { box-shadow: inset 0 0 0 0 rgba(40, 167, 69, 0); }
-  50%       { box-shadow: inset 0 0 8px 2px rgba(40, 167, 69, 0.18); }
-}
-
-@keyframes shimmerBar {
-  0%   { background-position: -400px 0; }
-  100% { background-position: 400px 0; }
-}
-
-@keyframes modalBackdropIn {
-  from { backdrop-filter: blur(0px); background: rgba(0,0,0,0); }
-  to   { backdrop-filter: blur(6px); background: rgba(15,23,42,0.55); }
-}
-
-/* --- Calendar View Container (counsellor inline + student modal body) --- */
+/* View container */
 .calendar-view {
-  background: linear-gradient(145deg, #f8faff 0%, #ffffff 100%);
-  border-radius: 14px;
-  box-shadow: 0 8px 32px rgba(13, 110, 253, 0.10), 0 2px 8px rgba(0,0,0,0.06);
+  background: #ffffff;
+  border-radius: 8px;
   height: 100%;
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  animation: calendarSlideIn 0.38s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
 .calendar-view .table-responsive {
   flex-grow: 1;
   overflow-y: auto;
   min-height: 0;
-  /* Elegant scrollbar */
   scrollbar-width: thin;
-  scrollbar-color: #90bfff #f0f4ff;
+  scrollbar-color: #c8d9f0 #f5f5f5;
 }
 
 .calendar-view .table-responsive::-webkit-scrollbar {
-  width: 7px;
-  height: 7px;
+  width: 6px;
+  height: 6px;
 }
 .calendar-view .table-responsive::-webkit-scrollbar-track {
-  background: #f0f4ff;
-  border-radius: 8px;
+  background: #f5f5f5;
 }
 .calendar-view .table-responsive::-webkit-scrollbar-thumb {
-  background: linear-gradient(180deg, #7db9ff, #3d8bfe);
-  border-radius: 8px;
-}
-.calendar-view .table-responsive::-webkit-scrollbar-thumb:hover {
-  background: #0d6efd;
+  background: #c8d9f0;
+  border-radius: 4px;
 }
 
-/* --- Calendar Table Header --- */
+/* Table header */
 .calendar-table thead th {
   position: sticky;
   top: 0;
   z-index: 20;
-  background: linear-gradient(135deg, #1a56db 0%, #0d6efd 60%, #38bdf8 100%);
-  color: #ffffff;
+  background: #f0f4ff;
+  color: #3b4a6b;
   font-size: 0.78rem;
-  font-weight: 700;
-  letter-spacing: 0.06em;
+  font-weight: 600;
+  letter-spacing: 0.04em;
   text-transform: uppercase;
-  padding: 12px 8px;
-  border: none !important;
-  text-shadow: 0 1px 3px rgba(0,0,0,0.18);
-}
-
-.calendar-table thead th:first-child {
-  border-radius: 10px 0 0 0;
-}
-.calendar-table thead th:last-child {
-  border-radius: 0 10px 0 0;
-}
-
-/* Lunch break column header override */
-.calendar-table thead th.bg-secondary {
-  background: linear-gradient(135deg, #495057, #6c757d) !important;
-  color: #fff !important;
-}
-
-/* --- Row staggered entrance animation --- */
-.calendar-table tbody tr {
-  animation: rowFadeIn 0.28s ease both;
-}
-.calendar-table tbody tr:nth-child(1)  { animation-delay: 0.03s; }
-.calendar-table tbody tr:nth-child(2)  { animation-delay: 0.06s; }
-.calendar-table tbody tr:nth-child(3)  { animation-delay: 0.09s; }
-.calendar-table tbody tr:nth-child(4)  { animation-delay: 0.12s; }
-.calendar-table tbody tr:nth-child(5)  { animation-delay: 0.15s; }
-.calendar-table tbody tr:nth-child(6)  { animation-delay: 0.18s; }
-.calendar-table tbody tr:nth-child(7)  { animation-delay: 0.21s; }
-.calendar-table tbody tr:nth-child(n+8) { animation-delay: 0.24s; }
-
-/* Alternating row tint */
-.calendar-table tbody tr:nth-child(even) > td.bg-light {
-  background-color: #eef4ff !important;
-}
-.calendar-table tbody tr:nth-child(odd) > td.bg-light {
-  background-color: #f6f9ff !important;
-}
-
-/* --- Date cell (leftmost column) --- */
-.calendar-table td.bg-light.fw-bold {
-  min-width: 120px;
   padding: 10px 8px;
-  border-right: 3px solid #dce8ff !important;
-  font-size: 0.82rem;
-  line-height: 1.4;
+  border-bottom: 2px solid #dce8ff !important;
+  border-top: none !important;
 }
 
-/* --- General td sizing --- */
+/* Lunch break column header */
+.calendar-table thead th.bg-secondary {
+  background: #e9ecef !important;
+  color: #6c757d !important;
+}
+
+/* Rows */
+.calendar-table tbody tr {
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.calendar-table tbody tr:hover {
+  background-color: #f8faff;
+}
+
+/* All cells */
 .calendar-table th,
 .calendar-table td {
   vertical-align: middle;
-  border-color: #e4ecf7 !important;
+  border-color: #eef2f7 !important;
+  font-size: 0.82rem;
 }
 
-/* Counsellor calendar: taller rows for readability */
+/* Date cell (leftmost) */
+.calendar-table td.bg-light.fw-bold {
+  min-width: 110px;
+  padding: 8px 10px;
+  border-right: 2px solid #eef2f7 !important;
+  background-color: #f9fafc !important;
+  font-size: 0.82rem;
+  line-height: 1.4;
+  color: #444;
+}
+
+/* Counsellor calendar: row height */
 .counselor-dashboard-layout .calendar-table td {
-  height: 96px;
-  position: relative;
-  padding: 4px;
+  height: 80px;
+  padding: 6px;
 }
 
-/* Student calendar: lighter touch */
+/* Student / follow-up calendar: row height */
 .modal .calendar-table td {
-  height: 66px;
-  position: relative;
+  height: 60px;
   padding: 4px;
 }
 
-/* --- FREE / clickable slot --- */
+/* FREE / clickable slot */
 .clickable-slot {
   cursor: pointer;
-  transition:
-    background-color 0.22s ease,
-    box-shadow 0.22s ease,
-    transform 0.15s ease;
-  font-size: 0.82rem;
+  background-color: #f0fdf4 !important;
+  color: #166534;
   font-weight: 600;
-  color: #4a7c59;
-  background: linear-gradient(135deg, #f0fdf4, #dcfce7) !important;
-  border-radius: 0;
-  animation: slotPulse 3s ease-in-out infinite;
+  font-size: 0.8rem;
+  transition: background-color 0.15s ease, color 0.15s ease;
 }
 
 .clickable-slot:hover {
-  background: linear-gradient(135deg, #22c55e, #16a34a) !important;
+  background-color: #22c55e !important;
   color: #ffffff !important;
-  box-shadow: 0 4px 16px rgba(34, 197, 94, 0.35),
-              inset 0 1px 0 rgba(255,255,255,0.25) !important;
-  transform: scale(1.04);
-  z-index: 5;
-  position: relative;
-  border-radius: 6px;
 }
 
-/* --- BOOKED slot (student side — red) --- */
+/* BOOKED slot (client side — red) */
 .calendar-table td.bg-danger {
-  background: linear-gradient(135deg, #fee2e2, #fca5a5) !important;
-  color: #991b1b !important;
-  font-weight: 700;
+  background-color: #fff1f2 !important;
+  color: #b91c1c !important;
+  font-weight: 600;
   font-size: 0.8rem;
   cursor: not-allowed !important;
-  border-left: 3px solid #ef4444 !important;
+  border-left: 3px solid #f87171 !important;
 }
 
-/* --- CONFIRMED / BOOKED slot (counsellor side — green) --- */
+/* CONFIRMED / BOOKED slot (counsellor side — green) */
 .calendar-table td.bg-success {
-  background: linear-gradient(135deg, #d1fae5, #6ee7b7) !important;
-  color: #065f46 !important;
-  font-weight: 700;
+  background-color: #f0fdf4 !important;
+  color: #166534 !important;
+  font-weight: 600;
   font-size: 0.8rem;
   cursor: pointer;
-  border-left: 3px solid #10b981 !important;
-  transition: filter 0.2s;
+  border-left: 3px solid #4ade80 !important;
 }
 .calendar-table td.bg-success:hover {
-  filter: brightness(0.93);
+  background-color: #dcfce7 !important;
 }
 
-/* --- BLOCKED slot (counsellor side — dark grey) --- */
+/* BLOCKED slot (counsellor side — grey) */
 .calendar-table td.bg-secondary.text-white {
-  background: linear-gradient(135deg, #374151, #6b7280) !important;
-  color: #f9fafb !important;
-  font-weight: 700;
+  background-color: #e5e7eb !important;
+  color: #4b5563 !important;
+  font-weight: 600;
   font-size: 0.8rem;
-  letter-spacing: 0.03em;
-  border-left: 3px solid #374151 !important;
-  transition: filter 0.2s;
+  border-left: 3px solid #9ca3af !important;
 }
 .calendar-table td.bg-secondary.text-white.clickable-slot:hover {
-  background: linear-gradient(135deg, #4b5563, #374151) !important;
-  transform: scale(1.04);
-  animation: none;
+  background-color: #d1d5db !important;
+  color: #1f2937 !important;
 }
 
-/* Lunch break cell — not a clickable slot */
+/* Lunch break cell */
 .calendar-table td.bg-secondary.text-white:not(.clickable-slot) {
-  opacity: 0.75;
+  background-color: #f3f4f6 !important;
+  color: #9ca3af !important;
   cursor: default;
   font-style: italic;
   font-weight: 500;
-  animation: none;
+  font-size: 0.78rem;
 }
 
-/* --- PAST slot (student side — muted) --- */
+/* PAST slot (muted) */
 .calendar-table td.bg-light.text-muted.opacity-50 {
-  background: #f3f4f6 !important;
-  color: #9ca3af !important;
+  background-color: #f9fafb !important;
+  color: #d1d5db !important;
   cursor: not-allowed !important;
   font-size: 0.75rem;
-  font-style: italic;
-  animation: none;
+  opacity: 1 !important;
 }
 
-/* --- Counsellor Block/Unblock pill buttons inside date cell --- */
+/* Counsellor Block/Unblock buttons */
 .calendar-table td .btn-outline-secondary,
 .calendar-table td .btn-outline-info {
-  font-size: 0.62rem !important;
-  padding: 0.18rem 0.45rem !important;
-  border-radius: 20px !important;
+  font-size: 0.65rem !important;
+  padding: 0.2rem 0.5rem !important;
+  border-radius: 4px !important;
   font-weight: 600;
-  transition: all 0.2s ease;
-}
-.calendar-table td .btn-outline-secondary:hover {
-  background: #374151 !important;
-  color: #fff !important;
-  transform: scale(1.08);
-}
-.calendar-table td .btn-outline-info:hover {
-  background: #0ea5e9 !important;
-  color: #fff !important;
-  transform: scale(1.08);
 }
 
-/* --- Student modal calendar: modal-content animation --- */
+/* Modal styling */
 .modal .modal-content {
-  animation: calendarSlideIn 0.35s cubic-bezier(0.22, 1, 0.36, 1) both;
-  border-radius: 16px !important;
+  border-radius: 10px !important;
   overflow: hidden;
-  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.28) !important;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.16) !important;
 }
 
 .modal .modal-header.bg-primary {
-  background: linear-gradient(135deg, #1a56db 0%, #0d6efd 60%, #38bdf8 100%) !important;
+  background: #4078c8 !important;
   border-bottom: none;
-  padding: 1.2rem 1.5rem;
+  padding: 1rem 1.4rem;
 }
-
-.modal .modal-header h5 {
-  font-weight: 700;
-  letter-spacing: 0.03em;
-  font-size: 1.05rem;
-}
-
-/* Student slot words styling */
-.calendar-table td.clickable-slot::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  pointer-events: none;
-}
-
 
 /* Table Formatting Fixes */
 .custom-table-container {
@@ -931,28 +825,23 @@ input[type="number"]::-webkit-outer-spin-button {
   width: 100%;
   margin-bottom: 1rem;
   scrollbar-width: thin;
-  scrollbar-color: #0d6efd #f1f1f1;
+  scrollbar-color: #c8d9f0 #f5f5f5;
 }
 
 .custom-table-container::-webkit-scrollbar {
-  height: 8px;
+  height: 6px;
 }
 
 .custom-table-container::-webkit-scrollbar-track {
-  background: #f1f1f1;
+  background: #f5f5f5;
   border-radius: 4px;
 }
 
 .custom-table-container::-webkit-scrollbar-thumb {
-  background: #ccc;
+  background: #c8d9f0;
   border-radius: 4px;
 }
 
-.custom-table-container::-webkit-scrollbar-thumb:hover {
-  background: #adb5bd;
-}
-
-/* Ensure table doesn't shrink layout too much */
 .history-table {
   min-width: 900px !important;
   border-collapse: separate;
@@ -977,12 +866,10 @@ input[type="number"]::-webkit-outer-spin-button {
   white-space: normal !important;
   word-wrap: break-word;
   word-break: break-all;
-  /* Fallback for very long strings */
   line-height: 1.4;
   vertical-align: top !important;
 }
 
 .modal-lg {
   max-width: 90% !important;
-  /* Allow modal to be wider if content requires */
 }

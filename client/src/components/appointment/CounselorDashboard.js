@@ -1292,8 +1292,17 @@ const CounselorDashboard = ({ user }) => {
                                             <input type="text" className="form-control bg-light" value={followupData.counselorName} readOnly />
                                         </div>
                                         <div className="col-md-6">
-                                            <label className="form-label fw-bold">Mode of Referral</label>
-                                            <input type="text" className="form-control" value={followupData.modeOfReferral} readOnly />
+                                            <label className="form-label fw-bold">Problem Extent</label>
+                                            <select 
+                                                className="form-select" 
+                                                value={followupData.problemExtent} 
+                                                onChange={(e) => setFollowupData({ ...followupData, problemExtent: e.target.value })}
+                                                required
+                                            >
+                                                <option value="Mild">Mild</option>
+                                                <option value="Moderate">Moderate</option>
+                                                <option value="Severe">Severe</option>
+                                            </select>
                                         </div>
                                         <div className="col-md-6">
                                             <label className="form-label fw-bold">Problem Related With</label>
