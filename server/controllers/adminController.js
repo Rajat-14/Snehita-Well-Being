@@ -183,8 +183,11 @@ exports.deleteTeamMember = async (req, res) => {
 exports.uploadImage = async (req, res) => {
     try {
         if (!req.file) return res.status(400).json({ error: "No file uploaded" });
-        // The file path returned starts with `/uploads/...` which our frontend expects
-        const imageUrl = `/uploads/${req.file.filename}`;
+        
+        const normalizedPath = req.file.path.replace(/\\/g, '/');
+        const uploadIndex = normalizedPath.indexOf('/uploads/');
+        const imageUrl = uploadIndex !== -1 ? normalizedPath.substring(uploadIndex) : `/uploads/${req.file.filename}`;
+        
         res.status(200).json({ imageUrl });
     } catch (error) {
         console.error("Upload Image Error:", error);
@@ -201,4 +204,136 @@ exports.reorderTeamMembers = async (req, res) => {
         res.status(200).json({ message: "Reordered successfully" });
     } catch (error) { res.status(500).json({ error: "Server error" }); }
 };
+
+// --- Achievements Admin CRUD ---
+const Achievement = require("../model/achievement");
+
+exports.getAchievements = async (req, res) => {
+    try {
+        const achievements = await Achievement.findAll({ order: [['order', 'ASC'], ['createdAt', 'ASC']] });
+        res.status(200).json(achievements);
+    } catch (error) {
+        res.status(500).json({ error: "Server error" });
+    }
+};
+
+exports.addAchievement = async (req, res) => {
+    try {
+        const { title, description, image, order } = req.body;
+        const achievement = await Achievement.create({ title, description, image, order: order || 0 });
+        res.status(201).json(achievement);
+    } catch (error) {
+        console.error("Add Achievement Error:", error);
+        res.status(500).json({ error: "Server error" });
+    }
+};
+
+exports.updateAchievement = async (req, res) => {
+    try {
+        const achievement = await Achievement.findByPk(req.params.id);
+        if (!achievement) return res.status(404).json({ error: "Not found" });
+        // Delete old image if being replaced
+        if (req.body.image && achievement.image && achievement.image !== req.body.image) {
+            const fs = require('fs'); const path = require('path');
+            let fp;
+            if (achievement.image.startsWith('/uploads/')) {
+                fp = path.join(__dirname, '..', achievement.image);
+            } else {
+                fp = path.join(__dirname, '..', 'uploads', 'achievements', achievement.image);
+            }
+            if (fp && fs.existsSync(fp)) { try { fs.unlinkSync(fp); } catch(e){ console.error(e); } }
+        }
+        Object.assign(achievement, req.body);
+        await achievement.save();
+        res.status(200).json(achievement);
+    } catch (error) {
+        console.error("Update Achievement Error:", error);
+        res.status(500).json({ error: "Server error" });
+    }
+};
+
+exports.deleteAchievement = async (req, res) => {
+    try {
+        const achievement = await Achievement.findByPk(req.params.id);
+        if (!achievement) return res.status(404).json({ error: "Not found" });
+        if (achievement.image) {
+            const fs = require('fs'); const path = require('path');
+            let fp;
+            if (achievement.image.startsWith('/uploads/')) {
+                fp = path.join(__dirname, '..', achievement.image);
+            } else {
+                fp = path.join(__dirname, '..', 'uploads', 'achievements', achievement.image);
+            }
+            if (fp && fs.existsSync(fp)) { try { fs.unlinkSync(fp); } catch(e){ console.error(e); } }
+        }
+        await achievement.destroy();
+        res.status(200).json({ message: "Deleted successfully" });
+    } catch (error) {
+        res.status(500).json({ error: "Server error" });
+    }
+};
+
+// --- Testimonials Admin CRUD ---
+const Testimonial = require("../model/testimonial");
+
+exports.getTestimonials = async (req, res) => {
+    try {
+        const testimonials = await Testimonial.findAll({ order: [['createdAt', 'ASC']] });
+        res.status(200).json(testimonials);
+    } catch (error) {
+        res.status(500).json({ error: "Server error" });
+    }
+};
+
+exports.addTestimonial = async (req, res) => {
+    try {
+        const { name, testimony, pic } = req.body;
+        const testimonial = await Testimonial.create({ name, testimony, pic });
+        res.status(201).json(testimonial);
+    } catch (error) {
+        console.error("Add Testimonial Error:", error);
+        res.status(500).json({ error: "Server error" });
+    }
+};
+
+exports.updateTestimonial = async (req, res) => {
+    try {
+        const testimonial = await Testimonial.findByPk(req.params.id);
+        if (!testimonial) return res.status(404).json({ error: "Not found" });
+        if (req.body.pic && testimonial.pic && testimonial.pic !== req.body.pic) {
+            const fs = require('fs'); const path = require('path');
+            let fp;
+            if (testimonial.pic.startsWith('/uploads/')) {
+                fp = path.join(__dirname, '..', testimonial.pic);
+            }
+            if (fp && fs.existsSync(fp)) { try { fs.unlinkSync(fp); } catch(e){ console.error(e); } }
+        }
+        Object.assign(testimonial, req.body);
+        await testimonial.save();
+        res.status(200).json(testimonial);
+    } catch (error) {
+        console.error("Update Testimonial Error:", error);
+        res.status(500).json({ error: "Server error" });
+    }
+};
+
+exports.deleteTestimonial = async (req, res) => {
+    try {
+        const testimonial = await Testimonial.findByPk(req.params.id);
+        if (!testimonial) return res.status(404).json({ error: "Not found" });
+        if (testimonial.pic) {
+            const fs = require('fs'); const path = require('path');
+            let fp;
+            if (testimonial.pic.startsWith('/uploads/')) {
+                fp = path.join(__dirname, '..', testimonial.pic);
+            } 
+            if (fp && fs.existsSync(fp)) { try { fs.unlinkSync(fp); } catch(e){ console.error(e); } }
+        }
+        await testimonial.destroy();
+        res.status(200).json({ message: "Deleted successfully" });
+    } catch (error) {
+        res.status(500).json({ error: "Server error" });
+    }
+};
+
 

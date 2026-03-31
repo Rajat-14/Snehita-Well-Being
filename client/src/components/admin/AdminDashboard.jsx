@@ -4,11 +4,13 @@ import "./admin.css";
 import ManageAboutUs from "./ManageAboutUs";
 import ManageCounselors from "./ManageCounselors";
 import ManageContactUs from "./ManageContactUs";
+import ManageHome from "./ManageHome";
 
 const NAV_ITEMS = [
   { key: "about",    label: "Manage About Us" },
   { key: "contact",  label: "Manage Contact Us" },
   { key: "counselors", label: "Manage Counselors" },
+  { key: "home",     label: "Manage Home" },
 ];
 
 const AdminDashboard = () => {
@@ -44,9 +46,11 @@ const AdminDashboard = () => {
         {activeTab === "about"      && <ManageAboutUs />}
         {activeTab === "contact"    && <ManageContactUs />}
         {activeTab === "counselors" && <ManageCounselors />}
+        {activeTab === "home"       && <ManageHome />}
       </div>
     </div>
   );
 };
 
 export default AdminDashboard;
+

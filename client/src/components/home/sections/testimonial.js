@@ -1,13 +1,26 @@
 import "./testimonial.css";
 import { useState, useEffect } from "react";
-// import testimonies from "../components/testimonies"; // DATA MOVED TO DB
 import anonymous from "../components/anonymous.jpg";
+
+const BASE_URL = process.env.REACT_APP_API_URL || "http://localhost:8000";
+
+const getTestimonialImageSrc = (pic) => {
+  if (!pic) return anonymous;
+  // New images uploaded via admin go to /uploads/testimonials/
+  if (pic.startsWith("/uploads/")) return `${BASE_URL}${pic}`;
+  // Legacy: filename stored as local asset (attempt require, fallback to anonymous)
+  try {
+    return require(`../../assets/Testimonies/${pic}`);
+  } catch {
+    return anonymous;
+  }
+};
 
 const Testimonial = () => {
   const [testimoniesData, setTestimoniesData] = useState([]);
 
   useEffect(() => {
-    fetch('http://localhost:8000/api/testimonials')
+    fetch(`${BASE_URL}/api/testimonials`)
       .then(res => res.json())
       .then(data => setTestimoniesData(data))
       .catch(err => console.error("Error fetching testimonials:", err));
@@ -31,17 +44,8 @@ const Testimonial = () => {
               <div className={`carousel-item ${index === 0 ? "active" : ""}`}>
                 <div className="testimonial4_slide">
                   <div>
-
-                    {/* {item.pic ? (
                     <img
-                      src={item.pic}
-                      className="img-circle img-responsive"
-                    />
-                  ) : (
-                    <Anonymous />
-                  )} */}
-                    <img
-                      src={item.pic ? require(`../../assets/Testimonies/${item.pic}`) : anonymous}
+                      src={getTestimonialImageSrc(item.pic)}
                       className="img-circle img-responsive"
                       alt={item.name ? item.name : "Anonymous Testimonial"}
                     />
@@ -82,3 +86,4 @@ const Testimonial = () => {
   );
 };
 export default Testimonial;
+

@@ -6,17 +6,22 @@ const isAdmin = require("../middleware/isAdmin");
 
 const multer = require("multer");
 const path = require("path");
+const fs = require("fs");
 
-// Configure multer for disk storage
-const storage = multer.diskStorage({
-    destination: (req, file, cb) => {
-        cb(null, path.join(__dirname, "../uploads"));
-    },
-    filename: (req, file, cb) => {
-        cb(null, Date.now() + path.extname(file.originalname));
-    }
-});
-const upload = multer({ storage });
+// Helper: create a multer instance for a given subfolder
+const makeUploader = (subfolder) => {
+    const dest = path.join(__dirname, "../uploads", subfolder);
+    if (!fs.existsSync(dest)) fs.mkdirSync(dest, { recursive: true });
+    const storage = multer.diskStorage({
+        destination: (req, file, cb) => cb(null, dest),
+        filename: (req, file, cb) => cb(null, Date.now() + path.extname(file.originalname))
+    });
+    return multer({ storage });
+};
+
+const uploadGeneral = makeUploader("");          // General (existing)
+const uploadAchievement = makeUploader("achievements");
+const uploadTestimonial = makeUploader("testimonials");
 
 // Admin Middleware applies to all nested routes
 router.use(isAdmin);
@@ -41,7 +46,22 @@ router.post("/contact-details", contactDetailController.createContactDetail);
 router.put("/contact-details/:id", contactDetailController.updateContactDetail);
 router.delete("/contact-details/:id", contactDetailController.deleteContactDetail);
 
-// Upload endpoint
-router.post("/upload", upload.single("image"), adminController.uploadImage);
+// Upload endpoints
+router.post("/upload", uploadGeneral.single("image"), adminController.uploadImage);
+router.post("/upload/achievement", uploadAchievement.single("image"), adminController.uploadImage);
+router.post("/upload/testimonial", uploadTestimonial.single("image"), adminController.uploadImage);
+
+// Achievements (admin)
+router.get("/achievements", adminController.getAchievements);
+router.post("/achievement", adminController.addAchievement);
+router.put("/achievement/:id", adminController.updateAchievement);
+router.delete("/achievement/:id", adminController.deleteAchievement);
+
+// Testimonials (admin)
+router.get("/testimonials", adminController.getTestimonials);
+router.post("/testimonial", adminController.addTestimonial);
+router.put("/testimonial/:id", adminController.updateTestimonial);
+router.delete("/testimonial/:id", adminController.deleteTestimonial);
 
 module.exports = router;
+
