@@ -595,7 +595,7 @@ exports.getPatientHistory = async (req, res) => {
                 appointmentDate: { [Op.lt]: today }
             },
             order: [['appointmentDate', 'DESC']],
-            attributes: ['id', 'appointmentDate', 'problemDescription', 'notes', 'problemRelatedWith', 'counselorName', 'status', 'progressScore'] // Added progressScore
+            attributes: ['id', 'appointmentDate', 'problemDescription', 'notes', 'problemRelatedWith', 'counselorName', 'status', 'progressScore', 'problemExtent'] // Added problemExtent
         });
 
         res.json(history);

@@ -724,8 +724,8 @@ const CounselorDashboard = ({ user }) => {
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            {appointments
-                                                .filter((appt) => {
+                                            {(function() {
+                                                let filteredAppts = appointments.filter((appt) => {
                                                     if (filter !== 'history' || historyTimeFilter === 'all') return true;
                                                     // DB stores "2026-01-23 05:30:00+05:30" — replace space with T for reliable parsing
                                                     const dateStr = String(appt.appointmentDate).replace(' ', 'T');
@@ -746,7 +746,21 @@ const CounselorDashboard = ({ user }) => {
                                                         return apptDate >= cutoff;
                                                     }
                                                     return true;
-                                                })
+                                                });
+
+                                                if (filter === 'history') {
+                                                    const seenUsers = new Set();
+                                                    filteredAppts = filteredAppts.filter(appt => {
+                                                        if (appt.userId && !seenUsers.has(appt.userId)) {
+                                                            seenUsers.add(appt.userId);
+                                                            return true;
+                                                        }
+                                                        return false;
+                                                    });
+                                                }
+
+                                                return filteredAppts;
+                                            })()
                                                 .map((appt) => (
                                                     <tr key={appt.id} onClick={() => openPatientModal(appt)} style={{
                                                         cursor: 'pointer',
@@ -1061,6 +1075,7 @@ const CounselorDashboard = ({ user }) => {
                                                         <th className="cell-min-width-md">Counselor</th>
                                                         <th className="cell-min-width-sm">Status</th>
                                                         <th className="cell-min-width-lg">Problem</th>
+                                                        <th className="cell-min-width-sm">Extent</th>
                                                         <th className="cell-min-width-md">Problem Related</th>
                                                         <th className="cell-min-width-sm">Progress</th>
                                                         <th className="cell-min-width-lg">Notes</th>
@@ -1086,6 +1101,11 @@ const CounselorDashboard = ({ user }) => {
                                                                 </span>
                                                             </td>
                                                             <td className="long-text-cell">{hist.problemDescription}</td>
+                                                            <td>
+                                                                <span className={`severity-badge severity-${(hist.problemExtent || '').toLowerCase()}`}>
+                                                                    {hist.problemExtent || '-'}
+                                                                </span>
+                                                            </td>
                                                             <td>{hist.problemRelatedWith || '-'}</td>
                                                             <td className="text-center fw-bold">{hist.progressScore ? `${hist.progressScore}/10` : '-'}</td>
                                                             <td className="long-text-cell"><small>{hist.notes || '-'}</small></td>
