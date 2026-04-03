@@ -73,6 +73,15 @@ const Appointment = sequelize.define('Appointment', {
         allowNull: true,
         comment: 'Reason for rejection if any'
     },
+    progressScore: {
+        type: DataTypes.INTEGER,
+        allowNull: true,
+        validate: { 
+            min: 1, 
+            max: 10 
+        },
+        comment: 'Score 1 to 10 indicating progress, filled by counselor'
+    },
 
     userId: {
         type: DataTypes.INTEGER,

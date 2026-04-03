@@ -3,6 +3,7 @@ import axios from "axios";
 import { ToastContainer, toast } from "react-toastify";
 import { BASE_URL } from "../services/helper";
 import "./appointment.css";
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
 
 const CounselorDashboard = ({ user }) => {
     const [appointments, setAppointments] = useState([]);
@@ -10,6 +11,7 @@ const CounselorDashboard = ({ user }) => {
     const [loading, setLoading] = useState(true);
     const [selectedAppointment, setSelectedAppointment] = useState(null);
     const [noteText, setNoteText] = useState("");
+    const [progressScore, setProgressScore] = useState("");
     const [showHistoryModal, setShowHistoryModal] = useState(false);
     const [patientHistory, setPatientHistory] = useState([]);
     const [historyLoading, setHistoryLoading] = useState(false);
@@ -344,19 +346,23 @@ const CounselorDashboard = ({ user }) => {
 
                 return updated;
             });
-            toast.success("Star status updated");
+            // toast.success("Star status updated"); // Removed per user request
         } catch (error) {
             console.error("Error toggling star:", error);
-            toast.error("Failed to update star status");
+            // toast.error("Failed to update star status"); // Removed per user request
         }
     };
 
     const handleAddNote = async () => {
         if (!selectedAppointment) return;
         try {
-            await axios.put(`${BASE_URL}/notes/${selectedAppointment.id}`, { notes: noteText }, { withCredentials: true });
+            const payload = { notes: noteText };
+            if (progressScore) payload.progressScore = parseInt(progressScore, 10);
+            
+            await axios.put(`${BASE_URL}/notes/${selectedAppointment.id}`, payload, { withCredentials: true });
             toast.success("Note saved successfully");
             setNoteText("");
+            setProgressScore("");
             setSelectedAppointment(null);
             fetchAppointments();
         } catch (error) {
@@ -368,6 +374,7 @@ const CounselorDashboard = ({ user }) => {
     const openNoteModal = (appt) => {
         setSelectedAppointment(appt);
         setNoteText(appt.notes || "");
+        setProgressScore(appt.progressScore || "");
     };
 
     const toggleActions = (id, e) => {
@@ -867,6 +874,32 @@ const CounselorDashboard = ({ user }) => {
                             <div className="modal-body">
                                 <p><strong>Date:</strong> {new Date(selectedAppointment.appointmentDate).toLocaleDateString()}</p>
                                 <p><strong>Problem:</strong> {selectedAppointment.problemDescription}</p>
+                                
+                                {priorCounts[selectedAppointment.id] > 0 && (
+                                    <div className="mb-4 bg-light p-3 rounded border">
+                                        <label className="form-label fw-bold text-primary mb-3 d-flex justify-content-between align-items-center">
+                                            <span>Progress Score Evaluator:</span>
+                                            <span className={`badge fs-6 ${progressScore >= 8 ? 'bg-success' : progressScore >= 4 ? 'bg-warning text-dark' : progressScore >= 1 ? 'bg-danger' : 'bg-secondary'}`}>
+                                                {progressScore ? `${progressScore} / 10` : 'Not Scored'}
+                                            </span>
+                                        </label>
+                                        <input
+                                            type="range"
+                                            className="form-range"
+                                            min="1"
+                                            max="10"
+                                            step="1"
+                                            value={progressScore || 5}
+                                            onChange={(e) => setProgressScore(e.target.value)}
+                                        />
+                                        <div className="d-flex justify-content-between text-muted small mt-2 fw-semibold">
+                                            <span className="text-danger">1 (Worsening)</span>
+                                            <span className="text-warning text-dark">5 (Moderate)</span>
+                                            <span className="text-success">10 (Significant)</span>
+                                        </div>
+                                    </div>
+                                )}
+
                                 <div className="mb-3">
                                     <label className="form-label">Session Notes:</label>
                                     <textarea
@@ -931,10 +964,88 @@ const CounselorDashboard = ({ user }) => {
                                                 <p><strong>Problem:</strong> {selectedAppointment.problemDescription}</p>
                                                 <p><strong>Extent:</strong> {selectedAppointment.problemExtent}</p>
                                                 <p><strong>Referral:</strong> {selectedAppointment.modeOfReferral}</p>
+                                                <p className="mb-0"><strong>Progress Score:</strong> <span className={`badge ${selectedAppointment.progressScore >= 8 ? 'bg-success' : selectedAppointment.progressScore >= 4 ? 'bg-warning text-dark' : selectedAppointment.progressScore >= 1 ? 'bg-danger' : 'bg-secondary'}`}>
+                                                    {selectedAppointment.progressScore ? `${selectedAppointment.progressScore} / 10` : 'Not Scored'}
+                                                </span></p>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
+
+                                {/* Progress Chart Section */}
+                                {(() => {
+                                    const chartData = [...patientHistory].filter(h => h.progressScore != null).sort((a, b) => new Date(a.appointmentDate) - new Date(b.appointmentDate));
+                                    if (chartData.length === 0) return null;
+                                    
+                                    const gradientStops = [];
+                                    if (chartData.length > 1) {
+                                        for (let i = 0; i < chartData.length - 1; i++) {
+                                            const current = chartData[i].progressScore;
+                                            const next = chartData[i+1].progressScore;
+                                            let color = "#6c757d"; // gray for no change
+                                            if (next > current) color = "#198754"; // green for increase
+                                            if (next < current) color = "#dc3545"; // red for decrease
+                                            
+                                            let startOffset = (i / (chartData.length - 1)) * 100;
+                                            let endOffset = ((i + 1) / (chartData.length - 1)) * 100;
+                                            
+                                            // Create solid segment coloring
+                                            gradientStops.push(<stop key={`stop-${i}-1`} offset={`${startOffset}%`} stopColor={color} />);
+                                            gradientStops.push(<stop key={`stop-${i}-2`} offset={`${endOffset}%`} stopColor={color} />);
+                                        }
+                                    }
+
+                                    return (
+                                        <div className="mb-4">
+                                            <h5 className="mb-3 text-secondary border-bottom pb-2">Progress Trend</h5>
+                                            <div style={{ width: '100%', height: 260, backgroundColor: '#f8f9fa', borderRadius: '8px', padding: '15px' }}>
+                                                <ResponsiveContainer>
+                                                    <LineChart
+                                                        data={chartData}
+                                                        margin={{ top: 10, right: 30, left: 0, bottom: 0 }}
+                                                    >
+                                                        <defs>
+                                                            <linearGradient id="trendSegmentColor" x1="0" y1="0" x2="1" y2="0">
+                                                                {gradientStops.length > 0 ? gradientStops : <stop offset="100%" stopColor="#198754" />}
+                                                            </linearGradient>
+                                                        </defs>
+                                                        <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e0e0e0" />
+                                                        <XAxis 
+                                                            dataKey="appointmentDate" 
+                                                            tickFormatter={(tick) => new Date(tick).toLocaleDateString()} 
+                                                            fontSize={12}
+                                                            tickMargin={10}
+                                                            axisLine={false}
+                                                            tickLine={false}
+                                                        />
+                                                        <YAxis 
+                                                            domain={[1, 10]} 
+                                                            ticks={[1, 2, 3, 4, 5, 6, 7, 8, 9, 10]} 
+                                                            fontSize={12} 
+                                                            axisLine={false}
+                                                            tickLine={false}
+                                                        />
+                                                        <Tooltip 
+                                                            labelFormatter={(label) => new Date(label).toLocaleDateString()}
+                                                            formatter={(value) => [`Score: ${value} / 10`, 'Progress']}
+                                                            contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px rgba(0,0,0,0.1)' }}
+                                                        />
+                                                        <Legend wrapperStyle={{ paddingTop: '10px' }} />
+                                                        <Line 
+                                                            type="monotone" 
+                                                            name="Progress Score" 
+                                                            dataKey="progressScore" 
+                                                            stroke="url(#trendSegmentColor)" 
+                                                            strokeWidth={4} 
+                                                            activeDot={{ r: 8, strokeWidth: 0, fill: '#6c757d' }} 
+                                                            dot={{ r: 4, fill: '#fff', strokeWidth: 2, stroke: '#6c757d' }}
+                                                        />
+                                                    </LineChart>
+                                                </ResponsiveContainer>
+                                            </div>
+                                        </div>
+                                    );
+                                })()}
 
                                 {/* History Section */}
                                 <h5 className="mb-3 text-secondary border-bottom pb-2">Appointment History</h5>
@@ -942,7 +1053,7 @@ const CounselorDashboard = ({ user }) => {
                                     <div className="text-center"><div className="spinner-border text-primary" role="status"></div></div>
                                 ) : (
                                     <div className="custom-table-container">
-                                        {patientHistory.filter(h => h.id !== selectedAppointment.id).length > 0 ? (
+                                        {patientHistory.length > 0 ? (
                                             <table className="table table-sm table-striped history-table">
                                                 <thead className="table-secondary">
                                                     <tr>
@@ -951,11 +1062,12 @@ const CounselorDashboard = ({ user }) => {
                                                         <th className="cell-min-width-sm">Status</th>
                                                         <th className="cell-min-width-lg">Problem</th>
                                                         <th className="cell-min-width-md">Problem Related</th>
+                                                        <th className="cell-min-width-sm">Progress</th>
                                                         <th className="cell-min-width-lg">Notes</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody>
-                                                    {patientHistory.filter(h => h.id !== selectedAppointment.id).map((hist) => (
+                                                    {patientHistory.map((hist) => (
                                                         <tr key={hist.id}>
                                                             <td>{new Date(hist.appointmentDate).toLocaleDateString()}</td>
                                                             <td>{hist.counselorName || '-'}</td>
@@ -975,6 +1087,7 @@ const CounselorDashboard = ({ user }) => {
                                                             </td>
                                                             <td className="long-text-cell">{hist.problemDescription}</td>
                                                             <td>{hist.problemRelatedWith || '-'}</td>
+                                                            <td className="text-center fw-bold">{hist.progressScore ? `${hist.progressScore}/10` : '-'}</td>
                                                             <td className="long-text-cell"><small>{hist.notes || '-'}</small></td>
                                                         </tr>
                                                     ))}

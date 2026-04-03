@@ -279,8 +279,15 @@ const emptyForm = { name: '', designation: '', type: initialType, email: '', tel
 
         {/* Designation */}
         <div className="admin-form-group">
-          <label>Designation</label>
-          <input type="text" name="designation" value={formData.designation} onChange={handleChange} className="admin-input" placeholder="e.g. Senior Counselor" />
+          <label>Designation / Role</label>
+          <select name="designation" value={formData.designation} onChange={handleChange} className="admin-input" required>
+            <option value="">-- Select Designation --</option>
+            <option value="Counsellor">Counsellor</option>
+            <option value="Senior Counsellor">Senior Counsellor</option>
+            <option value="Dean">Dean</option>
+            <option value="Faculty Advisor">Faculty Advisor</option>
+            <option value="Director">Director</option>
+          </select>
         </div>
 
         {/* Email + Phone */}

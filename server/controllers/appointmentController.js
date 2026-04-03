@@ -496,14 +496,34 @@ exports.updateAppointmentStatus = async (req, res) => {
 exports.updateAppointmentNotes = async (req, res) => {
     try {
         const { id } = req.params;
-        const { notes } = req.body;
+        const { notes, progressScore } = req.body;
 
         const appointment = await Appointment.findByPk(id);
         if (!appointment) {
             return res.status(404).json({ error: "Appointment not found" });
         }
 
-        appointment.notes = notes;
+        if (progressScore !== undefined) {
+            // Validate that this is not their first session
+            const priorCount = await Appointment.count({
+                where: {
+                    userId: appointment.userId,
+                    counselorName: appointment.counselorName,
+                    appointmentDate: { [Op.lt]: appointment.appointmentDate },
+                    status: { [Op.in]: ['confirmed', 'resolved', 'followup', 'completed'] }
+                }
+            });
+
+            if (priorCount === 0) {
+                return res.status(400).json({ error: "Progress score can only be added from the second session onwards." });
+            }
+            appointment.progressScore = progressScore;
+        }
+
+        if (notes !== undefined) {
+            appointment.notes = notes;
+        }
+        
         await appointment.save();
 
         res.json(appointment);
@@ -575,7 +595,7 @@ exports.getPatientHistory = async (req, res) => {
                 appointmentDate: { [Op.lt]: today }
             },
             order: [['appointmentDate', 'DESC']],
-            attributes: ['id', 'appointmentDate', 'problemDescription', 'notes', 'problemRelatedWith', 'counselorName', 'status'] // Removed status and timeSlot
+            attributes: ['id', 'appointmentDate', 'problemDescription', 'notes', 'problemRelatedWith', 'counselorName', 'status', 'progressScore'] // Added progressScore
         });
 
         res.json(history);
