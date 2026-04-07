@@ -287,7 +287,7 @@ exports.getAnalyticsData = async (req, res) => {
             where: {
                 counselorName: counselorName,
                 status: {
-                    [Op.in]: ['confirmed', 'resolved', 'completed', 'followup', 'pending']
+                    [Op.in]: ['resolved', 'followup']
                 }
             },
             attributes: ['appointmentDate', 'gender', 'problemExtent', 'problemRelatedWith', 'status', 'age', 'modeOfReferral']
@@ -523,7 +523,7 @@ exports.updateAppointmentNotes = async (req, res) => {
         if (notes !== undefined) {
             appointment.notes = notes;
         }
-        
+
         await appointment.save();
 
         res.json(appointment);
@@ -871,7 +871,7 @@ exports.bookFollowUp = async (req, res) => {
         // We reuse the existing logic but since it's confirmed, we'll trigger the confirmation email block
         // Actually, let's just call a manual send if needed or let the existing logic handle it.
         // The user wants a confirmation email to client.
-        
+
         // Fetch counselor location for the email
         let counselorLocation = "To be announced";
         const counselor = await Counselor.findOne({ where: { name: counselorName } });

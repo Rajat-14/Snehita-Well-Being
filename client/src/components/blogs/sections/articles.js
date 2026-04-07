@@ -171,76 +171,140 @@ const Articles = () => {
       )}
 
       {localStorage.getItem("role") === "counselor" && (
-        <div className="container mb-4">
-          <button
-            className="btn btn-primary mb-3"
-            onClick={() => setShowAddForm(!showAddForm)}
-          >
-            {showAddForm ? "Close Form" : "Add New Blog"}
-          </button>
+        <div className="container mb-5 mt-4">
+          {!showAddForm && (
+            <div className="d-flex justify-content-end mb-3">
+              <button
+                className="btn btn-primary shadow-sm rounded-pill px-4 py-2 fw-semibold"
+                style={{ transition: 'all 0.3s ease' }}
+                onClick={() => setShowAddForm(true)}
+              >
+                <i className="bi bi-plus-lg me-2"></i> Add New Blog
+              </button>
+            </div>
+          )}
 
           {showAddForm && (
-            <form onSubmit={handleAddBlog} className="card p-3 mb-3">
-
-              <div className="mb-2">
-                <input
-                  type="text"
-                  className="form-control"
-                  placeholder="Title"
-                  required
-                  value={newBlog.title}
-                  onChange={(e) =>
-                    setNewBlog({ ...newBlog, title: e.target.value })
-                  }
-                />
+            <div className="card shadow-lg rounded-4 overflow-hidden mb-4" style={{ backgroundColor: '#ffffff', border: 'none' }}>
+              <div className="card-header bg-white pt-4 pb-0 px-4" style={{ borderBottom: 'none' }}>
+                <h4 className="fw-bold text-dark mb-0">Create New Blog Post</h4>
+                <p className="text-muted small">Share your thoughts and resources with the community.</p>
               </div>
+              <form onSubmit={handleAddBlog} className="card-body p-4 pt-3">
+                <div className="row g-4">
+                  <div className="col-md-6">
+                    <label className="form-label fw-semibold text-secondary mb-1">Blog Title</label>
+                    <input
+                      type="text"
+                      className="form-control form-control-lg rounded-3 border-light-subtle shadow-none bg-light"
+                      style={{ transition: 'all 0.3s ease', fontSize: '1rem' }}
+                      placeholder="Enter an engaging title"
+                      required
+                      value={newBlog.title}
+                      onChange={(e) =>
+                        setNewBlog({ ...newBlog, title: e.target.value })
+                      }
+                      onFocus={(e) => { e.target.classList.remove('bg-light'); e.target.classList.add('border-primary'); }}
+                      onBlur={(e) => { e.target.classList.add('bg-light'); e.target.classList.remove('border-primary'); }}
+                    />
+                  </div>
+                  
+                  <div className="col-md-6">
+                    <label className="form-label fw-semibold text-secondary mb-1">Category / Type</label>
+                    <select
+                      className="form-select form-select-lg rounded-3 border-light-subtle shadow-none bg-light"
+                      style={{ transition: 'all 0.3s ease', fontSize: '1rem' }}
+                      value={newBlog.type}
+                      onChange={(e) =>
+                        setNewBlog({ ...newBlog, type: e.target.value })
+                      }
+                      required
+                      onFocus={(e) => { e.target.classList.remove('bg-light'); e.target.classList.add('border-primary'); }}
+                      onBlur={(e) => { e.target.classList.add('bg-light'); e.target.classList.remove('border-primary'); }}
+                    >
+                      <option value="" disabled>Select category</option>
+                      {articleTypes.map((t, index) => (
+                        <option key={index} value={t}>{t}</option>
+                      ))}
+                    </select>
+                  </div>
 
-              <div className="mb-2">
-                <select
-                  className="form-control"
-                  value={newBlog.type}
-                  onChange={(e) =>
-                    setNewBlog({ ...newBlog, type: e.target.value })
-                  }
-                  required
-                >
-                  <option value="" disabled>
-                    Type
-                  </option>
+                  <div className="col-12">
+                    <label className="form-label fw-semibold text-secondary mb-1">External Link (URL)</label>
+                    <input
+                      type="text"
+                      className="form-control form-control-lg rounded-3 border-light-subtle shadow-none bg-light"
+                      style={{ transition: 'all 0.3s ease', fontSize: '1rem' }}
+                      placeholder="https://example.com/your-article"
+                      value={newBlog.link}
+                      onChange={(e) =>
+                        setNewBlog({ ...newBlog, link: e.target.value })
+                      }
+                      onFocus={(e) => { e.target.classList.remove('bg-light'); e.target.classList.add('border-primary'); }}
+                      onBlur={(e) => { e.target.classList.add('bg-light'); e.target.classList.remove('border-primary'); }}
+                    />
+                  </div>
 
-                  {articleTypes.map((t, index) => (
-                    <option key={index} value={t}>
-                      {t}
-                    </option>
-                  ))}
-                </select>
-              </div>
+                  <div className="col-12">
+                    <label className="form-label fw-semibold text-secondary mb-1">Cover Image</label>
+                    <div className="position-relative">
+                      <input
+                        type="file"
+                        className="form-control position-absolute w-100 h-100 opacity-0"
+                        style={{ cursor: 'pointer', zIndex: 2 }}
+                        onChange={handleFileChange}
+                        accept="image/*"
+                      />
+                      <div className="d-flex flex-column align-items-center justify-content-center border-2 rounded-4 p-4 text-center bg-light" 
+                           style={{ borderColor: '#dee2e6', borderStyle: 'dashed', transition: 'all 0.3s ease', minHeight: '160px' }}
+                           onDragOver={(e) => {e.currentTarget.style.borderColor = '#0d6efd'; e.currentTarget.style.backgroundColor = '#f8f9fa';}}
+                           onDragLeave={(e) => {e.currentTarget.style.borderColor = '#dee2e6'; e.currentTarget.style.backgroundColor = '#f8f9fa';}}>
+                        {newBlog.pic ? (
+                          <>
+                            <i className="bi bi-image text-success mb-2" style={{ fontSize: '2rem' }}></i>
+                            <h6 className="mb-0 text-success fw-semibold">Image Selected</h6>
+                            <small className="text-muted mt-1">{newBlog.pic.name}</small>
+                          </>
+                        ) : (
+                          <>
+                            <div className="bg-white rounded-circle shadow-sm d-flex justify-content-center align-items-center mb-3" style={{ width: '56px', height: '56px' }}>
+                              <i className="bi bi-cloud-arrow-up text-primary fs-4"></i>
+                            </div>
+                            <h6 className="fw-semibold text-dark mb-1">Click to upload or drag and drop</h6>
+                            <p className="text-muted small mb-0">Landscape image recommended (approx. 16:9 ratio)</p>
+                          </>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                </div>
 
-              <div className="mb-2">
-                <input
-                  type="text"
-                  className="form-control"
-                  placeholder="Link (URL)"
-                  value={newBlog.link}
-                  onChange={(e) =>
-                    setNewBlog({ ...newBlog, link: e.target.value })
-                  }
-                />
-              </div>
-
-              <div className="mb-2">
-                <label>Image:</label>
-                <input
-                  type="file"
-                  className="form-control"
-                  onChange={handleFileChange}
-                />
-              </div>
-
-              <button type="submit" className="btn btn-success">
-                Submit Blog
-              </button>
-            </form>
+                <div className="d-flex justify-content-end gap-3 mt-4 pt-3" style={{ borderTop: '1px solid #f1f3f5' }}>
+                  <button 
+                    type="button" 
+                    className="btn rounded-pill px-4 fw-semibold text-secondary"
+                    style={{ transition: 'all 0.2s', backgroundColor: '#f1f3f5', border: 'none' }}
+                    onMouseOver={(e) => e.currentTarget.style.backgroundColor = '#e9ecef'}
+                    onMouseOut={(e) => e.currentTarget.style.backgroundColor = '#f1f3f5'}
+                    onClick={() => {
+                        setShowAddForm(false);
+                        setNewBlog({ title: "", type: "", link: "", pic: null });
+                    }}
+                  >
+                    Cancel
+                  </button>
+                  <button 
+                    type="submit" 
+                    className="btn btn-primary rounded-pill px-4 fw-semibold shadow-sm"
+                    style={{ transition: 'all 0.2s transform' }}
+                    onMouseOver={(e) => e.currentTarget.style.transform = 'translateY(-2px)'}
+                    onMouseOut={(e) => e.currentTarget.style.transform = 'translateY(0)'}
+                  >
+                    Publish Blog
+                  </button>
+                </div>
+              </form>
+            </div>
           )}
         </div>
       )}
@@ -277,6 +341,7 @@ const Articles = () => {
               <BlogCard
                 Link={item.Link}
                 Title={item.Title}
+                Type={item.Type}
                 Pic={item.Pic}
                 onDelete={role === "counselor" ? handleDelete : null}
               />
