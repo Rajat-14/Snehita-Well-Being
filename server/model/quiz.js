@@ -13,6 +13,10 @@ const Quiz = sequelize.define('Quiz', {
     imageUrl: {
         type: DataTypes.STRING,
         allowNull: true
+    },
+    suggestions: {
+        type: DataTypes.TEXT, // Store stringified array
+        allowNull: true
     }
 }, {
     timestamps: true

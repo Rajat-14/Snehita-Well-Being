@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import QuizCard from './Components/QuizCard'; // Path to your QuizCard component
+import QuizCard from './Components/QuizCard';
 import { Container, Row } from 'react-bootstrap';
 import Animation from '../templates/animation';
 
@@ -8,10 +8,26 @@ const QuizComponents = () => {
 
   useEffect(() => {
     fetch('http://localhost:8000/api/quizzes')
-      .then(res => res.json())
+      .then(res => {
+        if (!res.ok) throw new Error(`Quiz API error: ${res.status}`);
+        return res.json();
+      })
       .then(data => setQuizzes(data))
       .catch(err => console.error("Error fetching quizzes:", err));
   }, []);
+
+  const getQuizLink = (quiz) => {
+    const hardcodedRoutes = [
+      '/SleepQuiz', '/AngerQuiz', '/AnxietyQuiz', '/MotivationQuiz', '/HabitQuiz',
+      '/QualityOfLifeQuiz', '/StressQuiz', '/EmotionalIntelligenceQuiz',
+      '/SocialRelationshipQuiz', '/LifeStyleQuiz', '/InternetUsageQuiz',
+      '/DepressionTest', '/BodyImageQuiz', '/TimeManagementQuiz', '/HappinessQuiz'
+    ];
+    if (hardcodedRoutes.includes(quiz.link)) {
+      return quiz.link;
+    }
+    return `/quiz${quiz.link}`;
+  };
 
   return (
     <><Animation /><Container>
@@ -20,9 +36,9 @@ const QuizComponents = () => {
           {quizzes.map((quiz, index) => (
             <QuizCard
               key={index}
-              imageUrl={require(`./assets/${quiz.imageUrl}`)}
+              imageUrl={`http://localhost:8000/api/quiz-assets/${quiz.imageUrl}`}
               heading={quiz.heading}
-              link={quiz.link} />
+              link={getQuizLink(quiz)} />
           ))}
         </div>
       </Row>

@@ -510,7 +510,7 @@ exports.updateAppointmentNotes = async (req, res) => {
                     userId: appointment.userId,
                     counselorName: appointment.counselorName,
                     appointmentDate: { [Op.lt]: appointment.appointmentDate },
-                    status: { [Op.in]: ['confirmed', 'resolved', 'followup', 'completed'] }
+                    status: { [Op.in]: ['resolved', 'followup'] }
                 }
             });
 
@@ -582,18 +582,25 @@ exports.getPriorAppointmentCount = async (req, res) => {
 exports.getPatientHistory = async (req, res) => {
     try {
         const { userId } = req.params;
+        const { counselorName } = req.query;
 
         const today = new Date();
         today.setHours(0, 0, 0, 0);
 
-        const history = await Appointment.findAll({
-            where: {
-                userId: userId,
-                status: {
-                    [Op.in]: ['confirmed', 'resolved', 'followup', 'absent']
-                },
-                appointmentDate: { [Op.lt]: today }
+        let whereClause = {
+            userId: userId,
+            status: {
+                [Op.in]: ['confirmed', 'resolved', 'followup', 'absent']
             },
+            appointmentDate: { [Op.lt]: today }
+        };
+
+        if (counselorName) {
+            whereClause.counselorName = counselorName;
+        }
+
+        const history = await Appointment.findAll({
+            where: whereClause,
             order: [['appointmentDate', 'DESC']],
             attributes: ['id', 'appointmentDate', 'problemDescription', 'notes', 'problemRelatedWith', 'counselorName', 'status', 'progressScore', 'problemExtent'] // Added problemExtent
         });

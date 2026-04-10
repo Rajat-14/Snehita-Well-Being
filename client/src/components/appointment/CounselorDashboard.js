@@ -156,6 +156,7 @@ const CounselorDashboard = ({ user }) => {
         setHistoryLoading(true);
         try {
             const response = await axios.get(`${BASE_URL}/counselor/patient-history/${userId}`, {
+                params: { counselorName: user.person_name },
                 withCredentials: true
             });
             setPatientHistory(response.data);

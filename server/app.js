@@ -29,6 +29,7 @@ const resourceRoutes = require("./routes/resourceRoutes");
 const mediaRoutes = require("./routes/mediaRoutes");
 const infoRoutes = require("./routes/infoRoutes");
 const adminRoutes = require("./routes/adminRoutes");
+const quizManagementRoutes = require("./routes/quizManagementRoutes");
 
 // Middleware
 app.use(cors({
@@ -49,6 +50,10 @@ app.use('/uploads', (req, res, next) => {
 const clientAssetsPath = path.join(__dirname, '../../client/src/components/assets/BlogsPics');
 app.use('/uploads/blogs', express.static(clientAssetsPath));
 
+// Serve Quiz Images from FunQuizzes assets (Docker mounted volume)
+const quizAssetsPath = path.join(__dirname, '../../client/src/components/FunQuizzes/assets');
+app.use('/api/quiz-assets', express.static(quizAssetsPath));
+
 // Serve other uploads from server/uploads
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 app.use(express.static('public'));  // For serving public assets
@@ -67,6 +72,7 @@ app.use("/", appointmentRoutes);
 app.use("/api", resourceRoutes);
 app.use("/api", infoRoutes);
 app.use("/api/admin", adminRoutes);
+app.use("/api/manage-quizzes", quizManagementRoutes);
 app.use("/home", mediaRoutes);
 
 // Error handling middleware

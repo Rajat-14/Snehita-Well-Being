@@ -48,6 +48,13 @@ const Profile = React.lazy(() => import('./components/login_signup/Profile'));
 const CounselorAnalytics = React.lazy(() => import('./components/appointment/CounselorAnalytics'));
 const AdminDashboard = React.lazy(() => import('./components/admin/AdminDashboard'));
 
+const DynamicQuiz = React.lazy(() => import('./components/FunQuizzes/DynamicQuiz'));
+
+
+
+
+
+
 const appRouter = createBrowserRouter([
   {  
     path: '/',
@@ -57,6 +64,12 @@ const appRouter = createBrowserRouter([
         </React.Suspense>
     ),
     children: [
+      
+      { path: '/quiz/:quizName', element: <DynamicQuiz/> },
+      
+      
+      
+      
       {
         path: '/',
         element: <Home />,
