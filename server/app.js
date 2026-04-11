@@ -12,6 +12,7 @@ const Blog = require("./model/blog");
 const Quiz = require("./model/quiz");
 const Testimonial = require("./model/testimonial");
 const Appointment = require("./model/appointment");
+const UsefulLink = require("./model/usefulLink");
 const fs = require("fs");
 const cors = require("cors");
 const sequelize = require("./db/database");
@@ -30,6 +31,7 @@ const mediaRoutes = require("./routes/mediaRoutes");
 const infoRoutes = require("./routes/infoRoutes");
 const adminRoutes = require("./routes/adminRoutes");
 const quizManagementRoutes = require("./routes/quizManagementRoutes");
+const usefulLinkRoutes = require("./routes/usefulLinkRoutes");
 
 // Middleware
 app.use(cors({
@@ -49,6 +51,10 @@ app.use('/uploads', (req, res, next) => {
 // Serve Blog Images from Client Assets
 const clientAssetsPath = path.join(__dirname, '../../client/src/components/assets/BlogsPics');
 app.use('/uploads/blogs', express.static(clientAssetsPath));
+
+// Serve Useful Links Images from Client Assets
+const usefulLinkAssetsPath = path.join(__dirname, '../../client/src/components/assets/UsefullLinks');
+app.use('/uploads/useful-links', express.static(usefulLinkAssetsPath));
 
 // Serve Quiz Images from FunQuizzes assets (Docker mounted volume)
 const quizAssetsPath = path.join(__dirname, '../../client/src/components/FunQuizzes/assets');
@@ -73,6 +79,7 @@ app.use("/api", resourceRoutes);
 app.use("/api", infoRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/manage-quizzes", quizManagementRoutes);
+app.use("/api/useful-links", usefulLinkRoutes);
 app.use("/home", mediaRoutes);
 
 // Error handling middleware

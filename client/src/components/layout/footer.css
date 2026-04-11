@@ -1,13 +1,41 @@
-.footer-custom{
+.footer-custom {
     color: black;
     background-color: rgb(118, 206, 247);
     bottom: 0px;
 }
-.footer-title{
-    padding: 2px 0px;
-    /* margin: 0px 30px; */
-    border-bottom: 0px solid black;
+
+/* ── Compact footer spacing ─────────────────── */
+.footer-custom section.pt-3 {
+    padding-top: 0.5rem !important;
 }
-.footer-item{
+
+.footer-custom .mt-3 {
+    margin-top: 0.5rem !important;
+}
+
+.footer-custom .mb-4 {
+    margin-bottom: 0.75rem !important;
+}
+
+.footer-custom .row {
+    row-gap: 0;
+}
+
+.footer-title {
+    padding: 2px 0px;
+    border-bottom: 0px solid black;
+    font-size: 0.8rem;
+    margin-bottom: 0.5rem !important;
+}
+
+.footer-item {
     margin-left: 3px;
+    font-size: 0.82rem;
+    margin-bottom: 0.3rem;
+    line-height: 1.4;
+}
+
+.footer-custom .text-center.p-3 {
+    padding: 0.5rem !important;
+    font-size: 0.8rem;
 }

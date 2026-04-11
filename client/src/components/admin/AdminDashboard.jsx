@@ -5,12 +5,14 @@ import ManageAboutUs from "./ManageAboutUs";
 import ManageCounselors from "./ManageCounselors";
 import ManageContactUs from "./ManageContactUs";
 import ManageHome from "./ManageHome";
+import ManageUsefulLinks from "./ManageUsefulLinks";
 
 const NAV_ITEMS = [
   { key: "about",    label: "Manage About Us" },
   { key: "contact",  label: "Manage Contact Us" },
   { key: "counselors", label: "Manage Counselors" },
   { key: "home",     label: "Manage Home" },
+  { key: "usefulLinks", label: "Manage Useful Links" },
 ];
 
 const AdminDashboard = () => {
@@ -47,6 +49,7 @@ const AdminDashboard = () => {
         {activeTab === "contact"    && <ManageContactUs />}
         {activeTab === "counselors" && <ManageCounselors />}
         {activeTab === "home"       && <ManageHome />}
+        {activeTab === "usefulLinks" && <ManageUsefulLinks />}
       </div>
     </div>
   );
