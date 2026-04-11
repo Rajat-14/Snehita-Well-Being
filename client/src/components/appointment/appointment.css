@@ -873,3 +873,78 @@ input[type="number"]::-webkit-outer-spin-button {
 .modal-lg {
   max-width: 90% !important;
 }
+
+/* Mobile Responsive Overrides for Counselor Dashboard */
+@media (max-width: 768px) {
+  .counselor-dashboard-layout {
+    height: auto;
+    min-height: 100vh;
+    overflow: visible;
+    padding: 10px;
+    width: 100%;
+  }
+
+  .white-board-container {
+    overflow: visible;
+    min-height: 60vh;
+  }
+  
+  .calendar-view {
+    overflow: visible;
+    height: auto;
+  }
+
+  .header-bar {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    padding: 15px !important;
+  }
+  
+  .header-bar h2 {
+    font-size: 1.3rem !important;
+    margin-bottom: 12px !important;
+    text-align: center;
+    width: 100%;
+  }
+  
+  .header-bar .btn-group {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 10px;
+    width: 100%;
+  }
+  
+  .header-bar .btn-group .btn {
+    width: 100%;
+    margin-bottom: 8px;
+    border-radius: 4px !important;
+    padding: 10px !important;
+  }
+
+  .header-bar .btn.ms-3 {
+    margin-left: 0 !important;
+    width: 100%;
+    padding: 10px !important;
+  }
+
+  .calendar-table {
+    min-width: 800px; /* guarantees sufficient width for contents */
+  }
+
+  .calendar-table td, .calendar-table th {
+    font-size: 11px !important;
+    padding: 6px !important;
+  }
+
+  .counselor-requests-box h2 {
+    font-size: 1.5rem;
+  }
+  
+  .table-responsive {
+    border: 0;
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    display: block;
+  }
+}
