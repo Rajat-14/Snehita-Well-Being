@@ -314,38 +314,34 @@ input[type="number"]::-webkit-outer-spin-button {
   .appointment {
     flex-direction: column;
     align-items: center;
-    justify-content: space-around;
+    justify-content: flex-start;
   }
 
   .BODY {
     overflow: auto;
     background-repeat: no-repeat;
-    object-fit: "contain";
     background-size: cover;
     background-position: center;
     top: 0;
     left: 0;
     width: 100%;
-    height: 150vh;
+    height: auto;
+    min-height: 100vh;
+    padding-top: 20px;
+    padding-bottom: 40px;
   }
 
   .form {
-    position: absolute;
-    top: 27%;
-    left: 50%;
-    width: 80%;
-    /* Adjust width as needed */
-    max-width: 768px;
-    height: 43%;
-    /* Reset height */
-    margin-bottom: 20px;
-    /* Add some margin to separate the forms */
-    overflow-y: hidden;
-    /* Remove scroll */
-    padding: 5%;
-    transform: translate(-50%, -50%);
-    min-height: 10px;
-
+    position: relative;
+    top: auto;
+    left: auto;
+    transform: none;
+    width: 90%;
+    max-width: 100%;
+    height: auto;
+    margin: 0 auto 20px auto;
+    overflow-y: visible;
+    padding: 20px;
   }
 
   .form input[type="text"],
@@ -355,7 +351,6 @@ input[type="number"]::-webkit-outer-spin-button {
   .form input[type="submit"],
   .form select {
     font-size: 15px;
-    /* Adjust font size as needed */
     padding: 0.6em;
   }
 
@@ -364,23 +359,21 @@ input[type="number"]::-webkit-outer-spin-button {
   }
 
   .form2 {
-    position: absolute;
-    top: 54%;
-    right: 10%;
-    overflow-y: auto;
-    height: 500px;
+    position: relative;
+    top: auto;
+    right: auto;
+    width: 90%;
     max-width: 100%;
-    width: 80%;
+    height: auto;
     min-height: 200px;
-    padding: 5%;
+    margin: 0 auto;
+    padding: 20px;
+    overflow-y: auto;
   }
 
   .form h2,
   .form2 h2 {
     font-size: 20px;
-  }
-
-  .form2 h2 {
     padding-top: 10px;
   }
 

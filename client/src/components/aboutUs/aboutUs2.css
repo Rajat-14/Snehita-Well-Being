@@ -14,32 +14,54 @@
     width: 100%;
     background-color: white;
     position: sticky;
-    top: 80px;
+    top: 60px;
     text-align: center;
-    overflow: hidden;
+    overflow-x: auto;
+    overflow-y: hidden;
+    white-space: nowrap;
     border-bottom: 1px solid #dddddd;
     transition: 0.2s ease-in-out;
+    z-index: 10;
+}
+.nav-bar-back::-webkit-scrollbar {
+    height: 4px;
+}
+.nav-bar-back::-webkit-scrollbar-thumb {
+    background-color: #ccc;
+    border-radius: 4px;
 }
 .aboutUsFilter{
-    min-height: 150px;
+    min-height: 120px;
     width: 140px;
-    padding: 16px 4px !important;
+    padding: 10px 4px !important;
     text-wrap: wrap;
-    /* margin-right: 10px; */
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
 }
 @media screen and (max-width:770px) {
+    .nav-bar-back {
+        top: 60px;
+    }
     .aboutUsFilter{
         width: 120px;
         font-size: smaller;
-        min-height: 140px;
-        padding-left: 0px;
-        padding-right: 0px;
-        margin-left: 20px;
+        min-height: 110px;
+        padding-left: 2px;
+        padding-right: 2px;
+        margin-left: 5px;
+        margin-right: 5px;
     }
 }
 @media screen and (max-width:500px) {
+    .nav-pills {
+        flex-wrap: nowrap !important;
+        justify-content: flex-start !important;
+    }
     .aboutUsFilter{
-        margin-left: 15px;
-        margin-right: 15px;
+        min-height: 100px;
+        width: 110px;
+        font-size: 11px;
     }
 }
