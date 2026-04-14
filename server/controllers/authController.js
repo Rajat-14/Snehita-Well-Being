@@ -10,7 +10,11 @@ const BASE_URL = process.env.BASE_URL;
 const Role = require("../model/role");
 
 exports.register = async (req, res) => {
-    const { person_name, otp, email, mobileNumber, gender, entryNumber } = req.body;
+    let { person_name, otp, email, mobileNumber, gender, entryNumber } = req.body;
+
+    if (email) {
+        email = email.toLowerCase();
+    }
 
     // Email validation regex
     const emailRegex = /^[^!@#$%^&*()_+{}\[\]:;<>,.?~\\/-]+@iitrpr\.ac\.in$/i;
@@ -78,7 +82,11 @@ exports.register = async (req, res) => {
 };
 
 exports.login = async (req, res) => {
-    const { email, otp } = req.body;
+    let { email, otp } = req.body;
+
+    if (email) {
+        email = email.toLowerCase();
+    }
 
     try {
         if (email?.toLowerCase() === process.env.ADMIN_EMAIL?.toLowerCase()) {
@@ -144,7 +152,10 @@ exports.login = async (req, res) => {
 };
 
 exports.sendOtp = async (req, res) => {
-    const { email } = req.body;
+    let { email } = req.body;
+    if (email) {
+        email = email.toLowerCase();
+    }
     if (!email) {
         return res.status(400).json({ error: "Please Enter Your Email" });
     }
@@ -207,7 +218,11 @@ exports.sendOtp = async (req, res) => {
 };
 
 exports.sendLoginOtp = async (req, res) => {
-    const { email } = req.body;
+    let { email } = req.body;
+
+    if (email) {
+        email = email.toLowerCase();
+    }
 
     if (!email) {
         return res.status(400).json({ error: "Please Enter Your Email" });
@@ -301,7 +316,11 @@ exports.sendLoginOtp = async (req, res) => {
 };
 
 exports.otpVerify = async (req, res) => {
-    const { email, otp } = req.body;
+    let { email, otp } = req.body;
+
+    if (email) {
+        email = email.toLowerCase();
+    }
 
     try {
         const otpEmailed = await UserOtp.findOne({ where: { email: email } });
