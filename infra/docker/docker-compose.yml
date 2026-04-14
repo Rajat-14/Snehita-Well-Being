@@ -15,6 +15,7 @@ services:
       - ../../client/src/components/FunQuizzes:/client/src/components/FunQuizzes
       - ../../client/src/index.js:/client/src/index.js
       - ../../server/uploads:/app/uploads
+      - ../../server/videos:/app/videos
       - ../../client/src/components/assets/UsefullLinks:/client/src/components/assets/UsefullLinks
 
 

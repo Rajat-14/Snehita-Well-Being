@@ -49,6 +49,7 @@ const CounselorDashboard = ({ user }) => {
     const [counselorAvailability, setCounselorAvailability] = useState([]);
     const [loadingAvailability, setLoadingAvailability] = useState(false);
     const [showFollowupCalendar, setShowFollowupCalendar] = useState(false);
+    const [showMobileActionsDropdown, setShowMobileActionsDropdown] = useState(false);
 
     const openBlockConfirm = (date, slotString) => {
         setSlotToManage({ appointmentDate: date, timeSlot: slotString });
@@ -532,7 +533,7 @@ const CounselorDashboard = ({ user }) => {
 
     return (
         <div className="BODY">
-            <div className="appointment">
+            <div className="appointment counselor-appointment">
                 <div className="counselor-dashboard-layout">
                     <div className="d-flex justify-content-between align-items-center mb-4 p-3 bg-white rounded shadow-sm header-bar">
                         <h2 className="mb-0 text-primary">Counsellor Dashboard - {user.person_name}</h2>
@@ -962,20 +963,20 @@ const CounselorDashboard = ({ user }) => {
                                     <div className="mt-1 fw-semibold text-muted">{selectedAppointment.fullName}</div>
                                 </div>
 
-                                {/* Current Appointment Details */}
                                 <div className="card mb-4 shadow-sm">
                                     <div className="card-header bg-light">
                                         <strong>Current Appointment</strong>
                                     </div>
                                     <div className="card-body">
-                                        <div className="row">
-                                            <div className="col-md-6">
+                                        <div className="row g-2">
+                                            <div className="col-12 col-md-6">
                                                 <p><strong>Date:</strong> {new Date(selectedAppointment.appointmentDate).toLocaleDateString()}</p>
                                                 <p><strong>Time:</strong> {selectedAppointment.timeSlot}</p>
                                                 <p><strong>Status:</strong> <span className={`badge ${selectedAppointment.status === 'confirmed' ? 'bg-success' : selectedAppointment.status === 'rejected' ? 'bg-secondary' : selectedAppointment.status === 'absent' ? 'bg-danger' : 'bg-warning text-dark'}`}>{selectedAppointment.status}</span></p>
                                                 <p><strong>Gender:</strong> {selectedAppointment.gender || <span className="text-muted">Not specified</span>}</p>
+                                                <p className="mb-0"><strong>Entry No:</strong> {selectedAppointment.user?.entryNumber || <span className="text-muted">Not specified</span>}</p>
                                             </div>
-                                            <div className="col-md-6">
+                                            <div className="col-12 col-md-6">
                                                 <p><strong>Problem:</strong> {selectedAppointment.problemDescription}</p>
                                                 <p><strong>Extent:</strong> {selectedAppointment.problemExtent}</p>
                                                 <p><strong>Referral:</strong> {selectedAppointment.modeOfReferral}</p>
@@ -1120,65 +1121,117 @@ const CounselorDashboard = ({ user }) => {
                                     </div>
                                 )}
                             </div>
-                            <div className="modal-footer justify-content-between">
-                                <div>
+                            <div className="modal-footer justify-content-between flex-wrap gap-2">
+
+                                {/* ── DESKTOP (md+): original individual buttons ── */}
+                                <div className="d-none d-md-flex flex-wrap gap-2">
                                     {selectedAppointment.status !== 'confirmed' && selectedAppointment.status !== 'resolved' && selectedAppointment.status !== 'followup' && (
-                                        <button
-                                            type="button"
-                                            className="btn btn-success me-2"
-                                            onClick={() => { handleStatusUpdate(selectedAppointment.id, 'confirmed'); closePatientModal(); }}
-                                        >
+                                        <button type="button" className="btn btn-success"
+                                            onClick={() => { handleStatusUpdate(selectedAppointment.id, 'confirmed'); closePatientModal(); }}>
                                             Approve
                                         </button>
                                     )}
                                     {selectedAppointment.status !== 'resolved' && (
-                                        <button
-                                            type="button"
-                                            className="btn btn-info me-2 text-white"
-                                            onClick={() => { handleStatusUpdate(selectedAppointment.id, 'resolved'); closePatientModal(); }}
-                                        >
+                                        <button type="button" className="btn btn-info text-white"
+                                            onClick={() => { handleStatusUpdate(selectedAppointment.id, 'resolved'); closePatientModal(); }}>
                                             Mark Resolved
                                         </button>
                                     )}
                                     {selectedAppointment.status !== 'followup' && (
-                                        <button
-                                            type="button"
-                                            className="btn me-2"
+                                        <button type="button" className="btn"
                                             style={{ background: '#e67e22', color: '#fff' }}
-                                            onClick={() => { handleStatusUpdate(selectedAppointment.id, 'followup'); closePatientModal(); }}
-                                        >
+                                            onClick={() => { handleStatusUpdate(selectedAppointment.id, 'followup'); closePatientModal(); }}>
                                             Request Follow-Up
                                         </button>
                                     )}
                                     {selectedAppointment.status !== 'absent' && selectedAppointment.status !== 'resolved' && (
-                                        <button
-                                            type="button"
-                                            className="btn btn-warning me-2 text-dark"
-                                            onClick={() => { handleStatusUpdate(selectedAppointment.id, 'absent'); closePatientModal(); }}
-                                        >
+                                        <button type="button" className="btn btn-warning text-dark"
+                                            onClick={() => { handleStatusUpdate(selectedAppointment.id, 'absent'); closePatientModal(); }}>
                                             Mark Absent
                                         </button>
                                     )}
                                     {selectedAppointment.status !== 'rejected' && selectedAppointment.status !== 'resolved' && (
-                                        <button
-                                            type="button"
-                                            className="btn btn-danger"
-                                            onClick={(e) => initiateReject(selectedAppointment, e)}
-                                        >
+                                        <button type="button" className="btn btn-danger"
+                                            onClick={(e) => initiateReject(selectedAppointment, e)}>
                                             Reject
                                         </button>
                                     )}
                                     {isAppointmentPast(selectedAppointment) && (
-                                        <button
-                                            type="button"
-                                            className="btn btn-primary ms-2"
-                                            onClick={() => initiateFollowupBooking(selectedAppointment)}
-                                        >
+                                        <button type="button" className="btn btn-primary"
+                                            onClick={() => initiateFollowupBooking(selectedAppointment)}>
                                             Book Appointment
                                         </button>
                                     )}
                                 </div>
-                                <button type="button" className="btn btn-secondary" onClick={closePatientModal}>Close</button>
+
+                                {/* ── MOBILE (<md): collapsed Actions dropdown (React-state driven) ── */}
+                                <div className="d-flex d-md-none" style={{ position: 'relative' }}>
+                                    <button
+                                        className="btn btn-outline-primary"
+                                        type="button"
+                                        onClick={() => setShowMobileActionsDropdown(prev => !prev)}
+                                    >
+                                        ⚡ Actions ▲
+                                    </button>
+                                    {showMobileActionsDropdown && (
+                                        <ul
+                                            style={{
+                                                position: 'fixed',
+                                                bottom: '70px',
+                                                left: '20px',
+                                                zIndex: 9999,
+                                                backgroundColor: '#fff',
+                                                border: '1px solid rgba(0,0,0,.15)',
+                                                borderRadius: '0.375rem',
+                                                boxShadow: '0 0.5rem 1rem rgba(0,0,0,0.18)',
+                                                listStyle: 'none',
+                                                padding: '0.5rem 0',
+                                                margin: 0,
+                                                minWidth: '200px'
+                                            }}
+                                        >
+                                            {selectedAppointment.status !== 'confirmed' && selectedAppointment.status !== 'resolved' && selectedAppointment.status !== 'followup' && (
+                                                <li><button className="dropdown-item text-success fw-semibold"
+                                                    onClick={() => { handleStatusUpdate(selectedAppointment.id, 'confirmed'); closePatientModal(); setShowMobileActionsDropdown(false); }}>
+                                                    ✅ Approve</button></li>
+                                            )}
+                                            {selectedAppointment.status !== 'resolved' && (
+                                                <li><button className="dropdown-item text-info fw-semibold"
+                                                    onClick={() => { handleStatusUpdate(selectedAppointment.id, 'resolved'); closePatientModal(); setShowMobileActionsDropdown(false); }}>
+                                                    ✔ Mark Resolved</button></li>
+                                            )}
+                                            {selectedAppointment.status !== 'followup' && (
+                                                <li><button className="dropdown-item fw-semibold" style={{ color: '#e67e22' }}
+                                                    onClick={() => { handleStatusUpdate(selectedAppointment.id, 'followup'); closePatientModal(); setShowMobileActionsDropdown(false); }}>
+                                                    🔁 Request Follow-Up</button></li>
+                                            )}
+                                            {selectedAppointment.status !== 'absent' && selectedAppointment.status !== 'resolved' && (
+                                                <li><button className="dropdown-item text-warning fw-semibold"
+                                                    onClick={() => { handleStatusUpdate(selectedAppointment.id, 'absent'); closePatientModal(); setShowMobileActionsDropdown(false); }}>
+                                                    ⚠ Mark Absent</button></li>
+                                            )}
+                                            {selectedAppointment.status !== 'rejected' && selectedAppointment.status !== 'resolved' && (
+                                                <>
+                                                    <li><hr className="dropdown-divider" /></li>
+                                                    <li><button className="dropdown-item text-danger fw-semibold"
+                                                        onClick={(e) => { initiateReject(selectedAppointment, e); setShowMobileActionsDropdown(false); }}>
+                                                        ✖ Reject</button></li>
+                                                </>
+                                            )}
+                                            {isAppointmentPast(selectedAppointment) && (
+                                                <>
+                                                    <li><hr className="dropdown-divider" /></li>
+                                                    <li><button className="dropdown-item text-primary fw-semibold"
+                                                        onClick={() => { initiateFollowupBooking(selectedAppointment); setShowMobileActionsDropdown(false); }}>
+                                                        📅 Book Appointment</button></li>
+                                                </>
+                                            )}
+                                        </ul>
+                                    )}
+                                </div>
+
+                                {/* Close — always visible */}
+                                <button type="button" className="btn btn-secondary ms-auto" onClick={closePatientModal}>Close</button>
                             </div>
                         </div>
                     </div>
@@ -1401,31 +1454,30 @@ const CounselorDashboard = ({ user }) => {
             {showFollowupForm && (
                 <div className="modal d-block" style={{ backgroundColor: 'rgba(0,0,0,0.6)', zIndex: 1080 }}>
                     <div className="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
-                        <div className="modal-content">
+                        <form className="modal-content" onSubmit={handleFollowupSubmit}>
                             <div className="modal-header bg-primary text-white">
                                 <h5 className="modal-title">Book Follow-up Appointment</h5>
                                 <button type="button" className="btn-close btn-close-white" onClick={() => setShowFollowupForm(false)}></button>
                             </div>
-                            <form onSubmit={handleFollowupSubmit}>
-                                <div className="modal-body">
+                            <div className="modal-body">
                                     <div className="row g-3">
-                                        <div className="col-md-6">
+                                        <div className="col-12 col-md-6">
                                             <label className="form-label fw-bold">Client Name</label>
                                             <input type="text" className="form-control bg-light" value={followupData.fullName} readOnly />
                                         </div>
-                                        <div className="col-md-6">
+                                        <div className="col-12 col-md-6">
                                             <label className="form-label fw-bold">Email</label>
                                             <input type="email" className="form-control bg-light" value={followupData.email} readOnly />
                                         </div>
-                                        <div className="col-md-6">
+                                        <div className="col-12 col-md-6">
                                             <label className="form-label fw-bold">Mobile Number</label>
                                             <input type="text" className="form-control bg-light" value={followupData.mobileNumber} readOnly />
                                         </div>
-                                        <div className="col-md-6">
+                                        <div className="col-12 col-md-6">
                                             <label className="form-label fw-bold">Counselor</label>
                                             <input type="text" className="form-control bg-light" value={followupData.counselorName} readOnly />
                                         </div>
-                                        <div className="col-md-6">
+                                        <div className="col-12 col-md-6">
                                             <label className="form-label fw-bold">Problem Extent</label>
                                             <select 
                                                 className="form-select" 
@@ -1438,7 +1490,7 @@ const CounselorDashboard = ({ user }) => {
                                                 <option value="Severe">Severe</option>
                                             </select>
                                         </div>
-                                        <div className="col-md-6">
+                                        <div className="col-12 col-md-6">
                                             <label className="form-label fw-bold">Problem Related With</label>
                                             <select
                                                 className="form-select"
@@ -1484,11 +1536,11 @@ const CounselorDashboard = ({ user }) => {
                                         {bookingFollowup ? "Booking..." : "Submit Follow-Up"}
                                     </button>
                                 </div>
-                            </form>
-                        </div>
+                        </form>
                     </div>
                 </div>
             )}
+
 
             {/* Follow-up Calendar Modal */}
             {showFollowupCalendar && (

@@ -23,6 +23,24 @@ const uploadGeneral = makeUploader("");          // General (existing)
 const uploadAchievement = makeUploader("achievements");
 const uploadTestimonial = makeUploader("testimonials");
 
+// Video uploader — always saves as campusVideo.mp4 (overwrites existing)
+const videoStorage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        const dest = path.join(__dirname, "../videos");
+        if (!fs.existsSync(dest)) fs.mkdirSync(dest, { recursive: true });
+        cb(null, dest);
+    },
+    filename: (req, file, cb) => cb(null, "campusVideo.mp4")
+});
+const uploadVideo = multer({
+    storage: videoStorage,
+    fileFilter: (req, file, cb) => {
+        if (file.mimetype === "video/mp4") cb(null, true);
+        else cb(new Error("Only .mp4 files are allowed"), false);
+    },
+    limits: { fileSize: 500 * 1024 * 1024 } // 500 MB limit
+});
+
 // Admin Middleware applies to all nested routes
 router.use(isAdmin);
 
@@ -50,6 +68,7 @@ router.delete("/contact-details/:id", contactDetailController.deleteContactDetai
 router.post("/upload", uploadGeneral.single("image"), adminController.uploadImage);
 router.post("/upload/achievement", uploadAchievement.single("image"), adminController.uploadImage);
 router.post("/upload/testimonial", uploadTestimonial.single("image"), adminController.uploadImage);
+router.post("/upload/video", uploadVideo.single("video"), adminController.uploadVideo);
 
 // Achievements (admin)
 router.get("/achievements", adminController.getAchievements);

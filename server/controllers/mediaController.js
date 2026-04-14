@@ -2,11 +2,16 @@ const fs = require("fs");
 
 exports.streamVideo = (req, res) => {
     console.log("hello");
-    // const fileName = req.params.filename;
     const filePath = "./videos/campusVideo.mp4";
-    // if (!filePath) {
-    //   return res.status(404).send("File not found");
-    // }
+
+    if (!fs.existsSync(filePath)) {
+        return res.status(404).send("Video not found");
+    }
+
+    // Prevent all browser/CDN caching so new uploaded videos show immediately
+    res.setHeader("Cache-Control", "no-store, no-cache, must-revalidate, proxy-revalidate");
+    res.setHeader("Pragma", "no-cache");
+    res.setHeader("Expires", "0");
 
     const stat = fs.statSync(filePath);
     const fileSize = stat.size;

@@ -81,7 +81,7 @@ exports.login = async (req, res) => {
     const { email, otp } = req.body;
 
     try {
-        if (email === process.env.ADMIN_EMAIL) {
+        if (email?.toLowerCase() === process.env.ADMIN_EMAIL?.toLowerCase()) {
             const otpEmailed = await UserOtp.findOne({ where: { email: email } });
             if (!otpEmailed || String(otpEmailed.otp) !== String(otp)) {
                 return res.status(400).json({ error: "Invalid OTP" });
@@ -214,7 +214,7 @@ exports.sendLoginOtp = async (req, res) => {
     }
 
     try {
-        if (email === process.env.ADMIN_EMAIL) {
+        if (email?.toLowerCase() === process.env.ADMIN_EMAIL?.toLowerCase()) {
             const OTP = Math.floor(1000 + Math.random() * 9000);
             const existEmail = await UserOtp.findOne({ where: { email: email } });
             

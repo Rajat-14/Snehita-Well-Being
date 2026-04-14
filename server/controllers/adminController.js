@@ -179,6 +179,27 @@ exports.deleteTeamMember = async (req, res) => {
     }
 };
 
+// --- Upload Video (overwrites campusVideo.mp4) ---
+exports.uploadVideo = async (req, res) => {
+    try {
+        if (!req.file) return res.status(400).json({ error: "No video file uploaded" });
+
+        // Multer diskStorage already saved the new file as videos/campusVideo.mp4,
+        // overwriting the old one. The old file is gone — new one is live.
+        const path = require('path');
+        const savedPath = path.join(__dirname, '..', 'videos', 'campusVideo.mp4');
+        const fs = require('fs');
+        if (!fs.existsSync(savedPath)) {
+            return res.status(500).json({ error: "Video was not saved correctly on server" });
+        }
+
+        res.status(200).json({ message: "Video uploaded and replaced successfully", videoUrl: "/home/video" });
+    } catch (error) {
+        console.error("Upload Video Error:", error);
+        res.status(500).json({ error: "Server error" });
+    }
+};
+
 // --- Upload Image ---
 exports.uploadImage = async (req, res) => {
     try {

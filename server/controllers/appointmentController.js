@@ -225,7 +225,7 @@ exports.getCounselorAppointments = async (req, res) => {
             include: [{
                 model: User,
                 as: 'user',
-                attributes: ['isStarred']
+                attributes: ['isStarred', 'entryNumber']
             }],
             order: [['appointmentDate', timeframe === 'past' ? 'DESC' : 'ASC']]
         });

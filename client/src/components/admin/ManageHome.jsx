@@ -58,10 +58,19 @@ const ManageHome = () => {
                         💬 Testimonials
                     </button>
                 </li>
+                <li className="nav-item ms-2">
+                    <button
+                        className={`nav-link ${activeSection === "video" ? "active" : ""}`}
+                        onClick={() => setActiveSection("video")}
+                    >
+                        🎥 Home Video
+                    </button>
+                </li>
             </ul>
 
             {activeSection === "achievements" && <ManageAchievements />}
             {activeSection === "testimonials" && <ManageTestimonials />}
+            {activeSection === "video" && <ManageHomeVideo />}
 
             <ToastContainer position="bottom-right" autoClose={2500} />
         </div>
@@ -540,6 +549,137 @@ const ManageTestimonials = () => {
                     </div>
                 </div>
             )}
+        </div>
+    );
+};
+
+/* ═══════════════════════════════════════════════════════
+   HOME VIDEO MANAGER
+   Uploads an .mp4 file that replaces the existing campus video.
+═══════════════════════════════════════════════════════ */
+const ManageHomeVideo = () => {
+    const [videoFile, setVideoFile] = useState(null);
+    const [uploading, setUploading] = useState(false);
+    const [dragOver, setDragOver] = useState(false);
+    const [previewUrl, setPreviewUrl] = useState(null);
+    const fileInputRef = useRef();
+
+    const handleFileSelect = (file) => {
+        if (!file) return;
+        if (file.type !== "video/mp4") {
+            toast.error("Only .mp4 files are supported");
+            return;
+        }
+        setVideoFile(file);
+        setPreviewUrl(URL.createObjectURL(file));
+    };
+
+    const handleDrop = (e) => {
+        e.preventDefault();
+        setDragOver(false);
+        const file = e.dataTransfer.files[0];
+        handleFileSelect(file);
+    };
+
+    const handleUpload = async () => {
+        if (!videoFile) { toast.warn("Please select an .mp4 video file first"); return; }
+        if (!window.confirm("This will replace the current home page video. Continue?")) return;
+        setUploading(true);
+        const fd = new FormData();
+        fd.append("video", videoFile);
+        try {
+            await axios.post(`${BASE_URL}/api/admin/upload/video`, fd, {
+                withCredentials: true,
+                headers: { "Content-Type": "multipart/form-data" },
+                onUploadProgress: (e) => {
+                    const pct = Math.round((e.loaded * 100) / e.total);
+                    if (pct % 20 === 0) console.log(`Upload: ${pct}%`);
+                }
+            });
+            toast.success("🎥 Home video updated successfully! Refresh the homepage to see it.");
+            setVideoFile(null);
+            setPreviewUrl(null);
+        } catch (err) {
+            console.error("Video upload error:", err);
+            toast.error(err.response?.data?.error || "Upload failed");
+        } finally {
+            setUploading(false);
+        }
+    };
+
+    return (
+        <div>
+            <h5 className="mb-1">Home Page Video</h5>
+            <p className="text-muted small mb-4">
+                Upload an <strong>.mp4</strong> video to replace the campus video shown on the home page.
+                The old video will be automatically removed when a new one is uploaded.
+            </p>
+
+            {/* Drag and drop zone */}
+            <div
+                onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
+                onDragLeave={() => setDragOver(false)}
+                onDrop={handleDrop}
+                onClick={() => fileInputRef.current?.click()}
+                style={{
+                    border: `2px dashed ${dragOver ? "#0d6efd" : "#ced4da"}`,
+                    borderRadius: "10px",
+                    background: dragOver ? "#e8f0fe" : "#f8f9fa",
+                    padding: "40px 20px",
+                    textAlign: "center",
+                    cursor: "pointer",
+                    transition: "all 0.2s ease",
+                    marginBottom: "20px"
+                }}
+            >
+                <div style={{ fontSize: "3rem", marginBottom: "8px" }}>🎬</div>
+                {videoFile ? (
+                    <>
+                        <p className="fw-semibold text-success mb-1">✅ {videoFile.name}</p>
+                        <p className="text-muted small">({(videoFile.size / (1024 * 1024)).toFixed(1)} MB) — Click or drag to change</p>
+                    </>
+                ) : (
+                    <>
+                        <p className="fw-semibold mb-1">Drag &amp; drop your .mp4 video here</p>
+                        <p className="text-muted small">or click to browse files</p>
+                    </>
+                )}
+                <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept="video/mp4"
+                    style={{ display: "none" }}
+                    onChange={(e) => handleFileSelect(e.target.files[0])}
+                />
+            </div>
+
+            {/* Preview */}
+            {previewUrl && (
+                <div className="mb-4">
+                    <p className="text-muted small mb-2 fw-semibold">Preview (new video):</p>
+                    <video
+                        src={previewUrl}
+                        controls
+                        style={{
+                            width: "100%",
+                            maxHeight: "300px",
+                            borderRadius: "8px",
+                            border: "1px solid #dee2e6",
+                            backgroundColor: "#000"
+                        }}
+                    />
+                </div>
+            )}
+
+            <button
+                className="btn btn-primary px-4"
+                onClick={handleUpload}
+                disabled={uploading || !videoFile}
+            >
+                {uploading ? (
+                    <><span className="spinner-border spinner-border-sm me-2" role="status" />Uploading…</>
+                ) : "Upload &amp; Replace Video"}
+            </button>
         </div>
     );
 };
