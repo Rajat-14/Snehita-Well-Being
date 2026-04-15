@@ -7,6 +7,7 @@ import {
 } from "react-icons/fa";
 import { useEffect, useState } from "react";
 import './socialMedia.css';
+import { BASE_URL } from "../../services/helper";
 
 const SocialMedia = () => {
     const [socialMediaData, setSocialMediaData] = useState([]);
@@ -14,7 +15,7 @@ const SocialMedia = () => {
     useEffect(() => {
         const fetchSocialMedia = async () => {
             try {
-                const response = await fetch(`${process.env.REACT_APP_API_URL || 'http://localhost:8000'}/api/organization-info/type/social_media`);
+                const response = await fetch(`${BASE_URL}/api/organization-info/type/social_media`);
                 if (response.ok) {
                     const data = await response.json();
                     setSocialMediaData(data);

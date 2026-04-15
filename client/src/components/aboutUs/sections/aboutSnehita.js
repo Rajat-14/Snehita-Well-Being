@@ -1,5 +1,6 @@
 import './aboutSnehita.css';
 import { useEffect, useState } from 'react';
+import { BASE_URL } from '../../services/helper';
 
 const AboutSnehita = () => {
   const [orgInfo, setOrgInfo] = useState([]);
@@ -9,7 +10,7 @@ const AboutSnehita = () => {
   useEffect(() => {
     const fetchAboutSnehita = async () => {
       try {
-        const response = await fetch(`${process.env.REACT_APP_API_URL || 'http://localhost:8000'}/api/organization-info/type/aboutSnehita`);
+        const response = await fetch(`${BASE_URL}/api/organization-info/type/aboutSnehita`);
         if (!response.ok) {
           throw new Error('Failed to fetch about information');
         }

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { BASE_URL } from '../services/helper';
 import QuizTemplate from './Components/QuizTemplate';
 import LoadingPage from '../templates/loadingPage';
 
@@ -11,7 +12,7 @@ const DynamicQuiz = () => {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    fetch(`http://localhost:8000/api/manage-quizzes/questions/${quizName}`)
+    fetch(`${BASE_URL}/api/manage-quizzes/questions/${quizName}`)
       .then(res => {
         if (!res.ok) throw new Error(`Quiz not found (${res.status})`);
         return res.json();

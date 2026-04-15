@@ -11,13 +11,14 @@ import Address from "./component/address";
 import OurTeamSection from "./component/ourTeamSection";
 import Animation from "../templates/animation";
 import { NavLink } from "react-router-dom";
+import { BASE_URL } from "../services/helper";
 const ContactUs = () => {
   const [email, setEmail] = useState("snehita@iitrpr.ac.in"); // Default fallback
 
   useEffect(() => {
     const fetchContactDetails = async () => {
       try {
-        const response = await fetch(`${process.env.REACT_APP_API_URL || 'http://localhost:8000'}/api/contact-details`);
+        const response = await fetch(`${BASE_URL}/api/contact-details`);
         if (response.ok) {
           const data = await response.json();
           if (data.length > 0 && data[0].email) {

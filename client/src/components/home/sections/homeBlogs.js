@@ -1,6 +1,7 @@
 // import { Link } from "react-router-dom";
 import { NavLink } from "react-router-dom";
 import { useEffect, useState } from "react";
+import { BASE_URL } from "../../services/helper";
 import BlogCard from "../../blogs/components/blogCard";
 import Button from "../../templates/button";
 const HomeBlogs = () => {
@@ -26,7 +27,7 @@ const HomeBlogs = () => {
   }
 
   useEffect(() => {
-    fetch('http://localhost:8000/api/blogs')
+    fetch(`${BASE_URL}/api/blogs`)
       .then(res => res.json())
       .then(data => {
         const processedData = data.map(blog => ({

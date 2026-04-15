@@ -34,9 +34,13 @@ const quizManagementRoutes = require("./routes/quizManagementRoutes");
 const usefulLinkRoutes = require("./routes/usefulLinkRoutes");
 
 // Middleware
+const allowedOrigins = process.env.ALLOWED_ORIGINS 
+  ? process.env.ALLOWED_ORIGINS.split(',').map(url => url.trim()) 
+  : ["http://localhost:3000", "http://localhost:3001", process.env.BASE_URL].filter(Boolean);
+
 app.use(cors({
   credentials: true,
-  origin: ["http://localhost:3000", "http://localhost:3001", process.env.BASE_URL].filter(Boolean)
+  origin: allowedOrigins
 }));
 app.use(express.json());
 app.use(cookieParser());

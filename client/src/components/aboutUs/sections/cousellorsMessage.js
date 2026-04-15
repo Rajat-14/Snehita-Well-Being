@@ -1,5 +1,6 @@
 import MessageCard from "../component/messageCard";
 import { useEffect, useState } from "react";
+import { BASE_URL } from "../../services/helper";
 
 const CounsellorMessage = () => {
   const [counsellors, setCounsellors] = useState([]);
@@ -9,7 +10,7 @@ const CounsellorMessage = () => {
   useEffect(() => {
     const fetchCounsellorMessages = async () => {
       try {
-        const response = await fetch(`${process.env.REACT_APP_API_URL || 'http://localhost:8000'}/api/messages/type/counsellor`);
+        const response = await fetch(`${BASE_URL}/api/messages/type/counsellor`);
         if (!response.ok) {
           throw new Error('Failed to fetch counsellor messages');
         }
@@ -53,7 +54,7 @@ const CounsellorMessage = () => {
           }
         }
 
-        const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:8000';
+        const apiUrl = BASE_URL;
 
         // Fix image path
         const imagePath = item.image

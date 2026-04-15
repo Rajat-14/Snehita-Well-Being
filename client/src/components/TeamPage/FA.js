@@ -1,5 +1,6 @@
 import FacultyCard from "./components/facultyCard";
 import { useEffect, useState } from "react";
+import { BASE_URL } from "../services/helper";
 
 const FA = () => {
   const [facultyAdvisors, setFacultyAdvisors] = useState([]);
@@ -9,7 +10,7 @@ const FA = () => {
   useEffect(() => {
     const fetchFacultyAdvisors = async () => {
       try {
-        const response = await fetch(`${process.env.REACT_APP_API_URL || 'http://localhost:8000'}/api/team-members/type/faculty_advisor`);
+        const response = await fetch(`${BASE_URL}/api/team-members/type/faculty_advisor`);
         if (!response.ok) {
           throw new Error('Failed to fetch faculty advisors');
         }
@@ -38,7 +39,7 @@ const FA = () => {
   return (
     <div>
       {facultyAdvisors.map((item, index) => {
-        const baseUrl = process.env.REACT_APP_API_URL || 'http://localhost:8000';
+        const baseUrl = BASE_URL;
         const imageUrl = item.image
           ? (item.image.startsWith('http') ? item.image : `${baseUrl}${item.image}`)
           : '';

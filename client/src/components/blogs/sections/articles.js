@@ -1,5 +1,6 @@
 import BlogCard from "../components/blogCard";
 import { useState, useEffect } from "react";
+import { BASE_URL } from "../../services/helper";
 
 const Articles = () => {
   const [articleTypes, setArticleTypes] = useState([]);
@@ -62,7 +63,7 @@ const Articles = () => {
     if (newBlog.pic) formData.append("pic", newBlog.pic);
 
     try {
-      const response = await fetch("http://localhost:8000/api/blogs", {
+      const response = await fetch(`${BASE_URL}/api/blogs`, {
         method: "POST",
         body: formData,
       });
@@ -84,7 +85,7 @@ const Articles = () => {
   useEffect(() => {
     async function fetchData() {
       try {
-        const response = await fetch("http://localhost:8000/api/blogs");
+        const response = await fetch(`${BASE_URL}/api/blogs`);
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
@@ -106,7 +107,7 @@ const Articles = () => {
                 throw new Error("Not local asset");
               }
             } catch {
-              pic = `http://localhost:8000/uploads/blogs/${blog.pic}`;
+              pic = `${BASE_URL}/uploads/blogs/${blog.pic}`;
             }
 
             return {
@@ -317,7 +318,7 @@ const Articles = () => {
             if (window.confirm("Are you sure you want to delete this blog?")) {
               try {
                 await fetch(
-                  `http://localhost:8000/api/blogs/${item.id}`,
+                  `${BASE_URL}/api/blogs/${item.id}`,
                   { method: "DELETE" }
                 );
 

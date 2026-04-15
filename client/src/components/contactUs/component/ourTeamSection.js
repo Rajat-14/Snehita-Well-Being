@@ -1,6 +1,7 @@
 import TeamCard from "../../TeamPage/components/teamCard";
 import { NavLink } from "react-router-dom";
 import { useState, useEffect } from "react";
+import { BASE_URL } from "../../services/helper";
 
 const OurTeamSection = () => {
   const [teamMembers, setTeamMembers] = useState([]);
@@ -9,7 +10,7 @@ const OurTeamSection = () => {
   useEffect(() => {
     const fetchTeamMembers = async () => {
       try {
-        const response = await fetch(`${process.env.REACT_APP_API_URL || 'http://localhost:8000'}/api/team-members`);
+        const response = await fetch(`${BASE_URL}/api/team-members`);
         if (response.ok) {
           const data = await response.json();
 
@@ -48,7 +49,7 @@ const OurTeamSection = () => {
     if (!imagePath) return "";
     if (imagePath.startsWith("http")) return imagePath;
 
-    const baseUrl = (process.env.REACT_APP_API_URL || 'http://localhost:8000').replace(/\/$/, "");
+    const baseUrl = BASE_URL.replace(/\/$/, "");
     const cleanPath = imagePath.startsWith("/") ? imagePath : `/${imagePath}`;
     return `${baseUrl}${cleanPath}`;
   };

@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { BASE_URL } from "../../services/helper";
 import HomeBlogCard from "../components/homeBlogCard";
 
 const OurWork = () => {
@@ -9,7 +10,7 @@ const OurWork = () => {
   useEffect(() => {
     const fetchAchievements = async () => {
       try {
-        const response = await fetch(`${process.env.REACT_APP_API_URL || 'http://localhost:8000'}/api/achievements`);
+        const response = await fetch(`${BASE_URL}/api/achievements`);
         if (!response.ok) {
           throw new Error('Failed to fetch achievements');
         }
@@ -42,7 +43,7 @@ const OurWork = () => {
         <div className="mx-3 row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4 justify-content-center">
           {achievements.map((achievement, index) => {
             const animationClass = index % 3 === 0 ? "fade-right" : index % 3 === 1 ? "fade-up" : "fade-left";
-            const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:8000';
+            const apiUrl = BASE_URL;
             return (
               <div className="col" data-aos={animationClass} key={achievement.id}>
                 <HomeBlogCard

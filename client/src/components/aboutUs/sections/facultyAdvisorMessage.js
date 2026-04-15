@@ -1,6 +1,7 @@
 
 import MessageCard from "../component/messageCard";
 import { useEffect, useState } from "react";
+import { BASE_URL } from "../../services/helper";
 
 const FacultyAdvisorMessage = () => {
   const [facultyAdvisors, setFacultyAdvisors] = useState([]);
@@ -9,7 +10,7 @@ const FacultyAdvisorMessage = () => {
   useEffect(() => {
     const fetchFacultyAdvisors = async () => {
       try {
-        const response = await fetch(`${process.env.REACT_APP_API_URL || 'http://localhost:8000'}/api/team-members/type/faculty_advisor`);
+        const response = await fetch(`${BASE_URL}/api/team-members/type/faculty_advisor`);
         if (response.ok) {
           const data = await response.json();
           setFacultyAdvisors(data);
@@ -46,7 +47,7 @@ const FacultyAdvisorMessage = () => {
         }
         // If null/undefined, messageArray remains [] which is safe for MessageCard
 
-        const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:8000';
+        const apiUrl = BASE_URL;
         // Fix image path logic
         const imagePath = item.image
           ? (item.image.startsWith('http') ? item.image : `${apiUrl}${item.image}`)

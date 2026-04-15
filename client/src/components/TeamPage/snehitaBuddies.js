@@ -1,5 +1,6 @@
 import TeamCard from "./components/teamCard";
 import { useState, useEffect } from "react";
+import { BASE_URL } from "../services/helper";
 
 const SnehitaBuddies = () => {
   const [buddies, setBuddies] = useState([]);
@@ -9,7 +10,7 @@ const SnehitaBuddies = () => {
   useEffect(() => {
     const fetchBuddies = async () => {
       try {
-        const response = await fetch(`${process.env.REACT_APP_API_URL || 'http://localhost:8000'}/api/team-members/type/buddy`);
+        const response = await fetch(`${BASE_URL}/api/team-members/type/buddy`);
         if (!response.ok) {
           throw new Error('Failed to fetch buddies');
         }
@@ -39,7 +40,7 @@ const SnehitaBuddies = () => {
     if (!imagePath) return "";
     if (imagePath.startsWith("http")) return imagePath;
 
-    const baseUrl = (process.env.REACT_APP_API_URL || 'http://localhost:8000').replace(/\/$/, "");
+    const baseUrl = BASE_URL.replace(/\/$/, "");
     const cleanPath = imagePath.startsWith("/") ? imagePath : `/${imagePath}`;
     return `${baseUrl}${cleanPath}`;
   };

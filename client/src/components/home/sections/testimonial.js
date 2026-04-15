@@ -1,8 +1,8 @@
 import "./testimonial.css";
 import { useState, useEffect } from "react";
 import anonymous from "../components/anonymous.jpg";
+import { BASE_URL } from "../../services/helper";
 
-const BASE_URL = process.env.REACT_APP_API_URL || "http://localhost:8000";
 
 const getTestimonialImageSrc = (pic) => {
   if (!pic) return anonymous;

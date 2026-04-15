@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import QuizCard from './Components/QuizCard';
+import { BASE_URL } from '../services/helper';
 import { Container, Row } from 'react-bootstrap';
 import Animation from '../templates/animation';
 
@@ -7,7 +8,7 @@ const QuizComponents = () => {
   const [quizzes, setQuizzes] = useState([]);
 
   useEffect(() => {
-    fetch('http://localhost:8000/api/quizzes')
+    fetch(`${BASE_URL}/api/quizzes`)
       .then(res => {
         if (!res.ok) throw new Error(`Quiz API error: ${res.status}`);
         return res.json();
@@ -36,7 +37,7 @@ const QuizComponents = () => {
           {quizzes.map((quiz, index) => (
             <QuizCard
               key={index}
-              imageUrl={`http://localhost:8000/api/quiz-assets/${quiz.imageUrl}`}
+              imageUrl={`${BASE_URL}/api/quiz-assets/${quiz.imageUrl}`}
               heading={quiz.heading}
               link={getQuizLink(quiz)} />
           ))}

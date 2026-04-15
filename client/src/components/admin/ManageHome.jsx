@@ -678,7 +678,7 @@ const ManageHomeVideo = () => {
             >
                 {uploading ? (
                     <><span className="spinner-border spinner-border-sm me-2" role="status" />Uploading…</>
-                ) : "Upload &amp; Replace Video"}
+                ) : "Upload & Replace Video"}
             </button>
         </div>
     );

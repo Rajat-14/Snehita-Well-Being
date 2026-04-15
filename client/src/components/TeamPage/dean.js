@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import FacultyCard from "./components/facultyCard";
+import { BASE_URL } from "../services/helper";
 
 const Dean = () => {
   const [dean, setDean] = useState(null);
@@ -9,7 +10,7 @@ const Dean = () => {
   useEffect(() => {
     const fetchDean = async () => {
       try {
-        const response = await fetch(`${process.env.REACT_APP_API_URL || 'http://localhost:8000'}/api/team-members/type/dean`);
+        const response = await fetch(`${BASE_URL}/api/team-members/type/dean`);
         if (!response.ok) {
           throw new Error('Failed to fetch dean');
         }
@@ -41,7 +42,7 @@ const Dean = () => {
     return <div><p>No dean information available</p></div>;
   }
 
-  const baseUrl = process.env.REACT_APP_API_URL || 'http://localhost:8000';
+  const baseUrl = BASE_URL;
   const imageUrl = dean.image
     ? (dean.image.startsWith('http') ? dean.image : `${baseUrl}${dean.image}`)
     : '';

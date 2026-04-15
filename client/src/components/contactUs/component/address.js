@@ -1,6 +1,7 @@
 import map2 from "../assets/map_2.png";
 import { useEffect, useState } from "react";
 import { FaHome } from "react-icons/fa";
+import { BASE_URL } from "../../services/helper";
 
 const Address = () => {
   const [contact, setContact] = useState(null);
@@ -10,7 +11,7 @@ const Address = () => {
   useEffect(() => {
     const fetchContactDetails = async () => {
       try {
-        const response = await fetch(`${process.env.REACT_APP_API_URL || 'http://localhost:8000'}/api/contact-details`);
+        const response = await fetch(`${BASE_URL}/api/contact-details`);
         if (!response.ok) {
           throw new Error('Failed to fetch contact details');
         }
