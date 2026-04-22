@@ -24,8 +24,8 @@ const storage = multer.diskStorage({
 
         const folderName = folderMap[type] || type; // Fallback to type if not in map
 
-        // Construct path: server/middleware -> server -> root -> client/src...
-        const dest = path.join(__dirname, '../../client/src/components/assets/BlogsPics', folderName);
+        // Construct path to server/uploads/blogs
+        const dest = path.join(__dirname, '../uploads/blogs', folderName);
 
         try {
             const logMsg = `[${new Date().toISOString()}] Type: ${type}, Folder: ${folderName}, Dest: ${dest}, Exists: ${fs.existsSync(dest)}\n`;

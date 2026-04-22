@@ -4,7 +4,7 @@ const fs = require('fs');
 
 const frontendSrcPath = path.join(__dirname, '../../client/src');
 const funQuizzesPath = path.join(frontendSrcPath, 'components/FunQuizzes');
-const assetsPath = path.join(funQuizzesPath, 'assets');
+const assetsPath = path.join(__dirname, '../uploads/quizzes');
 const indexJsPath = path.join(frontendSrcPath, 'index.js');
 
 exports.generateQuiz = async (req, res) => {

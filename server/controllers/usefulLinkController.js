@@ -49,7 +49,7 @@ exports.updateUsefulLink = async (req, res) => {
             
             // Delete old image
             if (link.pic) {
-                const oldImagePath = path.join(__dirname, '../../client/src/components/assets/UsefullLinks', link.pic);
+                const oldImagePath = path.join(__dirname, '../uploads/useful-links', link.pic);
                 try {
                     if (fs.existsSync(oldImagePath)) {
                         fs.unlinkSync(oldImagePath);
@@ -79,7 +79,7 @@ exports.deleteUsefulLink = async (req, res) => {
 
         // Delete associated physical image file if it exists
         if (link.pic) {
-            const imagePath = path.join(__dirname, '../../client/src/components/assets/UsefullLinks', link.pic);
+            const imagePath = path.join(__dirname, '../uploads/useful-links', link.pic);
             try {
                 if (fs.existsSync(imagePath)) {
                     fs.unlinkSync(imagePath);

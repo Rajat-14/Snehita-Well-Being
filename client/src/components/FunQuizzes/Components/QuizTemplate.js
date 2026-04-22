@@ -3,8 +3,9 @@ import { NavLink } from 'react-router-dom';
 
 import './Quiz.css';
 import { Container, Row, Col, Button, Card } from 'react-bootstrap';
-import picTwo from '../assets/suggestion.jpeg'
+import { BASE_URL } from '../../services/helper';
 import Animation from '../../templates/animation';
+const picTwo = `${BASE_URL}/api/quiz-assets/suggestion.jpeg`;
 
 const QuizTemplate = ({ title , questions, onClose, finalTrait }) => {
   const [currentQuestion, setCurrentQuestion] = useState(0);

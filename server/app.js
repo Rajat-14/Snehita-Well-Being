@@ -52,16 +52,16 @@ app.use('/uploads', (req, res, next) => {
   next();
 });
 
-// Serve Blog Images from Client Assets
-const clientAssetsPath = path.join(__dirname, '../../client/src/components/assets/BlogsPics');
-app.use('/uploads/blogs', express.static(clientAssetsPath));
+// Serve Blog Images from server/uploads
+const blogAssetsPath = path.join(__dirname, 'uploads/blogs');
+app.use('/uploads/blogs', express.static(blogAssetsPath));
 
-// Serve Useful Links Images from Client Assets
-const usefulLinkAssetsPath = path.join(__dirname, '../../client/src/components/assets/UsefullLinks');
+// Serve Useful Links Images from server/uploads
+const usefulLinkAssetsPath = path.join(__dirname, 'uploads/useful-links');
 app.use('/uploads/useful-links', express.static(usefulLinkAssetsPath));
 
-// Serve Quiz Images from FunQuizzes assets (Docker mounted volume)
-const quizAssetsPath = path.join(__dirname, '../../client/src/components/FunQuizzes/assets');
+// Serve Quiz Images from server/uploads
+const quizAssetsPath = path.join(__dirname, 'uploads/quizzes');
 app.use('/api/quiz-assets', express.static(quizAssetsPath));
 
 // Serve other uploads from server/uploads

@@ -92,7 +92,7 @@ exports.deleteBlog = async (req, res) => {
 
         // Delete the physical image file
         if (blog.pic && blog.pic !== 'default.jpg') {
-            const imagePath = path.join(__dirname, '../../client/src/components/assets/BlogsPics', blog.pic);
+            const imagePath = path.join(__dirname, '../uploads/blogs', blog.pic);
             try {
                 if (fs.existsSync(imagePath)) {
                     fs.unlinkSync(imagePath);

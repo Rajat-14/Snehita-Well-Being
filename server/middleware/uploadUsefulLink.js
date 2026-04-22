@@ -4,7 +4,7 @@ const fs = require('fs');
 
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
-        const dest = path.join(__dirname, '../../client/src/components/assets/UsefullLinks');
+        const dest = path.join(__dirname, '../uploads/useful-links');
 
         try {
             if (!fs.existsSync(dest)) {
