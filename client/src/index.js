@@ -1,15 +1,14 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
+import ReactDOM from 'react-dom/client';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
-import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
 import './index.css';
 import 'react-toastify/dist/ReactToastify.css';
 import { Provider } from 'react-redux';
-import store from './redux/store/index'; 
+import store from './redux/store/index';
 import LoadingPage from './components/templates/loadingPage';
 import AboutWebsite from './components/aboutWebsite/aboutWebsite';
 
-// Lazy load your components
+// Lazy loaded components
 const Home = React.lazy(() => import('./components/home/home'));
 const AppLayout = React.lazy(() => import('./components/layout/appLayout'));
 const Login = React.lazy(() => import('./components/login_signup/login/Login'));
@@ -40,203 +39,86 @@ const BodyImageQuiz = React.lazy(() => import('./components/FunQuizzes/Body Imag
 const TimeManagementQuiz = React.lazy(() => import('./components/FunQuizzes/Time Management/TimeManagementQuiz'));
 const UsefullLink = React.lazy(() => import('./components/usefullLink/usefullLink'));
 const AppointmentSubmitted = React.lazy(() => import('./components/AppointmentSubmitted/AppointmentSubmitted'));
-const NewPassword  = React.lazy(() => import ( './components/login_signup/forgotPassword/newpassword')); 
-const OtpForget = React.lazy(() => import ('./components/login_signup/forgotPassword/otpforget'));
-const Email = React.lazy(() => import ( './components/login_signup/forgotPassword/email')); 
-const Otp = React.lazy(() => import ('./components/login_signup/otp/otp'));
+const NewPassword = React.lazy(() => import('./components/login_signup/forgotPassword/newpassword'));
+const OtpForget = React.lazy(() => import('./components/login_signup/forgotPassword/otpforget'));
+const Email = React.lazy(() => import('./components/login_signup/forgotPassword/email'));
+const Otp = React.lazy(() => import('./components/login_signup/otp/otp'));
 const Profile = React.lazy(() => import('./components/login_signup/Profile'));
 const CounselorAnalytics = React.lazy(() => import('./components/appointment/CounselorAnalytics'));
 const AdminDashboard = React.lazy(() => import('./components/admin/AdminDashboard'));
-
 const DynamicQuiz = React.lazy(() => import('./components/FunQuizzes/DynamicQuiz'));
 
-
-
-
-
-
-const appRouter = createBrowserRouter([
-  {  
-    path: '/',
-    element: (
-        <React.Suspense fallback={<div><LoadingPage/></div>}>
+const appRouter = createBrowserRouter(
+  [
+    {
+      path: '/',
+      element: (
+        <React.Suspense fallback={<LoadingPage />}>
           <AppLayout />
         </React.Suspense>
-    ),
-    children: [
-      
-      { path: '/quiz/:quizName', element: <DynamicQuiz/> },
-      
-      
-      
-      
-      {
-        path: '/',
-        element: <Home />,
-      },
-      {
-        path: '/blogs',
-        element: <Blogs />,
-      },
-      {
-        path: '/contactus',
-        element: <ContactUs />,
-      },
-      {
-        path: '/aboutus',
-        element: <AboutUs2Page />,
-      },
-      {
-        path:'/aboutWebsite',
-        element:<AboutWebsite/>
-      },
-      {
-        path: '/appointment',
-        element: <Appointment />,
-      },
-      {
-        path: '/knowyourself',
-        element: <KnowYourself />,
-      },
-      {
-        path : '/TeamPage',
-        element : <TeamPage/>
-      },
-      {
-        path: '/otherinfo',
-        element: <GenInfo/>,
-      },
-      {
-        path: '/login',
-        element: <Login/>,
-      },
-      {
-        path: '/signup',
-        element: <Register/>,
-      },
-      {
-        path: '/otp',
-        element: <Otp/>,
-      },
-      {
-        path: '/email',
-        element: <Email/>,
-      },
-      {
-        path: '/otpforget',
-        element: <OtpForget/>,
-      },
-      {
-        path: '/resetpassword',
-        element: <NewPassword/>,
-      },
-      {
-        path: '/profile',
-        element: <Profile/>,
-      },
-      {
-        path:'/usefullLink',
-        element: <UsefullLink/>
-      },
-      {
-        path: '/HappinessQuiz',
-        element: <HappinessQuiz/>,
-      },
-      {
-        path: '*',
-        element: <Error/>,
-      },
-      {
-        path: '/FunQuizzes',
-        element : <FunQuizzes/>
-      },
-      {
-        path : '/SleepQuiz',
-        element : <SleepQuiz/>
-      },
-      {
-        path : '/AngerQuiz',
-        element : <AngerQuiz/>
-      },
-      {
-        path : '/AnxietyQuiz',
-        element : <AnxietyQuiz/>
-      },
-      {
-        path: '/MotivationQuiz',
-        element : <MotivationQuiz/>
-      },
-      {
-        path: '/HabitQuiz',
-        element : <HabitQuiz/>
-      },
-      {
-        path: '/QualityOfLifeQuiz',
-        element : <QualityOfLifeQuiz/>
-      },
-      {
-        path: '/StressQuiz',
-        element : <StressQuiz/>
-      },
-      {
-        path: '/EmotionalIntelligenceQuiz',
-        element : <EmotionalIntelligenceQuiz/>
-      },
-      {
-        path: '/SocialRelationshipQuiz',
-        element : <SocialRelationshipQuiz/>
-      },
-      {
-        path: '/LifeStyleQuiz',
-        element : <LifestyleQuiz/>
-      },
-      {
-        path: '/InternetUsageQuiz',
-        element : <InternetUsageQuiz/>
-      },
-      {
-        path: '/DepressionTest',
-        element : <DepressionTest/>
-      },
-      {
-        path: '/BodyImageQuiz',
-        element : <BodyImageQuiz/>
-      },
-      {
-        path: '/TimeManagementQuiz',
-        element : <TimeManagementQuiz/>
-      },
-      {
-        path: '/otherinfo',
-        element: <GenInfo/>,
-      },
-      {
-        path: '/AppointmentSubmitted',
-        element : <AppointmentSubmitted/>
-      },
-      {
-        path: '/loading',
-        element : <LoadingPage/>
-      },
-      {
-        path: '/counselor/analytics',
-        element: <CounselorAnalytics />
-      },
-      
-    ],
-    errorElement: <Error />,
-  },
+      ),
+      errorElement: <Error />,
+      children: [
+        { index: true, element: <Home /> },
+
+        { path: 'quiz/:quizName', element: <DynamicQuiz /> },
+
+        { path: 'blogs', element: <Blogs /> },
+        { path: 'contactus', element: <ContactUs /> },
+        { path: 'aboutus', element: <AboutUs2Page /> },
+        { path: 'aboutWebsite', element: <AboutWebsite /> },
+        { path: 'appointment', element: <Appointment /> },
+        { path: 'knowyourself', element: <KnowYourself /> },
+        { path: 'TeamPage', element: <TeamPage /> },
+        { path: 'otherinfo', element: <GenInfo /> },
+        { path: 'login', element: <Login /> },
+        { path: 'signup', element: <Register /> },
+        { path: 'otp', element: <Otp /> },
+        { path: 'email', element: <Email /> },
+        { path: 'otpforget', element: <OtpForget /> },
+        { path: 'resetpassword', element: <NewPassword /> },
+        { path: 'profile', element: <Profile /> },
+        { path: 'usefullLink', element: <UsefullLink /> },
+        { path: 'HappinessQuiz', element: <HappinessQuiz /> },
+        { path: 'FunQuizzes', element: <FunQuizzes /> },
+        { path: 'SleepQuiz', element: <SleepQuiz /> },
+        { path: 'AngerQuiz', element: <AngerQuiz /> },
+        { path: 'AnxietyQuiz', element: <AnxietyQuiz /> },
+        { path: 'MotivationQuiz', element: <MotivationQuiz /> },
+        { path: 'HabitQuiz', element: <HabitQuiz /> },
+        { path: 'QualityOfLifeQuiz', element: <QualityOfLifeQuiz /> },
+        { path: 'StressQuiz', element: <StressQuiz /> },
+        { path: 'EmotionalIntelligenceQuiz', element: <EmotionalIntelligenceQuiz /> },
+        { path: 'SocialRelationshipQuiz', element: <SocialRelationshipQuiz /> },
+        { path: 'LifeStyleQuiz', element: <LifestyleQuiz /> },
+        { path: 'InternetUsageQuiz', element: <InternetUsageQuiz /> },
+        { path: 'DepressionTest', element: <DepressionTest /> },
+        { path: 'BodyImageQuiz', element: <BodyImageQuiz /> },
+        { path: 'TimeManagementQuiz', element: <TimeManagementQuiz /> },
+        { path: 'AppointmentSubmitted', element: <AppointmentSubmitted /> },
+        { path: 'loading', element: <LoadingPage /> },
+        { path: 'counselor/analytics', element: <CounselorAnalytics /> },
+
+        { path: '*', element: <Error /> }
+      ]
+    },
+
+    {
+      path: '/admin/dashboard',
+      element: (
+        <React.Suspense fallback={<div>Loading Admin Panel...</div>}>
+          <AdminDashboard />
+        </React.Suspense>
+      )
+    }
+  ],
   {
-    path: '/admin/dashboard',
-    element: (
-      <React.Suspense fallback={<div>Loading Admin Panel...</div>}>
-        <AdminDashboard />
-      </React.Suspense>
-    ),
+    basename: '/snehita-well-being'
   }
-]);
+);
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
+
 root.render(
   <Provider store={store}>
     <RouterProvider router={appRouter} />

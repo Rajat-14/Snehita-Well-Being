@@ -1,3 +1,4 @@
 # https://www.robotstxt.org/robotstxt.html
 User-agent: *
 Disallow:
+Sitemap: https://iitrpr.ac.in/snehita-well-being/sitemap.xml

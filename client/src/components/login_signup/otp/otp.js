@@ -64,7 +64,7 @@ const Otp = (props) => {
 
         toast.success("Registration successful");
         setTimeout(() => {
-          window.location.href = "/"; // Redirect to home page
+          window.location.href = "/snehita-well-being"; // Redirect to home page
         }, 1500);
       } catch (error) {
         const errorMsg = error.response?.data?.error || error.response?.data?.message || "Failed to verify. Please try again.";

@@ -69,9 +69,9 @@ const Login = () => {
 
       setTimeout(() => {
         if (response.data.user.role === 'admin') {
-            window.location.href = "/admin/dashboard";
+            window.location.href = "/snehita-well-being/admin/dashboard";
         } else {
-            window.location.href = "/";
+            window.location.href = "/snehita-well-being";
         }
       }, 1500);
     } catch (error) {

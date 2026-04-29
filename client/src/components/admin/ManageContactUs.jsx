@@ -286,7 +286,7 @@ const emptyForm = { name: '', designation: '', type: initialType, email: '', tel
             <option value="Senior Counsellor">Senior Counsellor</option>
             <option value="Dean">Dean</option>
             <option value="Faculty Advisor">Faculty Advisor</option>
-            <option value="Director">Director</option>
+            
           </select>
         </div>
 
