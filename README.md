@@ -92,6 +92,9 @@ Snehita-Well-Being/
 
 ## 🚀 Setup Instructions
 
+OS used - Linux , Windows , MAC OS (any will do)
+Software - Docker, Postgres 
+
 ### 1️⃣ Clone the Repository
 
 ```bash
