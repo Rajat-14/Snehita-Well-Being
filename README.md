@@ -52,7 +52,7 @@ The system focuses on:
 
 ## 🗂️ Project Structure
 
-```
+```bash
 Snehita-Well-Being/
 │
 ├── frontend/
@@ -105,7 +105,7 @@ cd Snehita-Well-Being
 
 Create a `.env` file inside the backend directory:
 
-```
+```env
 PORT=5000
 DATABASE_URL=your_postgres_connection_string
 MAIL=your_email_address
@@ -172,4 +172,131 @@ npm start
 
 ---
 
+## 🌐 Production Deployment
 
+The application is live and publicly accessible at:
+
+> **🔗 https://iitrpr.ac.in/snehita-well-being**
+
+Hosted on the **IIT Ropar institutional server**.
+
+---
+
+### 🏛️ Deployment Architecture
+
+```text
+                        Internet
+                           │
+                    ┌──────▼──────┐
+                    │    NGINX    │  (Port 80 / 443 — HTTPS)
+                    │ Web Server  │
+                    └──────┬──────┘
+                           │
+              ┌────────────┴────────────┐
+              │                         │
+     Static Files                Reverse Proxy
+  (React Build /dist)         (API requests → /api/*)
+              │                         │
+     Served directly            ┌───────▼───────┐
+                                │  Node.js API  │
+                                │  (Express.js) │
+                                │  via PM2      │
+                                └───────┬───────┘
+                                        │
+                                ┌───────▼───────┐
+                                │  PostgreSQL   │
+                                │   Database    │
+                                └───────┬───────┘
+```
+
+---
+
+### ⚙️ Services & Process Management
+
+| Service | Technology | Manager |
+|---|---|---|
+| Frontend (static files) | React (production build) | Nginx |
+| Backend API | Node.js / Express.js | PM2 |
+| Reverse Proxy | Nginx | systemd |
+| Database | PostgreSQL | systemd |
+
+#### Nginx
+
+- Serves the React production build (`client/build/`) as static files
+- Proxies all `/api/*` requests to the Node.js backend
+- Handles HTTPS termination
+
+#### PM2
+
+- Keeps the Node.js backend running persistently across server reboots
+- Automatically restarts the process on crashes
+
+---
+
+### 🛠️ Common Maintenance Commands
+
+#### PM2 — Backend Process
+
+```bash
+# View running processes
+pm2 list
+
+# Restart the backend
+pm2 restart snehita-backend
+
+# View live logs
+pm2 logs snehita-backend
+
+# Stop the backend
+pm2 stop snehita-backend
+
+# Save process list to survive reboots
+pm2 save
+```
+
+#### Nginx
+
+```bash
+# Test configuration syntax
+sudo nginx -t
+
+# Reload configuration (no downtime)
+sudo systemctl reload nginx
+
+# Restart Nginx
+sudo systemctl restart nginx
+
+# View Nginx error logs
+sudo tail -f /var/log/nginx/error.log
+```
+
+#### Deploying Updates
+
+```bash
+# 1. Pull latest changes
+git pull origin main
+
+# 2. Install backend dependencies (if changed)
+cd server && npm install
+
+# 3. Rebuild frontend
+cd ../client && npm install && npm run build
+
+# 4. Restart backend
+pm2 restart snehita-backend
+```
+
+---
+
+### 🔍 Search Engine Optimization (SEO)
+
+The application has been optimized for search engine discoverability:
+
+- Proper `<title>` tags and meta descriptions on all pages
+- Semantic HTML structure with correct heading hierarchy (`h1` → `h2` → `h3`)
+- Open Graph and relevant meta tags for social sharing
+- Canonical URLs configured
+
+✅ The website appears in Google search results for **"Snehita Well Being IIT Ropar"**.
+
+---
